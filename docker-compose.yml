@@ -1,0 +1,35 @@
+version: '3.7'
+
+volumes:
+  logs:
+    driver: local
+
+services:
+  application:
+    build: ./
+    ports:
+      - 8080:8080
+
+  db:
+    image: mysql
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+    - 3306:3306
+
+  flyway:
+    image: flyway/flyway
+    environment:
+      - FLYWAY_USER=${DB_USER}
+      - FLYWAY_PASSWORD=${DB_PASSWORD}
+      - FLYWAY_URL=jdbc:mysql://db
+      - FLYWAY_SCHEMAS=${DB_NAME}
+    command: -connectRetries=60 migrate
+    volumes:
+      - ./application/src/main/resources/sql:/flyway/sql
+    depends_on:
+      - db
