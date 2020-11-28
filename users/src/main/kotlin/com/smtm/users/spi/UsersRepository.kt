@@ -6,4 +6,6 @@ import com.smtm.users.registration.UserProfile
 interface UsersRepository {
 
     fun register(email: String, password: Password): UserProfile
+
+    fun hasNoEmailAs(email: String): Boolean
 }

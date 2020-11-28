@@ -1,35 +1,36 @@
 package com.smtm.users.registration
 
 import org.assertj.core.api.AbstractAssert
+import org.assertj.core.api.Assertions.assertThat
 
 class UserProfileAssert(userProfile: UserProfile?) : AbstractAssert<UserProfileAssert, UserProfile>(userProfile, UserProfileAssert::class.java) {
 
     private val actualAsValid
         get() = actual as UserProfile.Valid
 
-    fun hasId(id: Long): UserProfileAssert {
-        isValid()
-
-        if (actualAsValid.id != id) {
-            failWithMessage("Expected id to be <%s>, but was <%s>", id, actualAsValid.id)
-        }
-
-        return myself
-    }
+    private val actualAsInvalid
+        get() = actual as UserProfile.Invalid
 
     fun hasEmail(email: String): UserProfileAssert {
         isValid()
-
-        if (actualAsValid.email != email) {
-            failWithMessage("Expected email to be <%s>, but was <%s>", email, actualAsValid.email)
-        }
-
+        assertThat(actualAsValid.email).isEqualTo(email)
         return myself
     }
 
-    fun isValid(): UserProfileAssert {
+    fun hasConstraintViolation(key: String, violation: Violation) {
+        isInvalid()
+        assertThat(actualAsInvalid.violations).containsEntry(key, violation)
+    }
+
+    private fun isValid(): UserProfileAssert {
         isNotNull
         isInstanceOf(UserProfile.Valid::class.java)
+        return myself
+    }
+
+    private fun isInvalid(): UserProfileAssert {
+        isNotNull
+        isInstanceOf(UserProfile.Invalid::class.java)
         return myself
     }
 }

@@ -21,8 +21,12 @@ class UserRegistrationImplStepdefs(private val world: World) {
 
     @Then("user {string} is registered")
     fun `user arg1 is registered`(email: String) {
-        assertThat(userProfile)
-                .hasEmail(email)
+        assertThat(userProfile).hasEmail(email)
+    }
+
+    @Then("the uniqueness of the email address has been violated")
+    fun `the uniqueness of the email address has been violated`() {
+        assertThat(userProfile).hasConstraintViolation("email", Violation.NonUnique)
     }
 
     @ParameterType(".*")

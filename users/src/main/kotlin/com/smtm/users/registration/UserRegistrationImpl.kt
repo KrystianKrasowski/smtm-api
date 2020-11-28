@@ -10,7 +10,13 @@ internal class UserRegistrationImpl(
 ) : UserRegistration {
 
     override fun register(email: String, password: UnsecuredPassword): UserProfile {
-        return usersRepository.register(email, password.encrypt(passwordEncryption))
+        if (usersRepository.hasNoEmailAs(email)) {
+            return usersRepository.register(email, password.encrypt(passwordEncryption))
+        } else {
+            return invalidUserProfileOf(mapOf(
+                    "email" to Violation.NonUnique
+            ))
+        }
     }
 }
 
