@@ -1,25 +1,30 @@
 package com.smtm.application.validation.v1;
 
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 import com.smtm.users.registration.UserProfile;
 
 public class ConstraintViolationsDto {
 
-    private final Map<String, String> violations;
+    private final List<ConstraintViolationDto> violations;
 
     public static ConstraintViolationsDto of(UserProfile.Invalid invalidUserProfile) {
-        return of(invalidUserProfile.getViolations());
+        List<ConstraintViolationDto> violations = invalidUserProfile.getViolations()
+            .stream()
+            .map(violation -> ConstraintViolationDto.of(violation.getKey(), violation.getViolation()))
+            .collect(Collectors.toList());
+        return of(violations);
     }
 
-    public static ConstraintViolationsDto of(Map<String, String> violations) {
+    public static ConstraintViolationsDto of(List<ConstraintViolationDto> violations) {
         return new ConstraintViolationsDto(violations);
     }
 
-    private ConstraintViolationsDto(Map<String, String> violations) {
+    private ConstraintViolationsDto(List<ConstraintViolationDto> violations) {
         this.violations = violations;
     }
 
-    public Map<String, String> getViolations() {
+    public List<ConstraintViolationDto> getViolations() {
         return violations;
     }
 

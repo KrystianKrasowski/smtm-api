@@ -9,6 +9,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeType;
+import com.smtm.application.validation.v1.ConstraintViolationDto;
 import com.smtm.application.validation.v1.ConstraintViolationsDto;
 
 @SuppressWarnings("unchecked")
@@ -64,10 +65,10 @@ public class ResponseEntityAssert<T> extends AbstractAssert<ResponseEntityAssert
         return myself;
     }
 
-    public ResponseEntityAssert<T> hasConstraintViolation(String key, String violationMessage) {
+    public ResponseEntityAssert<T> hasConstraintViolation(String property, String message) {
         isNotNull();
         ConstraintViolationsDto violationsDto = extractConstraintViolations();
-        Assertions.assertThat(violationsDto.getViolations()).containsEntry(key, violationMessage);
+        Assertions.assertThat(violationsDto.getViolations()).contains(ConstraintViolationDto.of(property, message));
         return myself;
     }
 

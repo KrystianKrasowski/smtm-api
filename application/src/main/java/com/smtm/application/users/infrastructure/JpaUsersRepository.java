@@ -12,4 +12,9 @@ public class JpaUsersRepository implements UsersRepository {
     public UserProfile register(@NotNull String email, @NotNull Password password) {
         throw new IllegalStateException("Not implemented yet");
     }
+
+    @Override
+    public boolean isRegistered(@NotNull String email) {
+        throw new IllegalStateException("Not implemented yet");
+    }
 }

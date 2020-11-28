@@ -18,3 +18,14 @@ Feature: User registration
   Scenario: User already exists
     When user registers as "john.doe@smtm.com" with password "S3cr3t!"
     Then the uniqueness of the email address has been violated
+
+
+  Scenario Outline: User's password does not meet security policy
+    When user registers as "todd.smith@mail.com" with password "<password>"
+    Then the security policy of the password has been violated
+
+    Examples:
+      | password              |
+      | NoDigits!             |
+      | N0SpecialChars        |
+      | n0_upper_case_letters |

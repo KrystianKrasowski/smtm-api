@@ -10,7 +10,7 @@ class FakeUserRepository : UsersRepository {
 
     override fun register(email: String, password: Password): UserProfile = validUserProfileOf(generateId(), email)
 
-    override fun hasNoEmailAs(email: String): Boolean = !userList.any { it.email == email }
+    override fun isRegistered(email: String): Boolean = userList.any { it.email == email }
 
     fun addUsers(users: List<UserProfile.Valid>) {
         userList.addAll(users)

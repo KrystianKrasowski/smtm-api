@@ -29,6 +29,11 @@ class UserRegistrationImplStepdefs(private val world: World) {
         assertThat(userProfile).hasConstraintViolation("email", Violation.NonUnique)
     }
 
+    @Then("the security policy of the password has been violated")
+    fun `the security policy of the password has been violated`() {
+        assertThat(userProfile).hasConstraintViolation("password", Violation.TooWeak)
+    }
+
     @ParameterType(".*")
     fun unsecuredPassword(input: String) = unsecuredPasswordOf(input)
 }

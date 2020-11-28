@@ -7,5 +7,5 @@ interface UsersRepository {
 
     fun register(email: String, password: Password): UserProfile
 
-    fun hasNoEmailAs(email: String): Boolean
+    fun isRegistered(email: String): Boolean
 }

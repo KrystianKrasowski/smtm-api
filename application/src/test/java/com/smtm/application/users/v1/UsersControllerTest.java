@@ -1,11 +1,14 @@
 package com.smtm.application.users.v1;
 
 import static com.smtm.application.assertions.SmtmApplicationAssertions.assertThat;
-import java.util.HashMap;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import com.smtm.users.registration.ConstraintViolation;
+import com.smtm.users.registration.ConstraintViolationKt;
 import com.smtm.users.registration.UserProfileKt;
+import com.smtm.users.registration.Violation;
 
 class UsersControllerTest {
 
@@ -52,9 +55,9 @@ class UsersControllerTest {
     @Test
     void shouldReturnConstraintViolationsResource() {
         // given
-        HashMap<String, String> violations = new HashMap<>();
-        violations.put("email", "e-mail is already registered");
-        violations.put("password", "password does not meet the security policy");
+        ArrayList<ConstraintViolation> violations = new ArrayList<>();
+        violations.add(ConstraintViolationKt.constraintViolationOf("email", Violation.NonUnique));
+        violations.add(ConstraintViolationKt.constraintViolationOf("password", Violation.TooWeak));
         userRegistration.returns(UserProfileKt.invalidUserProfileOf(violations));
 
         // when
@@ -63,7 +66,7 @@ class UsersControllerTest {
         // then
         assertThat(response).hasHttpStatus(400);
         assertThat(response).hasContentType("application/smtm.constraint-violations.v1+json");
-        assertThat(response).hasConstraintViolation("email", "e-mail is already registered");
-        assertThat(response).hasConstraintViolation("password", "password does not meet the security policy");
+        assertThat(response).hasConstraintViolation("email", "value is not unique");
+        assertThat(response).hasConstraintViolation("password", "value is too weak");
     }
 }

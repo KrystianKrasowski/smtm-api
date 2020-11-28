@@ -19,7 +19,7 @@ class UserProfileAssert(userProfile: UserProfile?) : AbstractAssert<UserProfileA
 
     fun hasConstraintViolation(key: String, violation: Violation) {
         isInvalid()
-        assertThat(actualAsInvalid.violations).containsEntry(key, violation)
+        assertThat(actualAsInvalid.violations).contains(constraintViolationOf(key, violation))
     }
 
     private fun isValid(): UserProfileAssert {
