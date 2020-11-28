@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smtm.application.validation.v1.ConstraintViolationsDto;
 import com.smtm.application.validation.v1.ValidationMediaTypes;
 import com.smtm.users.api.UserRegistration;
+import com.smtm.users.registration.PasswordKt;
 import com.smtm.users.registration.UserProfile;
 
 @RestController
@@ -38,7 +39,7 @@ public class UsersController {
         produces = UserMediaTypes.USER_PROFILE_VALUE
     )
     public ResponseEntity<?> registerUser() {
-        UserProfile userProfile = userRegistration.register();
+        UserProfile userProfile = userRegistration.register("not-important@gmail.com", PasswordKt.unsecuredPasswordOf("secret"));
         return createResponse(userProfile);
     }
 

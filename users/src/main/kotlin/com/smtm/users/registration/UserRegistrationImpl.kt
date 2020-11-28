@@ -1,15 +1,17 @@
 package com.smtm.users.registration
 
 import com.smtm.users.api.UserRegistration
+import com.smtm.users.spi.PasswordEncryption
+import com.smtm.users.spi.UsersRepository
 
-internal class UserRegistrationImpl : UserRegistration {
+internal class UserRegistrationImpl(
+        private val usersRepository: UsersRepository,
+        private val passwordEncryption: PasswordEncryption
+) : UserRegistration {
 
-    override fun register(): UserProfile {
-        return invalidUserProfileOf(mapOf(
-                "email" to "e-mail is already registered",
-                "password" to "password does not meet security policy"
-        ))
+    override fun register(email: String, password: UnsecuredPassword): UserProfile {
+        return usersRepository.register(email, password.encrypt(passwordEncryption))
     }
 }
 
-fun userRegistrationOf(): UserRegistration = UserRegistrationImpl()
+fun userRegistrationOf(usersRepository: UsersRepository, passwordEncryption: PasswordEncryption): UserRegistration = UserRegistrationImpl(usersRepository, passwordEncryption)

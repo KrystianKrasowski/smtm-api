@@ -1,8 +1,9 @@
 package com.smtm.application.users.v1;
 
 import org.jetbrains.annotations.NotNull;
-import com.smtm.users.registration.UserProfile;
 import com.smtm.users.api.UserRegistration;
+import com.smtm.users.registration.UnsecuredPassword;
+import com.smtm.users.registration.UserProfile;
 import com.smtm.users.registration.UserProfileKt;
 
 public class FakeUserRegistration implements UserRegistration {
@@ -11,7 +12,7 @@ public class FakeUserRegistration implements UserRegistration {
 
     @NotNull
     @Override
-    public UserProfile register() {
+    public UserProfile register(@NotNull String email, @NotNull UnsecuredPassword password) {
         return userProfile;
     }
 

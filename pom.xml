@@ -12,6 +12,7 @@
 		<kotlin.version>1.4.20</kotlin.version>
 		<junit.version>5.7.0</junit.version>
 		<assertj.version>3.18.1</assertj.version>
+		<cucumber.version>6.8.1</cucumber.version>
 	</properties>
 
 	<modules>
@@ -72,9 +73,29 @@
 				<version>${junit.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.junit.vintage</groupId>
+				<artifactId>junit-vintage-engine</artifactId>
+				<version>${junit.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
 				<version>${assertj.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-java</artifactId>
+				<version>${cucumber.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-junit</artifactId>
+				<version>${cucumber.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-picocontainer</artifactId>
+				<version>${cucumber.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
