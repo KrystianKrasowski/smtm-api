@@ -11,7 +11,7 @@ class UserProfileAssert(userProfile: UserProfile?) : AbstractAssert<UserProfileA
     private val actualAsInvalid
         get() = actual as UserProfile.Invalid
 
-    fun hasEmail(email: String): UserProfileAssert {
+    fun hasEmail(email: EmailAddress): UserProfileAssert {
         isValid()
         assertThat(actualAsValid.email).isEqualTo(email)
         return myself

@@ -1,6 +1,7 @@
 package com.smtm.application.users.infrastructure;
 
 import org.jetbrains.annotations.NotNull;
+import com.smtm.users.registration.EmailAddress;
 import com.smtm.users.registration.Password;
 import com.smtm.users.registration.UserProfile;
 import com.smtm.users.spi.UsersRepository;
@@ -15,14 +16,14 @@ public class DbUsersRepositoryAdapter implements UsersRepository {
 
     @NotNull
     @Override
-    public UserProfile register(@NotNull String email, @NotNull Password password) {
+    public UserProfile register(@NotNull EmailAddress email, @NotNull Password password) {
         User user = User.of(email, password);
         usersRepositoryDb.save(user);
         return user.toUserProfile();
     }
 
     @Override
-    public boolean isRegistered(@NotNull String email) {
-        return usersRepositoryDb.findByEmail(email) != null;
+    public boolean isRegistered(@NotNull EmailAddress email) {
+        return usersRepositoryDb.findByEmail(email.toString()) != null;
     }
 }

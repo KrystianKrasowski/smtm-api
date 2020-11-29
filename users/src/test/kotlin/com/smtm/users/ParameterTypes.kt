@@ -9,6 +9,9 @@ class ParameterTypes {
 
     @ParameterType("(not enough special characters|not enough uppercase letters|not enough digits|not enough length)")
     fun passwordViolation(input: String) = ViolationsMap.valueOf(input).violation
+
+    @ParameterType(".*")
+    fun emailAddress(input: String) = emailAddressOf(input)
 }
 
 private enum class ViolationsMap(val violation: Violation) {

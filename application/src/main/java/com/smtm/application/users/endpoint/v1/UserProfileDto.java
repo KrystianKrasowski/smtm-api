@@ -8,7 +8,7 @@ public class UserProfileDto {
     private final String email;
 
     public static UserProfileDto of(UserProfile.Valid createdUser) {
-        return of(createdUser.getId(), createdUser.getEmail());
+        return of(createdUser.getId(), createdUser.getEmail().toString());
     }
 
     public static UserProfileDto of(long id, String email) {

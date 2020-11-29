@@ -20,6 +20,10 @@ Feature: User registration
     Then the uniqueness of the email address has been violated
 
 
+  Scenario: User's email is invalid
+    When user registers as "not-an-email" with password "S3cr3t!@#"
+    Then email is not valid
+
   Scenario: User's password does not meet security policy
     When user registers as "todd.smith@mail.com" with password "admin1"
     Then the security policy of the password has been violated

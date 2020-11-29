@@ -13,13 +13,13 @@ class UserRegistrationImplStepdefs(private val world: World) {
 
     private var userProfile: UserProfile? = null
 
-    @When("user registers as {string} with password \"{unsecuredPassword}\"")
-    fun `user registers as arg1 with password arg2`(email: String, password: UnencryptedPassword) {
+    @When("user registers as \"{emailAddress}\" with password \"{unsecuredPassword}\"")
+    fun `user registers as arg1 with password arg2`(email: EmailAddress, password: UnencryptedPassword) {
         userProfile = userRegistration.register(email, password)
     }
 
-    @Then("user {string} is registered")
-    fun `user arg1 is registered`(email: String) {
+    @Then("user \"{emailAddress}\" is registered")
+    fun `user arg1 is registered`(email: EmailAddress) {
         assertThat(userProfile).hasEmail(email)
     }
 
@@ -31,5 +31,10 @@ class UserRegistrationImplStepdefs(private val world: World) {
     @Then("the security policy of the password has been violated")
     fun `the security policy of the password has been violated`() {
         assertThat(userProfile).hasAnyConstraintViolationFor("password")
+    }
+
+    @Then("email is not valid")
+    fun `email is not valid`() {
+        assertThat(userProfile).hasConstraintViolation("email", Violation.NotAnEmailAddress)
     }
 }

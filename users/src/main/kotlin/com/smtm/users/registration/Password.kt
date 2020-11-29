@@ -7,7 +7,7 @@ data class UnencryptedPassword internal constructor(private val value: String) {
 
     fun encrypt(passwordEncryption: PasswordEncryption): Password = passwordEncryption.encrypt(value)
 
-    fun getViolations(policy: PasswordPolicy) = policy.validate(this)
+    fun getViolations(policy: PasswordPolicy): Collection<Violation> = policy.validate(this)
 
     override fun toString() = value
 }

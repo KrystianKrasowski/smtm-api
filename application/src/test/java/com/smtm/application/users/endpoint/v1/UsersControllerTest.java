@@ -1,6 +1,7 @@
 package com.smtm.application.users.endpoint.v1;
 
 import static com.smtm.users.registration.ConstraintViolationKt.constraintViolationOf;
+import static com.smtm.users.registration.EmailAddressKt.*;
 import static com.smtm.users.registration.PasswordKt.unencryptedPasswordOf;
 import static com.smtm.users.registration.UserProfileKt.invalidUserProfileOf;
 import static com.smtm.users.registration.UserProfileKt.validUserProfileOf;
@@ -19,8 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import com.smtm.users.api.UserRegistration;
-import com.smtm.users.registration.ConstraintViolation;
-import com.smtm.users.registration.Violation;
+import com.smtm.users.registration.*;
 
 @WebMvcTest(UsersController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -35,7 +35,9 @@ class UsersControllerTest {
     @Test
     void shouldReturnUserProfile() throws Exception {
         // given
-        when(userRegistration.register("john.doe@gmail.com", unencryptedPasswordOf("S3cr3t!"))).thenReturn(validUserProfileOf(1, "john.doe@gmail.com"));
+        EmailAddress email = emailAddressOf("john.doe@gmail.com");
+        UnencryptedPassword password = unencryptedPasswordOf("S3cr3t!");
+        when(userRegistration.register(email, password)).thenReturn(validUserProfileOf(1, email));
 
         // when
         ResultActions result = mockMvc.perform(post("/users")
@@ -58,7 +60,9 @@ class UsersControllerTest {
         ArrayList<ConstraintViolation> constraintViolations = new ArrayList<>();
         constraintViolations.add(constraintViolationOf("email", Violation.NonUnique));
         constraintViolations.add(constraintViolationOf("password", Violation.TooWeak));
-        when(userRegistration.register("john.doe@gmail.com", unencryptedPasswordOf("S3cr3t!"))).thenReturn(invalidUserProfileOf(constraintViolations));
+        EmailAddress email = emailAddressOf("john.doe@gmail.com");
+        UnencryptedPassword password = unencryptedPasswordOf("S3cr3t!");
+        when(userRegistration.register(email, password)).thenReturn(invalidUserProfileOf(constraintViolations));
 
         // when
         ResultActions result = mockMvc.perform(post("/users")

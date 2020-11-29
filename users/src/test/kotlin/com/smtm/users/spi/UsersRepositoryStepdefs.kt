@@ -2,6 +2,7 @@ package com.smtm.users.spi
 
 import com.smtm.users.World
 import com.smtm.users.registration.UserProfile
+import com.smtm.users.registration.emailAddressOf
 import com.smtm.users.registration.validUserProfileOf
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.DataTableType
@@ -15,5 +16,5 @@ class UsersRepositoryStepdefs(private val world: World) {
     }
 
     @DataTableType
-    fun userProfileEntry(entry: Map<String, String>) = validUserProfileOf(entry.getValue("id").toLong(), entry.getValue("email"))
+    fun userProfileEntry(entry: Map<String, String>) = validUserProfileOf(entry.getValue("id").toLong(), emailAddressOf(entry.getValue("email")))
 }

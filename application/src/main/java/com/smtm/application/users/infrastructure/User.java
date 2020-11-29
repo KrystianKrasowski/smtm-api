@@ -1,9 +1,7 @@
 package com.smtm.application.users.infrastructure;
 
 import javax.persistence.*;
-import com.smtm.users.registration.Password;
-import com.smtm.users.registration.UserProfile;
-import com.smtm.users.registration.UserProfileKt;
+import com.smtm.users.registration.*;
 
 @Entity
 @Table(name = "users")
@@ -19,9 +17,9 @@ public class User {
     @Column
     private String password;
 
-    public static User of(String email, Password password) {
+    public static User of(EmailAddress email, Password password) {
         User user = new User();
-        user.setEmail(email);
+        user.setEmail(email.toString());
         user.setPassword(password.getValue());
         return user;
     }
@@ -51,6 +49,6 @@ public class User {
     }
 
     public UserProfile toUserProfile() {
-        return UserProfileKt.validUserProfileOf(id, email);
+        return UserProfileKt.validUserProfileOf(id, EmailAddressKt.emailAddressOf(email));
     }
 }

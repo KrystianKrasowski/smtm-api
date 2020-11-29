@@ -1,5 +1,6 @@
 package com.smtm.users.spi
 
+import com.smtm.users.registration.EmailAddress
 import com.smtm.users.registration.Password
 import com.smtm.users.registration.UserProfile
 import com.smtm.users.registration.validUserProfileOf
@@ -8,9 +9,9 @@ class FakeUserRepository : UsersRepository {
 
     private val userList = mutableListOf<UserProfile.Valid>()
 
-    override fun register(email: String, password: Password): UserProfile = validUserProfileOf(generateId(), email)
+    override fun register(email: EmailAddress, password: Password): UserProfile = validUserProfileOf(generateId(), email)
 
-    override fun isRegistered(email: String): Boolean = userList.any { it.email == email }
+    override fun isRegistered(email: EmailAddress): Boolean = userList.any { it.email == email }
 
     fun addUsers(users: List<UserProfile.Valid>) {
         userList.addAll(users)

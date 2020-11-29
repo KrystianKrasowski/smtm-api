@@ -10,7 +10,7 @@ internal class UserRegistrationImpl(
         private val passwordEncryption: PasswordEncryption
 ) : UserRegistration {
 
-    override fun register(email: String, password: UnencryptedPassword): UserProfile = newUserValidator.findViolations(email, password)
+    override fun register(email: EmailAddress, password: UnencryptedPassword): UserProfile = newUserValidator.findViolations(email, password)
             .takeUnless { it.isEmpty() }
             ?.let { invalidUserProfileOf(it) }
             ?: usersRepository.register(email, password.encrypt(passwordEncryption))

@@ -34,7 +34,7 @@ public class UsersController {
         }
     )
     public ResponseEntity<?> registerUser(@RequestBody NewUserDto user) {
-        return Optional.of(userRegistration.register(user.getEmail(), user.getPasswordAsUnsecured()))
+        return Optional.of(userRegistration.register(user.getEmail(), user.getPassword()))
             .map(UserRegistrationResponseFactory::getFactoryFor)
             .map(UserRegistrationResponseFactory::create)
             .orElseThrow(() -> new IllegalStateException("Cannot register user"));

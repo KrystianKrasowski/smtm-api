@@ -8,7 +8,8 @@ enum class Violation {
     NotEnoughSpecialChars,
     NotEnoughUppercaseLetters,
     NotEnoughDigits,
-    NotEnoughLength
+    NotEnoughLength,
+    NotAnEmailAddress
 }
 
 fun constraintViolationOf(key: String, violation: Violation) = ConstraintViolation(key, violation)
