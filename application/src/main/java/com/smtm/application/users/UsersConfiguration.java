@@ -2,9 +2,9 @@ package com.smtm.application.users;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.smtm.application.users.infrastructure.BCryptPasswordEncryption;
-import com.smtm.application.users.infrastructure.UsersRepositoryAdapter;
-import com.smtm.application.users.infrastructure.UsersRepositoryDb;
+import com.smtm.application.users.infrastructure.BCryptPasswordEncryptionAdapter;
+import com.smtm.application.users.infrastructure.DbUsersRepositoryAdapter;
+import com.smtm.application.users.infrastructure.DbUsersRepository;
 import com.smtm.users.api.UserRegistration;
 import com.smtm.users.registration.UserRegistrationImplKt;
 import com.smtm.users.spi.PasswordEncryption;
@@ -14,13 +14,13 @@ import com.smtm.users.spi.UsersRepository;
 public class UsersConfiguration {
 
     @Bean
-    public UsersRepository usersRepository(UsersRepositoryDb usersRepositoryDb) {
-        return new UsersRepositoryAdapter(usersRepositoryDb);
+    public UsersRepository usersRepository(DbUsersRepository usersRepositoryDb) {
+        return new DbUsersRepositoryAdapter(usersRepositoryDb);
     }
 
     @Bean
     public PasswordEncryption passwordEncryption() {
-        return new BCryptPasswordEncryption();
+        return new BCryptPasswordEncryptionAdapter();
     }
 
     @Bean

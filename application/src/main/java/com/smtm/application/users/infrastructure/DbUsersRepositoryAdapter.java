@@ -5,11 +5,11 @@ import com.smtm.users.registration.Password;
 import com.smtm.users.registration.UserProfile;
 import com.smtm.users.spi.UsersRepository;
 
-public class UsersRepositoryAdapter implements UsersRepository {
+public class DbUsersRepositoryAdapter implements UsersRepository {
 
-    private final UsersRepositoryDb usersRepositoryDb;
+    private final DbUsersRepository usersRepositoryDb;
 
-    public UsersRepositoryAdapter(UsersRepositoryDb usersRepositoryDb) {
+    public DbUsersRepositoryAdapter(DbUsersRepository usersRepositoryDb) {
         this.usersRepositoryDb = usersRepositoryDb;
     }
 
