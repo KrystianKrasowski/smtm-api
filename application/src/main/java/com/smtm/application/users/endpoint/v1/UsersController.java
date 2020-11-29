@@ -36,7 +36,10 @@ public class UsersController {
     @PostMapping(
         value = "/users",
         consumes = UserMediaTypes.NEW_USER_VALUE,
-        produces = UserMediaTypes.USER_PROFILE_VALUE
+        produces = {
+            UserMediaTypes.USER_PROFILE_VALUE,
+            ValidationMediaTypes.CONSTRAINT_VIOLATION_VALUE
+        }
     )
     public ResponseEntity<?> registerUser() {
         UserProfile userProfile = userRegistration.register("not-important@gmail.com", PasswordKt.unsecuredPasswordOf("secret"));
