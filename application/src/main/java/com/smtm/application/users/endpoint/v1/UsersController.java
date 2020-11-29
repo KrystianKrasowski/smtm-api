@@ -5,14 +5,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.smtm.application.validation.v1.ConstraintViolationsDto;
 import com.smtm.application.validation.v1.ValidationMediaTypes;
 import com.smtm.users.api.UserRegistration;
-import com.smtm.users.registration.PasswordKt;
 import com.smtm.users.registration.UserProfile;
 
 @RestController
@@ -41,8 +37,8 @@ public class UsersController {
             ValidationMediaTypes.CONSTRAINT_VIOLATION_VALUE
         }
     )
-    public ResponseEntity<?> registerUser() {
-        UserProfile userProfile = userRegistration.register("not-important@gmail.com", PasswordKt.unsecuredPasswordOf("secret"));
+    public ResponseEntity<?> registerUser(@RequestBody NewUserDto user) {
+        UserProfile userProfile = userRegistration.register(user.getEmail(), user.getPasswordAsUnsecured());
         return createResponse(userProfile);
     }
 

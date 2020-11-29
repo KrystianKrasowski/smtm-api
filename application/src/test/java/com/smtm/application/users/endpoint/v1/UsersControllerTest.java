@@ -1,10 +1,10 @@
 package com.smtm.application.users.endpoint.v1;
 
 import static com.smtm.users.registration.ConstraintViolationKt.constraintViolationOf;
+import static com.smtm.users.registration.PasswordKt.unsecuredPasswordOf;
 import static com.smtm.users.registration.UserProfileKt.invalidUserProfileOf;
 import static com.smtm.users.registration.UserProfileKt.validUserProfileOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -35,12 +35,13 @@ class UsersControllerTest {
     @Test
     void shouldReturnUserProfile() throws Exception {
         // given
-        when(userRegistration.register(any(), any())).thenReturn(validUserProfileOf(1, "john.doe@gmail.com"));
+        when(userRegistration.register("john.doe@gmail.com", unsecuredPasswordOf("S3cr3t!"))).thenReturn(validUserProfileOf(1, "john.doe@gmail.com"));
 
         // when
         ResultActions result = mockMvc.perform(post("/users")
             .contentType("application/smtm.new-user.v1+json")
-            .accept("application/smtm.user-profile.v1+json"));
+            .accept("application/smtm.user-profile.v1+json")
+            .content("{ \"email\": \"john.doe@gmail.com\", \"password\": \"S3cr3t!\" }"));
 
         // then
         result.andExpect(status().isCreated())
@@ -57,12 +58,13 @@ class UsersControllerTest {
         ArrayList<ConstraintViolation> constraintViolations = new ArrayList<>();
         constraintViolations.add(constraintViolationOf("email", Violation.NonUnique));
         constraintViolations.add(constraintViolationOf("password", Violation.TooWeak));
-        when(userRegistration.register(any(), any())).thenReturn(invalidUserProfileOf(constraintViolations));
+        when(userRegistration.register("john.doe@gmail.com", unsecuredPasswordOf("S3cr3t!"))).thenReturn(invalidUserProfileOf(constraintViolations));
 
         // when
         ResultActions result = mockMvc.perform(post("/users")
             .contentType("application/smtm.new-user.v1+json")
-            .accept("application/smtm.user-profile.v1+json"));
+            .accept("application/smtm.user-profile.v1+json")
+            .content("{ \"email\": \"john.doe@gmail.com\", \"password\": \"S3cr3t!\" }"));
 
         // then
         result.andExpect(status().isBadRequest())
