@@ -3,7 +3,7 @@ package com.smtm.application.users.endpoint.v1;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smtm.users.registration.PasswordKt;
-import com.smtm.users.registration.UnsecuredPassword;
+import com.smtm.users.registration.UnencryptedPassword;
 
 public class NewUserDto {
 
@@ -28,7 +28,7 @@ public class NewUserDto {
         return password;
     }
 
-    public UnsecuredPassword getPasswordAsUnsecured() {
-        return PasswordKt.unsecuredPasswordOf(password);
+    public UnencryptedPassword getPasswordAsUnsecured() {
+        return PasswordKt.unencryptedPasswordOf(password);
     }
 }

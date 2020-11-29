@@ -3,7 +3,6 @@ package com.smtm.users.registration
 import com.smtm.users.World
 import com.smtm.users.api.UserRegistration
 import com.smtm.users.assertThat
-import io.cucumber.java.ParameterType
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 
@@ -15,7 +14,7 @@ class UserRegistrationImplStepdefs(private val world: World) {
     private var userProfile: UserProfile? = null
 
     @When("user registers as {string} with password \"{unsecuredPassword}\"")
-    fun `user registers as arg1 with password arg2`(email: String, password: UnsecuredPassword) {
+    fun `user registers as arg1 with password arg2`(email: String, password: UnencryptedPassword) {
         userProfile = userRegistration.register(email, password)
     }
 
@@ -31,9 +30,6 @@ class UserRegistrationImplStepdefs(private val world: World) {
 
     @Then("the security policy of the password has been violated")
     fun `the security policy of the password has been violated`() {
-        assertThat(userProfile).hasConstraintViolation("password", Violation.TooWeak)
+        assertThat(userProfile).hasAnyConstraintViolationFor("password")
     }
-
-    @ParameterType(".*")
-    fun unsecuredPassword(input: String) = unsecuredPasswordOf(input)
 }

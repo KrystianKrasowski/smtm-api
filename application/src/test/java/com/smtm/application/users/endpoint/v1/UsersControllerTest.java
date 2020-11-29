@@ -1,7 +1,7 @@
 package com.smtm.application.users.endpoint.v1;
 
 import static com.smtm.users.registration.ConstraintViolationKt.constraintViolationOf;
-import static com.smtm.users.registration.PasswordKt.unsecuredPasswordOf;
+import static com.smtm.users.registration.PasswordKt.unencryptedPasswordOf;
 import static com.smtm.users.registration.UserProfileKt.invalidUserProfileOf;
 import static com.smtm.users.registration.UserProfileKt.validUserProfileOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -35,7 +35,7 @@ class UsersControllerTest {
     @Test
     void shouldReturnUserProfile() throws Exception {
         // given
-        when(userRegistration.register("john.doe@gmail.com", unsecuredPasswordOf("S3cr3t!"))).thenReturn(validUserProfileOf(1, "john.doe@gmail.com"));
+        when(userRegistration.register("john.doe@gmail.com", unencryptedPasswordOf("S3cr3t!"))).thenReturn(validUserProfileOf(1, "john.doe@gmail.com"));
 
         // when
         ResultActions result = mockMvc.perform(post("/users")
@@ -58,7 +58,7 @@ class UsersControllerTest {
         ArrayList<ConstraintViolation> constraintViolations = new ArrayList<>();
         constraintViolations.add(constraintViolationOf("email", Violation.NonUnique));
         constraintViolations.add(constraintViolationOf("password", Violation.TooWeak));
-        when(userRegistration.register("john.doe@gmail.com", unsecuredPasswordOf("S3cr3t!"))).thenReturn(invalidUserProfileOf(constraintViolations));
+        when(userRegistration.register("john.doe@gmail.com", unencryptedPasswordOf("S3cr3t!"))).thenReturn(invalidUserProfileOf(constraintViolations));
 
         // when
         ResultActions result = mockMvc.perform(post("/users")

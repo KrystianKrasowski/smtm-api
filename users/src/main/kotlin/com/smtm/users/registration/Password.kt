@@ -1,28 +1,19 @@
 package com.smtm.users.registration
 
+import com.smtm.users.password.policy.PasswordPolicy
 import com.smtm.users.spi.PasswordEncryption
 
-data class UnsecuredPassword(private val value: String) {
+data class UnencryptedPassword internal constructor(private val value: String) {
 
     fun encrypt(passwordEncryption: PasswordEncryption): Password = passwordEncryption.encrypt(value)
 
-    fun isSecure() = hasAtLeastOneUppercaseLetter() && hasAtLeastOneSpecialChar() && hasAtLeastOneDigit()
+    fun getViolations(policy: PasswordPolicy) = policy.validate(this)
 
-    private fun hasAtLeastOneUppercaseLetter() = "[A-Z]+"
-            .toRegex()
-            .containsMatchIn(value)
-
-    private fun hasAtLeastOneSpecialChar() = "[~!@#$%&*()_+=-]+"
-            .toRegex()
-            .containsMatchIn(value)
-
-    private fun hasAtLeastOneDigit() = "[0-9]+"
-            .toRegex()
-            .containsMatchIn(value)
+    override fun toString() = value
 }
 
 data class Password(val value: String)
 
-fun unsecuredPasswordOf(value: String) = UnsecuredPassword(value)
+fun unencryptedPasswordOf(value: String?) = UnencryptedPassword(value ?: "")
 
 fun passwordOf(value: String) = Password(value)

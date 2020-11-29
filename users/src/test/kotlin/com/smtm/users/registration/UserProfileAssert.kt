@@ -22,6 +22,11 @@ class UserProfileAssert(userProfile: UserProfile?) : AbstractAssert<UserProfileA
         assertThat(actualAsInvalid.violations).contains(constraintViolationOf(key, violation))
     }
 
+    fun hasAnyConstraintViolationFor(key: String) {
+        isInvalid()
+        assertThat(actualAsInvalid.violations.find { it.key == key }).isNotNull
+    }
+
     private fun isValid(): UserProfileAssert {
         isNotNull
         isInstanceOf(UserProfile.Valid::class.java)

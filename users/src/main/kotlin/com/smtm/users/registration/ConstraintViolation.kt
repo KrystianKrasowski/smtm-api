@@ -4,7 +4,11 @@ data class ConstraintViolation internal constructor(val key: String, val violati
 
 enum class Violation {
     NonUnique,
-    TooWeak
+    TooWeak,
+    NotEnoughSpecialChars,
+    NotEnoughUppercaseLetters,
+    NotEnoughDigits,
+    NotEnoughLength
 }
 
 fun constraintViolationOf(key: String, violation: Violation) = ConstraintViolation(key, violation)
