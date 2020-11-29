@@ -11,19 +11,22 @@ Feature: User registration
 
 
   Scenario: User registers successfully
+    Given password "S3cr3t!@#" encrypts to "[encrypted secure password]"
     When user registers as "todd.smith@mail.com" with password "S3cr3t!@#"
     Then user "todd.smith@mail.com" is registered
+    And password is encrypted to "[encrypted secure password]"
 
 
   Scenario: User already exists
     When user registers as "john.doe@smtm.com" with password "S3cr3t!@#"
-    Then the uniqueness of the email address has been violated
+    Then email is not unique
 
 
   Scenario: User's email is invalid
     When user registers as "not-an-email" with password "S3cr3t!@#"
     Then email is not valid
 
+
   Scenario: User's password does not meet security policy
     When user registers as "todd.smith@mail.com" with password "admin1"
-    Then the security policy of the password has been violated
+    Then password is not secure

@@ -5,6 +5,8 @@ import com.smtm.users.api.UserRegistration
 import com.smtm.users.assertThat
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.*
 
 class UserRegistrationImplStepdefs(private val world: World) {
 
@@ -21,15 +23,21 @@ class UserRegistrationImplStepdefs(private val world: World) {
     @Then("user \"{emailAddress}\" is registered")
     fun `user arg1 is registered`(email: EmailAddress) {
         assertThat(userProfile).hasEmail(email)
+        assertThat(world.userRepository.registeredEmail).isEqualTo(email)
     }
 
-    @Then("the uniqueness of the email address has been violated")
-    fun `the uniqueness of the email address has been violated`() {
+    @Then("password is encrypted to \"{password}\"")
+    fun `password is encrypted to`(password: Password) {
+        assertThat(world.userRepository.registeredPassword).isEqualTo(password)
+    }
+
+    @Then("email is not unique")
+    fun `email is not unique`() {
         assertThat(userProfile).hasConstraintViolation("email", Violation.NonUnique)
     }
 
-    @Then("the security policy of the password has been violated")
-    fun `the security policy of the password has been violated`() {
+    @Then("password is not secure")
+    fun `password is not secure`() {
         assertThat(userProfile).hasAnyConstraintViolationFor("password")
     }
 

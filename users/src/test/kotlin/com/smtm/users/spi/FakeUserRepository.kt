@@ -9,7 +9,15 @@ class FakeUserRepository : UsersRepository {
 
     private val userList = mutableListOf<UserProfile.Valid>()
 
-    override fun register(email: EmailAddress, password: Password): UserProfile = validUserProfileOf(generateId(), email)
+    lateinit var registeredEmail: EmailAddress
+
+    lateinit var registeredPassword: Password
+
+    override fun register(email: EmailAddress, password: Password): UserProfile {
+        registeredEmail = email
+        registeredPassword = password
+        return validUserProfileOf(generateId(), email)
+    }
 
     override fun isRegistered(email: EmailAddress): Boolean = userList.any { it.email == email }
 
