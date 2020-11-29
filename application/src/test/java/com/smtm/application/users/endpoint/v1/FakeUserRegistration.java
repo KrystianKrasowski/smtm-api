@@ -1,4 +1,4 @@
-package com.smtm.application.users.v1;
+package com.smtm.application.users.endpoint.v1;
 
 import org.jetbrains.annotations.NotNull;
 import com.smtm.users.api.UserRegistration;

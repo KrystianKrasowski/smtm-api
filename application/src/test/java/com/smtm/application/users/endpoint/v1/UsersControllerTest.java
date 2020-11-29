@@ -1,4 +1,4 @@
-package com.smtm.application.users.v1;
+package com.smtm.application.users.endpoint.v1;
 
 import static com.smtm.application.assertions.SmtmApplicationAssertions.assertThat;
 import java.util.ArrayList;
