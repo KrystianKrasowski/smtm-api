@@ -13,6 +13,7 @@
 		<junit.version>5.7.0</junit.version>
 		<assertj.version>3.18.1</assertj.version>
 		<cucumber.version>6.8.1</cucumber.version>
+		<mysql.version>8.0.22</mysql.version>
 	</properties>
 
 	<modules>
@@ -63,9 +64,19 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>${mysql.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.jetbrains.kotlin</groupId>
 				<artifactId>kotlin-stdlib</artifactId>
 				<version>${kotlin.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mindrot</groupId>
+				<artifactId>jbcrypt</artifactId>
+				<version>0.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>

@@ -59,7 +59,11 @@ class UsersControllerTest {
         // given
         ArrayList<ConstraintViolation> constraintViolations = new ArrayList<>();
         constraintViolations.add(constraintViolationOf("email", Violation.NonUnique));
-        constraintViolations.add(constraintViolationOf("password", Violation.TooWeak));
+        constraintViolations.add(constraintViolationOf("email", Violation.NotAnEmailAddress));
+        constraintViolations.add(constraintViolationOf("password", Violation.NotEnoughDigits));
+        constraintViolations.add(constraintViolationOf("password", Violation.NotEnoughLength));
+        constraintViolations.add(constraintViolationOf("password", Violation.NotEnoughSpecialChars));
+        constraintViolations.add(constraintViolationOf("password", Violation.NotEnoughUppercaseLetters));
         EmailAddress email = emailAddressOf("john.doe@gmail.com");
         UnencryptedPassword password = unencryptedPasswordOf("S3cr3t!");
         when(userRegistration.register(email, password)).thenReturn(invalidUserProfileOf(constraintViolations));
@@ -75,7 +79,15 @@ class UsersControllerTest {
             .andExpect(content().contentType("application/smtm.constraint-violations.v1+json"))
             .andExpect(jsonPath("$.violations[0].property", is("email")))
             .andExpect(jsonPath("$.violations[0].violationMessage", is("value is not unique")))
-            .andExpect(jsonPath("$.violations[1].property", is("password")))
-            .andExpect(jsonPath("$.violations[1].violationMessage", is("value is too weak")));
+            .andExpect(jsonPath("$.violations[1].property", is("email")))
+            .andExpect(jsonPath("$.violations[1].violationMessage", is("value is not an email address")))
+            .andExpect(jsonPath("$.violations[2].property", is("password")))
+            .andExpect(jsonPath("$.violations[2].violationMessage", is("not enough digits")))
+            .andExpect(jsonPath("$.violations[3].property", is("password")))
+            .andExpect(jsonPath("$.violations[3].violationMessage", is("not enough length")))
+            .andExpect(jsonPath("$.violations[4].property", is("password")))
+            .andExpect(jsonPath("$.violations[4].violationMessage", is("not enough special chars")))
+            .andExpect(jsonPath("$.violations[5].property", is("password")))
+            .andExpect(jsonPath("$.violations[5].violationMessage", is("not enough uppercase letters")));
     }
 }

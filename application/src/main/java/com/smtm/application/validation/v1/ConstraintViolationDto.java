@@ -10,7 +10,11 @@ public class ConstraintViolationDto {
 
     static {
         DICTIONARY.put(Violation.NonUnique, "value is not unique");
-        DICTIONARY.put(Violation.TooWeak, "value is too weak");
+        DICTIONARY.put(Violation.NotAnEmailAddress, "value is not an email address");
+        DICTIONARY.put(Violation.NotEnoughDigits, "not enough digits");
+        DICTIONARY.put(Violation.NotEnoughLength, "not enough length");
+        DICTIONARY.put(Violation.NotEnoughSpecialChars, "not enough special chars");
+        DICTIONARY.put(Violation.NotEnoughUppercaseLetters, "not enough uppercase letters");
     }
 
     private final String property;
