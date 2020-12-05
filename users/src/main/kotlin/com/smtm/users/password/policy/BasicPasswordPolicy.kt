@@ -9,7 +9,7 @@ internal const val PasswordMinLength = 8
 class BasicPasswordPolicy(private val specialCharacters: String, private val minimumLength: Int) : PasswordPolicy {
 
     override fun validate(password: UnencryptedPassword): Collection<Violation> {
-        return setOfNotNull(
+        return listOfNotNull(
                 hasNoSpecialCharacter(password.toString()),
                 hasNoUppercaseLetter(password.toString()),
                 hasNoDigit(password.toString()),
