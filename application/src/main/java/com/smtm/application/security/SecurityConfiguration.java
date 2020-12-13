@@ -1,5 +1,7 @@
 package com.smtm.application.security;
 
+import java.time.Clock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -65,7 +67,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public TokenGenerator tokenGenerator() {
-        return TokenGeneratorImplKt.tokenGeneratorOf();
+    public TokenGenerator tokenGenerator(@Value("${smtm.security.jwt.secret}") String secret,
+                                         @Value("${smtm.security.jwt.validity}") Integer validityTime,
+                                         Clock clock) {
+        return TokenGeneratorImplKt.tokenGeneratorOf(secret, validityTime, clock);
     }
 }
