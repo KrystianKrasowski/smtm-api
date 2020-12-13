@@ -1,4 +1,4 @@
-package com.smtm.application.users.endpoint.v1;
+package com.smtm.application.security.users.v1;
 
 import java.util.Optional;
 import org.springframework.hateoas.EntityModel;
@@ -33,7 +33,7 @@ public class UsersController {
             ValidationMediaTypes.CONSTRAINT_VIOLATION_VALUE
         }
     )
-    public ResponseEntity<?> registerUser(@RequestBody NewUserDto user) {
+    public ResponseEntity<?> registerUser(@RequestBody CredentialsDto user) {
         return Optional.of(userRegistration.register(user.getEmail(), user.getPassword()))
             .map(UserRegistrationResponseFactory::getFactoryFor)
             .map(UserRegistrationResponseFactory::create)

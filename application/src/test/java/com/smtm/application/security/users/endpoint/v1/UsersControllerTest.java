@@ -1,4 +1,4 @@
-package com.smtm.application.users.endpoint.v1;
+package com.smtm.application.security.users.endpoint.v1;
 
 import static com.smtm.users.registration.ConstraintViolationKt.constraintViolationOf;
 import static com.smtm.users.registration.EmailAddressKt.*;
@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import com.smtm.application.security.users.v1.UsersController;
 import com.smtm.users.api.UserRegistration;
 import com.smtm.users.registration.*;
 

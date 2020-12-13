@@ -1,4 +1,4 @@
-package com.smtm.application.users.endpoint.v1;
+package com.smtm.application.security.users.v1;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;

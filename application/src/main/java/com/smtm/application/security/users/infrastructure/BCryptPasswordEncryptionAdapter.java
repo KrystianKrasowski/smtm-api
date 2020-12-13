@@ -1,4 +1,4 @@
-package com.smtm.application.users.infrastructure;
+package com.smtm.application.security.users.infrastructure;
 
 import org.jetbrains.annotations.NotNull;
 import org.mindrot.jbcrypt.BCrypt;

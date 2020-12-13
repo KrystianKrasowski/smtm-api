@@ -1,4 +1,4 @@
-package com.smtm.application.users.infrastructure;
+package com.smtm.application.security.users.infrastructure;
 
 import org.jetbrains.annotations.NotNull;
 import com.smtm.users.registration.EmailAddress;

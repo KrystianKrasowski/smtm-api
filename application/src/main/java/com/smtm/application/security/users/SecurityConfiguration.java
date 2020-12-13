@@ -1,17 +1,17 @@
-package com.smtm.application.users;
+package com.smtm.application.security.users;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.smtm.application.users.infrastructure.BCryptPasswordEncryptionAdapter;
-import com.smtm.application.users.infrastructure.DbUsersRepositoryAdapter;
-import com.smtm.application.users.infrastructure.DbUsersRepository;
+import com.smtm.application.security.users.infrastructure.BCryptPasswordEncryptionAdapter;
+import com.smtm.application.security.users.infrastructure.DbUsersRepositoryAdapter;
+import com.smtm.application.security.users.infrastructure.DbUsersRepository;
 import com.smtm.users.api.UserRegistration;
 import com.smtm.users.registration.UserRegistrationImplKt;
 import com.smtm.users.spi.PasswordEncryption;
 import com.smtm.users.spi.UsersRepository;
 
 @Configuration
-public class UsersConfiguration {
+public class SecurityConfiguration {
 
     @Bean
     public UsersRepository usersRepository(DbUsersRepository usersRepositoryDb) {

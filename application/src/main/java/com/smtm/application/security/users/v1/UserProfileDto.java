@@ -1,4 +1,4 @@
-package com.smtm.application.users.endpoint.v1;
+package com.smtm.application.security.users.v1;
 
 import com.smtm.users.registration.UserProfile;
 
