@@ -4,8 +4,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import com.smtm.application.SmtmMediaTypes;
 import com.smtm.application.validation.v1.ConstraintViolationsDto;
-import com.smtm.application.validation.v1.ValidationMediaTypes;
 import com.smtm.security.registration.UserProfile;
 
 abstract class UserRegistrationResponseFactory<T extends UserProfile> {
@@ -42,7 +42,7 @@ abstract class UserRegistrationResponseFactory<T extends UserProfile> {
             EntityModel<UserProfileDto> model = createUserProfileRepresentation(user);
             return ResponseEntity
                 .created(linkTo(methodOn(UsersController.class).getUser(user.getId())).toUri())
-                .contentType(UserMediaTypes.USER_PROFILE)
+                .contentType(SmtmMediaTypes.Security.V1.USER_PROFILE)
                 .body(model);
         }
 
@@ -63,7 +63,7 @@ abstract class UserRegistrationResponseFactory<T extends UserProfile> {
             ConstraintViolationsDto violationsDto = ConstraintViolationsDto.of(userProfile);
             return ResponseEntity
                 .badRequest()
-                .contentType(ValidationMediaTypes.CONSTRAINT_VIOLATION)
+                .contentType(SmtmMediaTypes.Validation.V1.CONSTRAINT_VIOLATION)
                 .body(violationsDto);
         }
     }

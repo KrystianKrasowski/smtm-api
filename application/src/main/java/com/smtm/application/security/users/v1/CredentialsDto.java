@@ -12,6 +12,10 @@ public class CredentialsDto {
     private final String email;
     private final String password;
 
+    public static CredentialsDto of(String email, String password) {
+        return new CredentialsDto(email, password);
+    }
+
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public CredentialsDto(@JsonProperty("email") String email, @JsonProperty("password") String password) {
         this.email = email;

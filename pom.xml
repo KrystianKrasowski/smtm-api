@@ -14,6 +14,7 @@
 		<assertj.version>3.18.1</assertj.version>
 		<cucumber.version>6.8.1</cucumber.version>
 		<mysql.version>8.0.22</mysql.version>
+		<mockito.version>1.10.19</mockito.version>
 	</properties>
 	<modules>
 		<module>application</module>
@@ -45,6 +46,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.0.0-M5</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -108,6 +114,11 @@
 				<groupId>io.cucumber</groupId>
 				<artifactId>cucumber-picocontainer</artifactId>
 				<version>${cucumber.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${mockito.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
