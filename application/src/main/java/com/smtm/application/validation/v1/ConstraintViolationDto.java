@@ -2,7 +2,7 @@ package com.smtm.application.validation.v1;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.smtm.users.registration.Violation;
+import com.smtm.security.registration.Violation;
 
 public class ConstraintViolationDto {
 

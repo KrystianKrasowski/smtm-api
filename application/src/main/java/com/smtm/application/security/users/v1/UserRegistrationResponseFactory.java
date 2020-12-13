@@ -6,7 +6,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import com.smtm.application.validation.v1.ConstraintViolationsDto;
 import com.smtm.application.validation.v1.ValidationMediaTypes;
-import com.smtm.users.registration.UserProfile;
+import com.smtm.security.registration.UserProfile;
 
 abstract class UserRegistrationResponseFactory<T extends UserProfile> {
 

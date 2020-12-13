@@ -5,7 +5,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.smtm.application.validation.v1.ValidationMediaTypes;
-import com.smtm.users.api.UserRegistration;
+import com.smtm.security.api.UserRegistration;
 
 @RestController
 public class UsersController {

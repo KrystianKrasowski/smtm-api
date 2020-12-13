@@ -2,24 +2,21 @@ package com.smtm.application.security.users;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.smtm.application.security.users.infrastructure.BCryptPasswordEncryptionAdapter;
 import com.smtm.application.security.users.infrastructure.DbUsersRepository;
 import com.smtm.application.security.users.infrastructure.DbUsersRepositoryAdapter;
-import com.smtm.users.api.UserRegistration;
-import com.smtm.users.registration.UserRegistrationImplKt;
-import com.smtm.users.spi.PasswordEncryption;
-import com.smtm.users.spi.UsersRepository;
+import com.smtm.security.api.UserRegistration;
+import com.smtm.security.registration.UserRegistrationImplKt;
+import com.smtm.security.spi.PasswordEncryption;
+import com.smtm.security.spi.UsersRepository;
 
 @Configuration
 @EnableWebSecurity

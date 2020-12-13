@@ -2,10 +2,10 @@ package com.smtm.application.security.users.v1;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.smtm.users.registration.EmailAddress;
-import com.smtm.users.registration.EmailAddressKt;
-import com.smtm.users.registration.PasswordKt;
-import com.smtm.users.registration.UnencryptedPassword;
+import com.smtm.security.registration.EmailAddress;
+import com.smtm.security.registration.EmailAddressKt;
+import com.smtm.security.registration.PasswordKt;
+import com.smtm.security.registration.UnencryptedPassword;
 
 public class CredentialsDto {
 

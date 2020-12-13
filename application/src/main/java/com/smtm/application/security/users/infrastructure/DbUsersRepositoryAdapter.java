@@ -1,10 +1,10 @@
 package com.smtm.application.security.users.infrastructure;
 
 import org.jetbrains.annotations.NotNull;
-import com.smtm.users.registration.EmailAddress;
-import com.smtm.users.registration.Password;
-import com.smtm.users.registration.UserProfile;
-import com.smtm.users.spi.UsersRepository;
+import com.smtm.security.registration.EmailAddress;
+import com.smtm.security.registration.Password;
+import com.smtm.security.registration.UserProfile;
+import com.smtm.security.spi.UsersRepository;
 
 public class DbUsersRepositoryAdapter implements UsersRepository {
 

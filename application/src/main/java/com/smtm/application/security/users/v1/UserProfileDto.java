@@ -1,6 +1,6 @@
 package com.smtm.application.security.users.v1;
 
-import com.smtm.users.registration.UserProfile;
+import com.smtm.security.registration.UserProfile;
 
 public class UserProfileDto {
 

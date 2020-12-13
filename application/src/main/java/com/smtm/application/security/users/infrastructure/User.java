@@ -6,7 +6,7 @@ import javax.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.smtm.users.registration.*;
+import com.smtm.security.registration.*;
 
 @Entity
 @Table(name = "users")

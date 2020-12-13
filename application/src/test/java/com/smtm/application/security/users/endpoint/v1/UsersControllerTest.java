@@ -1,10 +1,10 @@
 package com.smtm.application.security.users.endpoint.v1;
 
-import static com.smtm.users.registration.ConstraintViolationKt.constraintViolationOf;
-import static com.smtm.users.registration.EmailAddressKt.*;
-import static com.smtm.users.registration.PasswordKt.unencryptedPasswordOf;
-import static com.smtm.users.registration.UserProfileKt.invalidUserProfileOf;
-import static com.smtm.users.registration.UserProfileKt.validUserProfileOf;
+import static com.smtm.security.registration.ConstraintViolationKt.constraintViolationOf;
+import static com.smtm.security.registration.EmailAddressKt.*;
+import static com.smtm.security.registration.PasswordKt.unencryptedPasswordOf;
+import static com.smtm.security.registration.UserProfileKt.invalidUserProfileOf;
+import static com.smtm.security.registration.UserProfileKt.validUserProfileOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,8 +20,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import com.smtm.application.security.users.v1.UsersController;
-import com.smtm.users.api.UserRegistration;
-import com.smtm.users.registration.*;
+import com.smtm.security.api.UserRegistration;
+import com.smtm.security.registration.*;
 
 @WebMvcTest(UsersController.class)
 @AutoConfigureMockMvc(addFilters = false)

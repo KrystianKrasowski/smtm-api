@@ -3,9 +3,9 @@ package com.smtm.application.security.users.infrastructure;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.smtm.users.registration.Password;
-import com.smtm.users.registration.PasswordKt;
-import com.smtm.users.spi.PasswordEncryption;
+import com.smtm.security.registration.Password;
+import com.smtm.security.registration.PasswordKt;
+import com.smtm.security.spi.PasswordEncryption;
 
 public class BCryptPasswordEncryptionAdapter implements PasswordEncryption {
 
