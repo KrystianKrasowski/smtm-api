@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smtm.security.registration.EmailAddress;
 import com.smtm.security.registration.EmailAddressKt;
-import com.smtm.security.registration.PasswordKt;
 import com.smtm.security.registration.UnencryptedPassword;
+import com.smtm.security.registration.UnencryptedPasswordKt;
 
 public class CredentialsDto {
 
@@ -27,6 +27,6 @@ public class CredentialsDto {
     }
 
     public UnencryptedPassword getPassword() {
-        return PasswordKt.unencryptedPasswordOf(password);
+        return UnencryptedPasswordKt.unencryptedPasswordOf(password);
     }
 }

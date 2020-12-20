@@ -1,4 +1,4 @@
-package com.smtm.application.security.users.infrastructure;
+package com.smtm.application.security.infrastructure;
 
 import org.springframework.data.repository.CrudRepository;
 

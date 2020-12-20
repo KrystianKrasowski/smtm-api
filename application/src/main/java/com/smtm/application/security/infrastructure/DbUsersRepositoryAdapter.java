@@ -1,11 +1,10 @@
-package com.smtm.application.security.users.infrastructure;
+package com.smtm.application.security.infrastructure;
 
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.smtm.security.registration.EmailAddress;
-import com.smtm.security.registration.Password;
 import com.smtm.security.registration.UnencryptedPassword;
 import com.smtm.security.registration.UserProfile;
 import com.smtm.security.spi.UsersRepository;
@@ -22,8 +21,8 @@ public class DbUsersRepositoryAdapter implements UsersRepository {
 
     @NotNull
     @Override
-    public UserProfile register(@NotNull EmailAddress email, @NotNull Password password) {
-        User user = User.of(email, password);
+    public UserProfile register(@NotNull EmailAddress email, @NotNull UnencryptedPassword password) {
+        User user = User.of(email, passwordEncoder.encode(password.toString()));
         usersRepository.save(user);
         return user.toUserProfile();
     }

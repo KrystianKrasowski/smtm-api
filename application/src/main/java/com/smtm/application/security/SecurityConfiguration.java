@@ -6,16 +6,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.smtm.application.security.users.infrastructure.BCryptPasswordEncryptionAdapter;
-import com.smtm.application.security.users.infrastructure.DbUsersRepository;
-import com.smtm.application.security.users.infrastructure.DbUsersRepositoryAdapter;
+import com.smtm.application.security.infrastructure.DbUsersRepository;
+import com.smtm.application.security.infrastructure.DbUsersRepositoryAdapter;
 import com.smtm.security.api.Authentication;
 import com.smtm.security.api.Authorization;
 import com.smtm.security.api.UserRegistration;
 import com.smtm.security.authentication.AuthenticationImplKt;
 import com.smtm.security.authorization.AuthorizationImplKt;
 import com.smtm.security.registration.UserRegistrationImplKt;
-import com.smtm.security.spi.PasswordEncryption;
 import com.smtm.security.spi.UsersRepository;
 
 @Configuration
@@ -32,17 +30,12 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public PasswordEncryption passwordEncryption(PasswordEncoder passwordEncoder) {
-        return new BCryptPasswordEncryptionAdapter(passwordEncoder);
+    public UserRegistration userRegistration(UsersRepository usersRepository) {
+        return UserRegistrationImplKt.userRegistrationOf(usersRepository);
     }
 
     @Bean
-    public UserRegistration userRegistration(UsersRepository usersRepository, PasswordEncryption passwordEncryption) {
-        return UserRegistrationImplKt.userRegistrationOf(usersRepository, passwordEncryption);
-    }
-
-    @Bean
-    public Authentication tokenGenerator(UsersRepository usersRepository,
+    public Authentication authentication(UsersRepository usersRepository,
                                          @Value("${smtm.security.jwt.secret}") String secret,
                                          @Value("${smtm.security.jwt.validity}") Integer validityTime,
                                          Clock clock) {

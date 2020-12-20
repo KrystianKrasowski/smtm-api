@@ -9,9 +9,6 @@ class ParameterTypes {
     @ParameterType(".*")
     fun unencryptedPassword(input: String) = unencryptedPasswordOf(input)
 
-    @ParameterType(".*")
-    fun password(input: String) = passwordOf(input)
-
     @ParameterType("(not enough special characters|not enough uppercase letters|not enough digits|not enough length)")
     fun passwordViolation(input: String) = ViolationsMap.valueOf(input).violation
 

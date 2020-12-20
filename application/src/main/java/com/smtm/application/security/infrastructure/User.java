@@ -1,4 +1,4 @@
-package com.smtm.application.security.users.infrastructure;
+package com.smtm.application.security.infrastructure;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,10 +22,10 @@ public class User implements UserDetails {
     @Column
     private String password;
 
-    public static User of(EmailAddress email, Password password) {
+    public static User of(EmailAddress email, String password) {
         User user = new User();
         user.setEmail(email.toString());
-        user.setPassword(password.getValue());
+        user.setPassword(password);
         return user;
     }
 

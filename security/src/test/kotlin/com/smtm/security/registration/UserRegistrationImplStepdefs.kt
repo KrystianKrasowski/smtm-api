@@ -10,7 +10,7 @@ import org.assertj.core.api.Assertions.*
 class UserRegistrationImplStepdefs(private val world: World) {
 
     private val userRegistration: UserRegistration
-        get() = userRegistrationOf(world.userRepository, world.passwordEncryption)
+        get() = userRegistrationOf(world.userRepository)
 
     private var userProfile: UserProfile? = null
 
@@ -23,11 +23,6 @@ class UserRegistrationImplStepdefs(private val world: World) {
     fun `user arg1 is registered`(email: EmailAddress) {
         assertThat(userProfile).hasEmail(email)
         assertThat(world.userRepository.registeredEmail).isEqualTo(email)
-    }
-
-    @Then("password is encrypted to \"{password}\"")
-    fun `password is encrypted to`(password: Password) {
-        assertThat(world.userRepository.registeredPassword).isEqualTo(password)
     }
 
     @Then("email is not unique")

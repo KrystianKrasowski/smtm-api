@@ -2,7 +2,7 @@ package com.smtm.application.security.token.v1;
 
 import static com.smtm.application.security.token.v1.Fixtures.*;
 import static com.smtm.security.registration.EmailAddressKt.emailAddressOf;
-import static com.smtm.security.registration.PasswordKt.unencryptedPasswordOf;
+import static com.smtm.security.registration.UnencryptedPasswordKt.unencryptedPasswordOf;
 import static org.mockito.BDDMockito.given;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

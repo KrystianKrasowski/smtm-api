@@ -11,10 +11,8 @@ Feature: User registration
 
 
   Scenario: User registers successfully
-    Given password "S3cr3t!@#" encrypts to "[encrypted secure password]"
     When user registers as "todd.smith@mail.com" with password "S3cr3t!@#"
     Then user "todd.smith@mail.com" is registered
-    And password is encrypted to "[encrypted secure password]"
 
 
   Scenario: User already exists

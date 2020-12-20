@@ -1,6 +1,9 @@
 package com.smtm.security.spi
 
-import com.smtm.security.registration.*
+import com.smtm.security.registration.EmailAddress
+import com.smtm.security.registration.UnencryptedPassword
+import com.smtm.security.registration.UserProfile
+import com.smtm.security.registration.validUserProfileOf
 
 class FakeUserRepository : UsersRepository {
 
@@ -8,9 +11,9 @@ class FakeUserRepository : UsersRepository {
 
     lateinit var registeredEmail: EmailAddress
 
-    lateinit var registeredPassword: Password
+    lateinit var registeredPassword: UnencryptedPassword
 
-    override fun register(email: EmailAddress, password: Password): UserProfile {
+    override fun register(email: EmailAddress, password: UnencryptedPassword): UserProfile {
         registeredEmail = email
         registeredPassword = password
         return validUserProfileOf(generateId(), email)
