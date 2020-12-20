@@ -16,4 +16,6 @@ data class Password(val value: String)
 
 fun unencryptedPasswordOf(value: String?) = UnencryptedPassword(value ?: "")
 
+fun String.toUnencryptedPassword() = unencryptedPasswordOf(this)
+
 fun passwordOf(value: String) = Password(value)

@@ -14,7 +14,7 @@ class UserRegistrationImplStepdefs(private val world: World) {
 
     private var userProfile: UserProfile? = null
 
-    @When("user registers as \"{emailAddress}\" with password \"{unsecuredPassword}\"")
+    @When("user registers as \"{emailAddress}\" with password \"{unencryptedPassword}\"")
     fun `user registers as arg1 with password arg2`(email: EmailAddress, password: UnencryptedPassword) {
         userProfile = userRegistration.register(email, password)
     }

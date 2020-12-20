@@ -15,3 +15,5 @@ data class EmailAddress internal constructor(val address: String) {
 }
 
 fun emailAddressOf(address: String) = EmailAddress(address)
+
+fun String.toEmailAddress() = emailAddressOf(this)

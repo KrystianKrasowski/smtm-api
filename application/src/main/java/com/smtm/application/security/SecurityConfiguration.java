@@ -15,12 +15,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.smtm.application.security.users.infrastructure.BCryptPasswordEncryptionAdapter;
 import com.smtm.application.security.users.infrastructure.DbUsersRepository;
 import com.smtm.application.security.users.infrastructure.DbUsersRepositoryAdapter;
-import com.smtm.security.api.TokenGenerator;
+import com.smtm.security.api.Authentication;
 import com.smtm.security.api.UserRegistration;
 import com.smtm.security.registration.UserRegistrationImplKt;
 import com.smtm.security.spi.PasswordEncryption;
 import com.smtm.security.spi.UsersRepository;
-import com.smtm.security.token.TokenGeneratorImplKt;
+import com.smtm.security.authentication.TokenGeneratorImplKt;
 
 @Configuration
 @EnableWebSecurity
@@ -67,7 +67,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public TokenGenerator tokenGenerator(@Value("${smtm.security.jwt.secret}") String secret,
+    public Authentication tokenGenerator(@Value("${smtm.security.jwt.secret}") String secret,
                                          @Value("${smtm.security.jwt.validity}") Integer validityTime,
                                          Clock clock) {
         return TokenGeneratorImplKt.tokenGeneratorOf(secret, validityTime, clock);

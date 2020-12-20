@@ -4,10 +4,10 @@ Feature: User registration
 
   Background:
     * users repository contains
-      | id | email                  |
-      | 1  | john.doe@smtm.com      |
-      | 2  | samuel.smith@smtm.com  |
-      | 3  | nick.soapdish@smtm.com |
+      | id | email                  | password |
+      | 1  | john.doe@smtm.com      | ***      |
+      | 2  | samuel.smith@smtm.com  | ***      |
+      | 3  | nick.soapdish@smtm.com | ***      |
 
 
   Scenario: User registers successfully

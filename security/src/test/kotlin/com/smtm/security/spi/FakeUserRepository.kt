@@ -1,13 +1,10 @@
 package com.smtm.security.spi
 
-import com.smtm.security.registration.EmailAddress
-import com.smtm.security.registration.Password
-import com.smtm.security.registration.UserProfile
-import com.smtm.security.registration.validUserProfileOf
+import com.smtm.security.registration.*
 
 class FakeUserRepository : UsersRepository {
 
-    private val userList = mutableListOf<UserProfile.Valid>()
+    private val users = mutableMapOf<String, UserProfile.Valid>()
 
     lateinit var registeredEmail: EmailAddress
 
@@ -19,11 +16,15 @@ class FakeUserRepository : UsersRepository {
         return validUserProfileOf(generateId(), email)
     }
 
-    override fun isRegistered(email: EmailAddress): Boolean = userList.any { it.email == email }
+    override fun isRegistered(email: EmailAddress): Boolean = users.values.any { it.email == email }
 
-    fun addUsers(users: List<UserProfile.Valid>) {
-        userList.addAll(users)
+    override fun findAuthorized(email: EmailAddress, password: UnencryptedPassword): UserProfile.Valid? {
+        return users["$email.$password"]
     }
 
-    private fun generateId() = userList.size.toLong()
+    fun addUser(email: EmailAddress, password: UnencryptedPassword, profile: UserProfile.Valid) {
+        users["$email.$password"] = profile
+    }
+
+    private fun generateId() = users.size.toLong()
 }

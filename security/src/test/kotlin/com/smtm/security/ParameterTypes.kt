@@ -1,11 +1,13 @@
-package com.smtm.security.registration
+package com.smtm.security
 
+import com.smtm.security.registration.*
+import io.cucumber.java.DataTableType
 import io.cucumber.java.ParameterType
 
 class ParameterTypes {
 
     @ParameterType(".*")
-    fun unsecuredPassword(input: String) = unencryptedPasswordOf(input)
+    fun unencryptedPassword(input: String) = unencryptedPasswordOf(input)
 
     @ParameterType(".*")
     fun password(input: String) = passwordOf(input)
@@ -15,7 +17,18 @@ class ParameterTypes {
 
     @ParameterType(".*")
     fun emailAddress(input: String) = emailAddressOf(input)
+
+    @DataTableType
+    fun validUserProfileEntry(entry: Map<String, String>): ValidUserProfileEntry {
+        return ValidUserProfileEntry(
+                id = entry.getValue("id").toLong(),
+                emailAddress = entry.getValue("email").toEmailAddress(),
+                password = entry.getValue("password").toUnencryptedPassword()
+        )
+    }
 }
+
+data class ValidUserProfileEntry(val id: Long, val emailAddress: EmailAddress, val password: UnencryptedPassword)
 
 private enum class ViolationsMap(val violation: Violation) {
     `not enough special characters`(Violation.NotEnoughSpecialChars),
