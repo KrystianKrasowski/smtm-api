@@ -54,7 +54,7 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public UserProfile toUserProfile() {
+    public UserProfile.Valid toUserProfile() {
         return UserProfileKt.validUserProfileOf(id, EmailAddressKt.emailAddressOf(email));
     }
 

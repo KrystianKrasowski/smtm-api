@@ -4,47 +4,22 @@ import java.time.Clock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.smtm.application.security.users.infrastructure.BCryptPasswordEncryptionAdapter;
 import com.smtm.application.security.users.infrastructure.DbUsersRepository;
 import com.smtm.application.security.users.infrastructure.DbUsersRepositoryAdapter;
 import com.smtm.security.api.Authentication;
+import com.smtm.security.api.Authorization;
 import com.smtm.security.api.UserRegistration;
+import com.smtm.security.authentication.AuthenticationImplKt;
+import com.smtm.security.authorization.AuthorizationImplKt;
 import com.smtm.security.registration.UserRegistrationImplKt;
 import com.smtm.security.spi.PasswordEncryption;
 import com.smtm.security.spi.UsersRepository;
-import com.smtm.security.authentication.TokenGeneratorImplKt;
 
 @Configuration
-@EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring()
-            .antMatchers(HttpMethod.POST, "/security/users")
-            .antMatchers(HttpMethod.POST, "/security/token");
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-            .anyRequest()
-            .authenticated()
-            .and()
-            .httpBasic()
-            .realmName("Smtm")
-            .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }
+public class SecurityConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -52,8 +27,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public UsersRepository usersRepository(DbUsersRepository dbUsersRepository) {
-        return new DbUsersRepositoryAdapter(dbUsersRepository);
+    public UsersRepository usersRepository(DbUsersRepository dbUsersRepository, PasswordEncoder passwordEncoder) {
+        return new DbUsersRepositoryAdapter(dbUsersRepository, passwordEncoder);
     }
 
     @Bean
@@ -67,9 +42,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public Authentication tokenGenerator(@Value("${smtm.security.jwt.secret}") String secret,
+    public Authentication tokenGenerator(UsersRepository usersRepository,
+                                         @Value("${smtm.security.jwt.secret}") String secret,
                                          @Value("${smtm.security.jwt.validity}") Integer validityTime,
                                          Clock clock) {
-        return TokenGeneratorImplKt.tokenGeneratorOf(secret, validityTime, clock);
+        return AuthenticationImplKt.authenticationOf(usersRepository, secret, validityTime, clock);
+    }
+
+    @Bean
+    public Authorization authorization(@Value("${smtm.security.jwt.secret}") String secret) {
+        return AuthorizationImplKt.authorizationOf(secret);
     }
 }
