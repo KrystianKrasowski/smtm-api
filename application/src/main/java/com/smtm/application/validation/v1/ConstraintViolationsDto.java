@@ -2,7 +2,7 @@ package com.smtm.application.validation.v1;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import com.smtm.users.registration.UserProfile;
+import com.smtm.security.registration.UserProfile;
 
 public class ConstraintViolationsDto {
 

@@ -14,10 +14,11 @@
 		<assertj.version>3.18.1</assertj.version>
 		<cucumber.version>6.8.1</cucumber.version>
 		<mysql.version>8.0.22</mysql.version>
+		<mockito.version>1.10.19</mockito.version>
 	</properties>
 	<modules>
 		<module>application</module>
-		<module>users</module>
+		<module>security</module>
 	</modules>
 	<build>
 		<pluginManagement>
@@ -46,6 +47,11 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.1</version>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.0.0-M5</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -53,7 +59,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.smtm</groupId>
-				<artifactId>users</artifactId>
+				<artifactId>security</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -80,9 +86,9 @@
 				<version>${kotlin.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.mindrot</groupId>
-				<artifactId>jbcrypt</artifactId>
-				<version>0.4</version>
+				<groupId>com.auth0</groupId>
+				<artifactId>java-jwt</artifactId>
+				<version>3.10.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
@@ -113,6 +119,11 @@
 				<groupId>io.cucumber</groupId>
 				<artifactId>cucumber-picocontainer</artifactId>
 				<version>${cucumber.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${mockito.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
