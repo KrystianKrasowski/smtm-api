@@ -6,8 +6,7 @@ import com.smtm.security.authentication.tokenOf
 
 internal class AuthorizationImpl(private val secret: String) : Authorization {
 
-    override fun authorize(token: String): Token? = runCatching { tokenOf(token, secret) }
-            .getOrNull()
+    override fun authorize(token: String): Token? = tokenOf(token, secret)
 }
 
 fun authorizationOf(secret: String): Authorization = AuthorizationImpl(secret)

@@ -39,9 +39,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             .map(header -> header.replace("Bearer ", ""));
     }
 
-    private Optional<UsernamePasswordAuthenticationToken> authorize(String token) {
-        return Optional.ofNullable(authorization.authorize(token))
-            .map(t -> new UsernamePasswordAuthenticationToken(t.getUserId(), null, new ArrayList<>()));
+    private Optional<UsernamePasswordAuthenticationToken> authorize(String tokenValue) {
+        return Optional.ofNullable(authorization.authorize(tokenValue))
+            .map(token -> new UsernamePasswordAuthenticationToken(token.getUserId(), null, new ArrayList<>()));
     }
 
     private void setAuthenticationToken(UsernamePasswordAuthenticationToken token) {

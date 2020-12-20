@@ -20,8 +20,12 @@ fun tokenOf(subject: Long, expiresAt: Date, secret: String) = JWT.create()
         .withSubject(subject.toString())
         .withExpiresAt(expiresAt)
         .sign(algorithm(secret))
-        .let { tokenOf(it, secret) }
+        .let { Token(it, secret) }
 
-fun tokenOf(value: String, secret: String) = Token(value, secret)
+fun tokenOf(value: String, secret: String) = JWT.require(algorithm(secret))
+        .build()
+        .runCatching { verify(value) }
+        .map { Token(value, secret) }
+        .getOrNull()
 
 private fun algorithm(secret: String) = Algorithm.HMAC512(secret)
