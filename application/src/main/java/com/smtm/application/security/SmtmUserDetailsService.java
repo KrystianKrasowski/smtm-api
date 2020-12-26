@@ -1,9 +1,10 @@
-package com.smtm.application.security.infrastructure;
+package com.smtm.application.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import com.smtm.infrastructure.persistence.users.DbUsersRepository;
 
 // In order to make Spring Security magic work properly, it seems that this should be the only implementation of UserServiceDetails interface
 // It cannot be exposed as @Bean method with parameters or I can't do it.

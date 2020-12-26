@@ -1,4 +1,4 @@
-package com.smtm.application;
+package com.smtm;
 
 import java.time.Clock;
 import org.springframework.boot.SpringApplication;

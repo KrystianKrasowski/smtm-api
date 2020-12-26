@@ -1,4 +1,4 @@
-package com.smtm.application.security.infrastructure;
+package com.smtm.infrastructure.persistence.users;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package com.smtm.application.security.infrastructure;
+package com.smtm.infrastructure.persistence.users;
 
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
