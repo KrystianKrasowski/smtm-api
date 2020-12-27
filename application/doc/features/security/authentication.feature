@@ -11,7 +11,7 @@ Feature: Authentication
 
 
   Scenario: User authenticates successfully
-    When client calls "/security/token" with body
+    When client performs a POST "/security/token" request with body
       """
       {
         "email": "john.doe@gmail.com",
@@ -30,7 +30,7 @@ Feature: Authentication
 
 
   Scenario: Provided email address is not registered
-    When client calls "/security/token" with body
+    When client performs a POST "/security/token" request with body
       """
       {
         "email": "todd.smith@gmail.com",
@@ -41,7 +41,7 @@ Feature: Authentication
 
 
   Scenario: Provided password is invalid
-    When client calls "/security/token" with body
+    When client performs a POST "/security/token" request with body
       """
       {
         "email": "john.doe@gmail.com",

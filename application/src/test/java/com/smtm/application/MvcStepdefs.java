@@ -1,14 +1,15 @@
 package com.smtm.application;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.Map;
-import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -30,12 +31,20 @@ public class MvcStepdefs {
         headers.forEach(this.headers::add);
     }
 
-    @When("client calls {string} with body")
-    public void clientCallsAddressWithBody(String address, String body) throws Exception {
+    @When("client performs a {httpMethod} {string} request with body")
+    public void clientPerformsARequestWithBody(HttpMethod method, String endpoint, String body) throws Exception {
         actions = mvc.perform(
-            post(address)
+            request(method, endpoint)
                 .headers(headers)
                 .content(body)
+        );
+    }
+
+    @When("client performs a {httpMethod} {string} request")
+    public void clientPerformsARequest(HttpMethod method, String endpoint) throws Exception {
+        actions = mvc.perform(
+            request(method, endpoint)
+                .headers(headers)
         );
     }
 
@@ -52,6 +61,11 @@ public class MvcStepdefs {
     @Then("response body is")
     public void responseBodyIs(String body) throws Exception {
         actions.andExpect(content().json(body));
+    }
+
+    @ParameterType("(GET|POST|PUT|DELETE|OPTIONS|TRACE|PATCH)")
+    public HttpMethod httpMethod(String method) {
+        return HttpMethod.resolve(method);
     }
 
     private void assertHeader(String name, String value) {

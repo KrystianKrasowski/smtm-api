@@ -36,4 +36,9 @@ public class TestSecurityConfiguration {
     public TokenController tokenController(Authentication authentication) {
         return new TokenController(authentication);
     }
+
+    @Bean
+    public TestProtectedResourceController testProtectedResourceController() {
+        return new TestProtectedResourceController();
+    }
 }

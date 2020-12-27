@@ -8,7 +8,7 @@ Feature: User registration
 
 
   Scenario: User registers successfully
-    When client calls "/security/users" with body
+    When client performs a POST "/security/users" request with body
       """
       {
           "email": "john.doe@gmail.com",
@@ -38,7 +38,7 @@ Feature: User registration
       | property | violation             |
       | email    | NotAnEmailAddress     |
       | password | NotEnoughSpecialChars |
-    When client calls "/security/users" with body
+    When client performs a POST "/security/users" request with body
       """
       {
         "email": "john.doe@gmail.com",
