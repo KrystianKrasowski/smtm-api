@@ -2,9 +2,21 @@ package com.smtm.application.security.v1;
 
 import com.smtm.security.authentication.Token;
 
-class TokenDto {
+public class TokenDto {
 
     private final String value;
+
+    public static TokenDto of(String token) {
+        return new TokenDto(token);
+    }
+
+    public static TokenDto of(Token token) {
+        return of(token.getValue());
+    }
+
+    public String getValue() {
+        return value;
+    }
 
     @Override
     public String toString() {
@@ -24,18 +36,6 @@ class TokenDto {
     @Override
     public int hashCode() {
         return value.hashCode();
-    }
-
-    static TokenDto of(String token) {
-        return new TokenDto(token);
-    }
-
-    static TokenDto of(Token token) {
-        return of(token.getValue());
-    }
-
-    String getValue() {
-        return value;
     }
 
     private TokenDto(String value) {
