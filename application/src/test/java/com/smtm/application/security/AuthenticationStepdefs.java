@@ -13,9 +13,9 @@ public class AuthenticationStepdefs {
         this.fakeAuthentication = fakeAuthentication;
     }
 
-    @Given("credentials produces a valid token")
-    public void credentialsProducesAValidToken(CredentialsDto credentialsDto) {
-        fakeAuthentication.setValidTokenFor(credentialsDto);
+    @Given("token {string} is produced by credentials")
+    public void tokenIsProducedByCredentials(String token, CredentialsDto credentials) {
+        fakeAuthentication.setValidTokenFor(credentials, token);
     }
 
     @DataTableType

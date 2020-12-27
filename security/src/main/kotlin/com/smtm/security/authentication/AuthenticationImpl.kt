@@ -4,6 +4,7 @@ import com.smtm.security.api.Authentication
 import com.smtm.security.registration.EmailAddress
 import com.smtm.security.registration.UnencryptedPassword
 import com.smtm.security.spi.UsersRepository
+import com.smtm.security.token.Token
 import java.time.Clock
 import java.util.*
 
@@ -16,7 +17,7 @@ internal class AuthenticationImpl(
 
     override fun authenticate(emailAddress: EmailAddress, password: UnencryptedPassword): Token? = usersRepository
             .findAuthorized(emailAddress, password)
-            ?.let { tokenOf(it.id, Date.from(specifyExpirationDate()), secret) }
+            ?.let { createToken(it.id, Date.from(specifyExpirationDate()), secret) }
 
     private fun specifyExpirationDate() = clock
             .instant()

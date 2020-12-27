@@ -1,6 +1,6 @@
 package com.smtm.security.api
 
-import com.smtm.security.authentication.Token
+import com.smtm.security.token.Token
 
 interface Authorization {
 

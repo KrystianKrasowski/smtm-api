@@ -18,8 +18,8 @@ public class TestSecurityConfiguration {
     }
 
     @Bean
-    public Authorization authorization(@Value("${smtm.security.jwt.secret}") String secret) {
-        return new FakeAuthorization(secret);
+    public Authorization authorization() {
+        return new FakeAuthorization();
     }
 
     @Bean

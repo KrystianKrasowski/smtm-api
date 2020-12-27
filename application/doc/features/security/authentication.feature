@@ -5,7 +5,7 @@ Feature: Authentication
     * request headers are
       | Content-Type | application/smtm.credentials.v1+json |
       | Accept       | application/smtm.token.v1+json       |
-    * credentials produces a valid token
+    * token "[super-secret-token]" is produced by credentials
       | email              | password     |
       | john.doe@gmail.com | Qwerty123!@# |
 
@@ -24,7 +24,7 @@ Feature: Authentication
     And response body is
       """
       {
-        "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjA5MzcyODAwfQ.DL9vK3JwQ9Pj8f2GI4lw8RaH0E-tShNBWXTOkZNj_fGClD322vG5DrzZZ5OnXy0HPEjujjaWu8EglC9G-GDLQA"
+        "value": "[super-secret-token]"
       }
       """
 

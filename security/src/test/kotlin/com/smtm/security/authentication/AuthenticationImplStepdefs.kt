@@ -3,6 +3,7 @@ package com.smtm.security.authentication
 import com.smtm.security.World
 import com.smtm.security.registration.EmailAddress
 import com.smtm.security.registration.UnencryptedPassword
+import com.smtm.security.token.Token
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.*

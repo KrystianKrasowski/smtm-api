@@ -1,5 +1,6 @@
 package com.smtm.application.security;
 
+import static com.smtm.security.token.TokenKt.tokenOf;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,10 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.smtm.application.security.v1.CredentialsDto;
 import com.smtm.security.api.Authentication;
-import com.smtm.security.authentication.Token;
-import com.smtm.security.authentication.TokenKt;
+import com.smtm.security.authentication.TokenFactoryKt;
 import com.smtm.security.registration.EmailAddress;
 import com.smtm.security.registration.UnencryptedPassword;
+import com.smtm.security.token.Token;
+import com.smtm.security.token.TokenKt;
 
 public class FakeAuthentication implements Authentication {
 
@@ -29,8 +31,8 @@ public class FakeAuthentication implements Authentication {
         return validTokens.get(createKey(emailAddress, password));
     }
 
-    void setValidTokenFor(CredentialsDto credentials) {
-        validTokens.put(createKey(credentials), TokenKt.tokenOf(1L, Date.from(Instant.parse("2020-12-31T00:00:00.00Z")), secret));
+    void setValidTokenFor(CredentialsDto credentials, String token) {
+        validTokens.put(createKey(credentials), tokenOf(token, 1));
     }
 
     private String createKey(CredentialsDto credentials) {

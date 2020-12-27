@@ -1,21 +1,18 @@
 package com.smtm.application.security;
 
+import static com.smtm.security.token.TokenKt.tokenOf;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.smtm.security.api.Authorization;
-import com.smtm.security.authentication.Token;
-import com.smtm.security.authentication.TokenKt;
+import com.smtm.security.token.Token;
 
 public class FakeAuthorization implements Authorization {
 
-    private final String secret;
-
     private final List<String> validTokens;
 
-    public FakeAuthorization(String secret) {
-        this.secret = secret;
+    public FakeAuthorization() {
         this.validTokens = new ArrayList<>();
     }
 
@@ -23,7 +20,7 @@ public class FakeAuthorization implements Authorization {
     @Override
     public Token authorize(@NotNull String token) {
         if (validTokens.contains(token)) {
-            return TokenKt.tokenOf(token, secret);
+            return tokenOf(token, 1);
         }
 
         return null;

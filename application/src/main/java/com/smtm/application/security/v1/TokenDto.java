@@ -1,6 +1,6 @@
 package com.smtm.application.security.v1;
 
-import com.smtm.security.authentication.Token;
+import com.smtm.security.token.Token;
 
 public class TokenDto {
 
