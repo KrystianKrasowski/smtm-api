@@ -1,4 +1,4 @@
-package com.smtm.application.security.users.v1;
+package com.smtm.application.security.v1;
 
 import com.smtm.security.registration.UserProfile;
 
@@ -13,11 +13,6 @@ public class UserProfileDto {
 
     public static UserProfileDto of(long id, String email) {
         return new UserProfileDto(id, email);
-    }
-
-    private UserProfileDto(long id, String email) {
-        this.id = id;
-        this.email = email;
     }
 
     public long getId() {
@@ -52,5 +47,10 @@ public class UserProfileDto {
             "id=" + id +
             ", email='" + email + '\'' +
             '}';
+    }
+
+    private UserProfileDto(long id, String email) {
+        this.id = id;
+        this.email = email;
     }
 }

@@ -1,11 +1,13 @@
-package com.smtm.application.security.users.v1;
+package com.smtm.application.security.v1;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.mediatype.problem.Problem;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
-import com.smtm.application.SmtmMediaTypes;
-import com.smtm.application.validation.v1.ConstraintViolationsDto;
+import com.smtm.application.common.dto.ViolationsProblemDto;
 import com.smtm.security.registration.UserProfile;
 
 abstract class UserRegistrationResponseFactory<T extends UserProfile> {
@@ -22,7 +24,7 @@ abstract class UserRegistrationResponseFactory<T extends UserProfile> {
         }
 
         if (userProfile instanceof UserProfile.Invalid) {
-            return new ConstraintsViolationsDtoFactory((UserProfile.Invalid) userProfile);
+            return new ProblemFactory((UserProfile.Invalid) userProfile);
         }
 
         throw new IllegalArgumentException("Unsupported result type");
@@ -41,8 +43,8 @@ abstract class UserRegistrationResponseFactory<T extends UserProfile> {
             UserProfileDto user = UserProfileDto.of(userProfile);
             EntityModel<UserProfileDto> model = createUserProfileRepresentation(user);
             return ResponseEntity
-                .created(linkTo(methodOn(UsersController.class).getUser(user.getId())).toUri())
-                .contentType(SmtmMediaTypes.Security.V1.USER_PROFILE)
+                .created(WebMvcLinkBuilder.linkTo(methodOn(UsersController.class).getUser(user.getId())).toUri())
+                .contentType(com.smtm.application.security.v1.MediaTypes.USER_PROFILE)
                 .body(model);
         }
 
@@ -52,19 +54,22 @@ abstract class UserRegistrationResponseFactory<T extends UserProfile> {
         }
     }
 
-    static class ConstraintsViolationsDtoFactory extends UserRegistrationResponseFactory<UserProfile.Invalid> {
+    static class ProblemFactory extends UserRegistrationResponseFactory<UserProfile.Invalid> {
 
-        ConstraintsViolationsDtoFactory(UserProfile.Invalid userProfile) {
+        ProblemFactory(UserProfile.Invalid userProfile) {
             super(userProfile);
         }
 
         @Override
-        public ResponseEntity<?> create() {
-            ConstraintViolationsDto violationsDto = ConstraintViolationsDto.of(userProfile);
-            return ResponseEntity
-                .badRequest()
-                .contentType(SmtmMediaTypes.Validation.V1.CONSTRAINT_VIOLATION)
-                .body(violationsDto);
+        ResponseEntity<?> create() {
+            Problem.ExtendedProblem<ViolationsProblemDto> problem = Problem.create()
+                .withTitle("Provided credentials violate some of the constraints")
+                .withProperties(new ViolationsProblemDto(userProfile.getViolations()));
+
+            return ResponseEntity.badRequest()
+                .contentType(MediaTypes.HTTP_PROBLEM_DETAILS_JSON)
+                .body(problem);
         }
     }
+
 }

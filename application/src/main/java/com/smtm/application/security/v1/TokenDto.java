@@ -1,22 +1,10 @@
-package com.smtm.application.security.token.v1;
+package com.smtm.application.security.v1;
 
 import com.smtm.security.authentication.Token;
 
-public class TokenDto {
+class TokenDto {
 
     private final String value;
-
-    public static TokenDto of(String token) {
-        return new TokenDto(token);
-    }
-
-    public static TokenDto of(Token token) {
-        return of(token.getValue());
-    }
-
-    public String getValue() {
-        return value;
-    }
 
     @Override
     public String toString() {
@@ -36,6 +24,18 @@ public class TokenDto {
     @Override
     public int hashCode() {
         return value.hashCode();
+    }
+
+    static TokenDto of(String token) {
+        return new TokenDto(token);
+    }
+
+    static TokenDto of(Token token) {
+        return of(token.getValue());
+    }
+
+    String getValue() {
+        return value;
     }
 
     private TokenDto(String value) {

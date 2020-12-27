@@ -24,7 +24,7 @@ class UserProfileAssert(userProfile: UserProfile?) : AbstractAssert<UserProfileA
 
     fun hasAnyConstraintViolationFor(key: String) {
         isInvalid()
-        assertThat(actualAsInvalid.violations.find { it.key == key }).isNotNull
+        assertThat(actualAsInvalid.violations.find { it.property == key }).isNotNull
     }
 
     private fun isValid(): UserProfileAssert {

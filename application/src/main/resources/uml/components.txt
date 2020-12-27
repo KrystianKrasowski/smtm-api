@@ -1,6 +1,0 @@
-@startuml
-
-interface UserRegistration
-component Users
-
-@enduml

@@ -1,4 +1,4 @@
-package com.smtm.application.security.users.v1;
+package com.smtm.application.security.v1;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
