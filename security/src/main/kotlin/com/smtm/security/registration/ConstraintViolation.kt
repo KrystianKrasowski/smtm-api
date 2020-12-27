@@ -1,10 +1,9 @@
 package com.smtm.security.registration
 
-data class ConstraintViolation internal constructor(val key: String, val violation: Violation)
+data class ConstraintViolation internal constructor(val property: String, val violation: Violation)
 
 enum class Violation {
     NonUnique,
-    TooWeak,
     NotEnoughSpecialChars,
     NotEnoughUppercaseLetters,
     NotEnoughDigits,

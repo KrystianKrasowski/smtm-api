@@ -1,0 +1,28 @@
+@startuml
+
+component Security
+interface UserRegistration
+interface Authentication
+interface Authorization
+interface UsersRepository
+
+package "Infrastructure" {
+    rectangle UsersRepositoryAdapter <<database>>
+    UsersRepositoryAdapter -down-( UsersRepository
+}
+
+Security -up- UsersRepository
+Security -down- UserRegistration
+Security -down- Authentication
+Security -down- Authorization
+
+package "Application" {
+    rectangle UsersController <<resource>>
+    rectangle TokenController <<resource>>
+    rectangle JwtAuthorizationFilter <<filter>>
+    JwtAuthorizationFilter -up-> Authorization
+    TokenController -up->Authentication
+    UsersController -up-> UserRegistration
+}
+
+@enduml
