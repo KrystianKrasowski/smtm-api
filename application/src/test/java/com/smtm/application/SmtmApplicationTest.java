@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import com.smtm.application.categories.TestCategoriesConfiguration;
 import com.smtm.application.security.TestSecurityConfiguration;
 import com.smtm.application.security.WebSecurityConfiguration;
 import io.cucumber.junit.Cucumber;
@@ -15,7 +16,8 @@ import io.cucumber.spring.CucumberContextConfiguration;
 @CucumberContextConfiguration
 @SpringBootTest(classes = {
     TestSecurityConfiguration.class,
-    WebSecurityConfiguration.class
+    WebSecurityConfiguration.class,
+    TestCategoriesConfiguration.class
 })
 @AutoConfigureMockMvc
 @EnableWebMvc
