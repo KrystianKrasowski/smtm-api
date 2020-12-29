@@ -1,26 +1,14 @@
-package com.smtm.application.security;
+package com.smtm.application.security
 
-import org.jetbrains.annotations.NotNull;
-import com.smtm.security.api.UserRegistration;
-import com.smtm.security.registration.EmailAddress;
-import com.smtm.security.registration.UnencryptedPassword;
-import com.smtm.security.registration.UserProfile;
+import com.smtm.security.api.UserRegistration
+import com.smtm.security.registration.EmailAddress
+import com.smtm.security.registration.UnencryptedPassword
+import com.smtm.security.registration.UserProfile
+import com.smtm.security.registration.validUserProfileOf
 
-class FakeUserRegistration implements UserRegistration {
+class FakeUserRegistration : UserRegistration {
 
-    private UserProfile userProfile = null;
+    var userProfile: UserProfile? = null
 
-    @NotNull
-    @Override
-    public UserProfile register(@NotNull EmailAddress email, @NotNull UnencryptedPassword password) {
-        if (userProfile == null) {
-            return new UserProfile.Valid(1L, email);
-        } else {
-            return userProfile;
-        }
-    }
-
-    void setUserProfile(UserProfile profile) {
-        this.userProfile = profile;
-    }
+    override fun register(email: EmailAddress, password: UnencryptedPassword): UserProfile = userProfile ?: validUserProfileOf(1, email)
 }
