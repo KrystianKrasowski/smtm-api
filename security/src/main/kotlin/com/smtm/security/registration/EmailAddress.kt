@@ -5,7 +5,7 @@ private const val EmailPattern = "^[A-Za-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ0-
 data class EmailAddress internal constructor(val address: String) {
 
     private val notAnEmailViolation = Violation.NotAnEmailAddress
-            .takeUnless { EmailPattern.toRegex().matches(address) }
+        .takeUnless { EmailPattern.toRegex().matches(address) }
 
     fun getViolations(): Collection<Violation> = listOfNotNull(notAnEmailViolation)
 

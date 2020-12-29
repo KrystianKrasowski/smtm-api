@@ -9,22 +9,24 @@ import java.time.Clock
 import java.util.*
 
 internal class AuthenticationImpl(
-        private val usersRepository: UsersRepository,
-        private val secret: String,
-        private val validityTime: Int,
-        private val clock: Clock
+    private val usersRepository: UsersRepository,
+    private val secret: String,
+    private val validityTime: Int,
+    private val clock: Clock
 ) : Authentication {
 
     override fun authenticate(emailAddress: EmailAddress, password: UnencryptedPassword): Token? = usersRepository
-            .findAuthorized(emailAddress, password)
-            ?.let { createToken(it.id, Date.from(specifyExpirationDate()), secret) }
+        .findAuthorized(emailAddress, password)
+        ?.let { createToken(it.id, Date.from(specifyExpirationDate()), secret) }
 
     private fun specifyExpirationDate() = clock
-            .instant()
-            .plusSeconds(validityTime.toLong())
+        .instant()
+        .plusSeconds(validityTime.toLong())
 }
 
-fun authenticationOf(usersRepository: UsersRepository,
-                     secret: String,
-                     validityTime: Int,
-                     clock: Clock): Authentication = AuthenticationImpl(usersRepository, secret, validityTime, clock)
+fun authenticationOf(
+    usersRepository: UsersRepository,
+    secret: String,
+    validityTime: Int,
+    clock: Clock
+): Authentication = AuthenticationImpl(usersRepository, secret, validityTime, clock)

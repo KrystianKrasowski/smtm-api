@@ -6,7 +6,7 @@ import com.smtm.security.registration.UnencryptedPassword
 import com.smtm.security.token.Token
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 
 class AuthenticationImplStepdefs(private val world: World) {
 

@@ -6,6 +6,6 @@ import org.junit.runner.RunWith
 
 @RunWith(Cucumber::class)
 @CucumberOptions(
-        features = ["doc/features"]
+    features = ["doc/features"]
 )
 class SecurityTest

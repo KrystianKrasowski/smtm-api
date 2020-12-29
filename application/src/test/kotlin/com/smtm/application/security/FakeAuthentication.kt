@@ -6,12 +6,11 @@ import com.smtm.security.api.Authentication
 import com.smtm.security.registration.EmailAddress
 import com.smtm.security.registration.UnencryptedPassword
 import com.smtm.security.token.Token
-import com.smtm.security.token.tokenOf
 
 class FakeAuthentication : Authentication {
 
     val validTokens: MutableMap<CredentialsDto, Token> = mutableMapOf()
 
     override fun authenticate(emailAddress: EmailAddress, password: UnencryptedPassword): Token? = credentialsDtoOf(emailAddress, password)
-            .let { validTokens[it] }
+        .let { validTokens[it] }
 }

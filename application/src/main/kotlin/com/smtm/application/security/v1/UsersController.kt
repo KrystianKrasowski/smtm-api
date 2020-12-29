@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*
 class UsersController(private val userRegistration: UserRegistration) {
 
     @GetMapping(
-            value = ["/{id}"],
-            consumes = [UserProfileDto.MediaTypeValue],
-            produces = [UserProfileDto.MediaTypeValue]
+        value = ["/{id}"],
+        consumes = [UserProfileDto.MediaTypeValue],
+        produces = [UserProfileDto.MediaTypeValue]
     )
     fun getUser(@PathVariable("id") id: Long): ResponseEntity<*> {
         TODO("Not implemented yet")
@@ -36,10 +36,10 @@ class UsersController(private val userRegistration: UserRegistration) {
 private fun UserProfile.Valid.toResponse201() = userProfileDtoOf(this).toResponse201()
 
 private fun UserProfile.Invalid.toResponse400() = Problem.create()
-        .withTitle("Provided credentials violate some of the constraints")
-        .withProperties(ViolationsProblemDto(violations))
-        .toResponse400()
+    .withTitle("Provided credentials violate some of the constraints")
+    .withProperties(ViolationsProblemDto(violations))
+    .toResponse400()
 
 private fun Problem.toResponse400() = ResponseEntity.badRequest()
-        .contentType(HTTP_PROBLEM_DETAILS_JSON)
-        .body(this)
+    .contentType(HTTP_PROBLEM_DETAILS_JSON)
+    .body(this)

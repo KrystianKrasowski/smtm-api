@@ -18,9 +18,9 @@ class ParameterTypes {
     @DataTableType
     fun validUserProfileEntry(entry: Map<String, String>): ValidUserProfileEntry {
         return ValidUserProfileEntry(
-                id = entry.getValue("id").toLong(),
-                emailAddress = entry.getValue("email").toEmailAddress(),
-                password = entry.getValue("password").toUnencryptedPassword()
+            id = entry.getValue("id").toLong(),
+            emailAddress = entry.getValue("email").toEmailAddress(),
+            password = entry.getValue("password").toUnencryptedPassword()
         )
     }
 }

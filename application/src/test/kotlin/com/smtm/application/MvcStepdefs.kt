@@ -1,20 +1,15 @@
 package com.smtm.application
 
 import io.cucumber.java.ParameterType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultActions
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import kotlin.Throws
-import java.lang.Exception
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import java.lang.RuntimeException
 
 class MvcStepdefs(private val mvc: MockMvc) {
 
@@ -29,17 +24,17 @@ class MvcStepdefs(private val mvc: MockMvc) {
     @When("client performs a {httpMethod} {string} request with body")
     fun clientPerformsARequestWithBody(method: HttpMethod, endpoint: String, body: String) {
         actions = mvc.perform(
-                request(method, endpoint)
-                        .headers(headers)
-                        .content(body)
+            request(method, endpoint)
+                .headers(headers)
+                .content(body)
         )
     }
 
     @When("client performs a {httpMethod} {string} request")
     fun clientPerformsARequest(method: HttpMethod, endpoint: String) {
         actions = mvc.perform(
-                request(method, endpoint)
-                        .headers(headers)
+            request(method, endpoint)
+                .headers(headers)
         )
     }
 

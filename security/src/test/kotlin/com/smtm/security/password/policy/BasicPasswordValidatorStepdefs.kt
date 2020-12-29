@@ -32,8 +32,8 @@ class BasicPasswordValidatorStepdefs {
     fun `password is validated`(value: String) {
         password = unencryptedPasswordOf(value)
         val validator = basicPasswordValidatorOf(
-                specialCharacters = specialCharacters,
-                minimumLength = minimumLength
+            specialCharacters = specialCharacters,
+            minimumLength = minimumLength
         )
         violations = password.getViolations(validator)
     }

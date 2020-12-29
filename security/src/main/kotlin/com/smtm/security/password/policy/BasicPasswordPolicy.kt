@@ -10,24 +10,24 @@ class BasicPasswordPolicy(private val specialCharacters: String, private val min
 
     override fun validate(password: UnencryptedPassword): Collection<Violation> {
         return listOfNotNull(
-                hasNoSpecialCharacter(password.toString()),
-                hasNoUppercaseLetter(password.toString()),
-                hasNoDigit(password.toString()),
-                isTooShort(password.toString())
+            hasNoSpecialCharacter(password.toString()),
+            hasNoUppercaseLetter(password.toString()),
+            hasNoDigit(password.toString()),
+            isTooShort(password.toString())
         )
     }
 
     private fun hasNoSpecialCharacter(value: String) = Violation.NotEnoughSpecialChars
-            .takeUnless { "[$specialCharacters]+".toRegex().containsMatchIn(value) }
+        .takeUnless { "[$specialCharacters]+".toRegex().containsMatchIn(value) }
 
     private fun hasNoUppercaseLetter(value: String) = Violation.NotEnoughUppercaseLetters
-            .takeUnless { "[A-Z]+".toRegex().containsMatchIn(value) }
+        .takeUnless { "[A-Z]+".toRegex().containsMatchIn(value) }
 
     private fun hasNoDigit(value: String) = Violation.NotEnoughDigits
-            .takeUnless { "[0-9]+".toRegex().containsMatchIn(value) }
+        .takeUnless { "[0-9]+".toRegex().containsMatchIn(value) }
 
     private fun isTooShort(value: String) = Violation.NotEnoughLength
-            .takeUnless { value.length >= minimumLength }
+        .takeUnless { value.length >= minimumLength }
 }
 
 fun basicPasswordValidatorOf(specialCharacters: String = PasswordSpecialCharacters, minimumLength: Int = PasswordMinLength): PasswordPolicy {

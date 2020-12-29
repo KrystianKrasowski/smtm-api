@@ -9,27 +9,27 @@ import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class JwtAuthorizationFilter(authenticationManager: AuthenticationManager, private val authorization: Authorization)
-    : BasicAuthenticationFilter(authenticationManager) {
+class JwtAuthorizationFilter(authenticationManager: AuthenticationManager, private val authorization: Authorization) :
+    BasicAuthenticationFilter(authenticationManager) {
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         request.extractToken()
-                ?.authorize()
-                ?.store()
+            ?.authorize()
+            ?.store()
 
         chain.doFilter(request, response)
     }
 
     private fun HttpServletRequest.extractToken() = getHeader("Authorization")
-            ?.takeIf { it.startsWith("Bearer ") }
-            ?.replace("Bearer ", "")
+        ?.takeIf { it.startsWith("Bearer ") }
+        ?.replace("Bearer ", "")
 
     private fun String.authorize() = authorization
-            .authorize(this)
-            ?.let { UsernamePasswordAuthenticationToken(it.userId, null, ArrayList()) }
+        .authorize(this)
+        ?.let { UsernamePasswordAuthenticationToken(it.userId, null, ArrayList()) }
 
     private fun UsernamePasswordAuthenticationToken.store() {
         SecurityContextHolder.getContext()
-                .authentication = this
+            .authentication = this
     }
 }

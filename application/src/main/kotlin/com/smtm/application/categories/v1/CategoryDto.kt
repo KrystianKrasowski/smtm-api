@@ -9,10 +9,10 @@ import org.springframework.http.ResponseEntity
 
 data class CategoryDto(val id: Long?, val name: String, val icon: String) : RepresentationModel<CategoryDto>() {
 
-    fun toResponse201() = ResponseEntity.created(getRequiredLink("self").toUri())
+    fun toResponse201(): ResponseEntity<CategoryDto> = ResponseEntity.created(getRequiredLink("self").toUri())
         .contentType(MediaTypeValue.toMediaType())
         .body(this)
-    
+
     companion object {
 
         const val MediaTypeValue = "application/smtm.category.v1+json"

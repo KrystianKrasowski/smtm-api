@@ -13,20 +13,20 @@ class WebSecurityConfiguration(private val authorization: Authorization) : WebSe
 
     override fun configure(web: WebSecurity) {
         web.ignoring()
-                .antMatchers(HttpMethod.POST, "/security/users")
-                .antMatchers(HttpMethod.POST, "/security/token")
+            .antMatchers(HttpMethod.POST, "/security/users")
+            .antMatchers(HttpMethod.POST, "/security/token")
     }
 
     override fun configure(http: HttpSecurity) {
         http.csrf()
-                .disable()
+            .disable()
 
         http.authorizeRequests()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .addFilter(JwtAuthorizationFilter(authenticationManager(), authorization))
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .anyRequest()
+            .authenticated()
+            .and()
+            .addFilter(JwtAuthorizationFilter(authenticationManager(), authorization))
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }
 }
