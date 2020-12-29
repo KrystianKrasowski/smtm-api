@@ -1,6 +1,6 @@
 package com.smtm.security.registration
 
-private const val EmailPattern = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"
+private const val EmailPattern = "^[A-Za-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ0-9._%+-]+@[A-ZęóąśłżźćńĘÓĄŚŁŻŹĆŃa-z0-9.-]+\\.[A-ZęóąśłżźćńĘÓĄŚŁŻŹĆŃa-z]{2,6}$"
 
 data class EmailAddress internal constructor(val address: String) {
 
