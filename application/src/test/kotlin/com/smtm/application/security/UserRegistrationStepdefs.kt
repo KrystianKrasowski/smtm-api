@@ -13,9 +13,4 @@ class UserRegistrationStepdefs(private val fakeUserRegistration: FakeUserRegistr
     fun constraintViolationsAre(constraintViolations: List<ConstraintViolation>) {
         fakeUserRegistration.userProfile = invalidUserProfileOf(constraintViolations)
     }
-
-    @DataTableType
-    fun constraintViolations(violations: Map<String, String>): ConstraintViolation {
-        return constraintViolationOf(violations.getValue("property"), Violation.valueOf(violations.getValue("violation")))
-    }
 }

@@ -1,6 +1,6 @@
 @startuml
 
-component Categories
+component Transactions
 interface CategoryRegister
 interface CategoriesRepository
 
@@ -9,8 +9,8 @@ package "Infrastructure" {
     CategoriesRepositoryAdapter -down-( CategoriesRepository
 }
 
-Categories -up- CategoriesRepository
-Categories -down- CategoryRegister
+Transactions -up- CategoriesRepository
+Transactions -down- CategoryRegister
 
 package "Application" {
     rectangle CategoriesController <<resource>>

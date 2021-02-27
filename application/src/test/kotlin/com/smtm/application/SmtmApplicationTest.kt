@@ -1,6 +1,6 @@
 package com.smtm.application
 
-import com.smtm.application.categories.TestCategoriesConfiguration
+import com.smtm.application.transactions.categories.TestCategoriesConfiguration
 import com.smtm.application.security.TestSecurityConfiguration
 import com.smtm.application.security.WebSecurityConfiguration
 import io.cucumber.junit.Cucumber

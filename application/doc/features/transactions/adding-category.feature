@@ -35,3 +35,30 @@ Feature: New category
         ]
       }
       """
+
+  Scenario: Category already exists
+    Given category constraint violations are
+      | property | violation |
+      | name     | NonUnique |
+    When client performs a POST "/categories" request with body
+      """
+      {
+        "name": "Rent",
+        "icon": "House"
+      }
+      """
+    Then response status code is 400
+    And response headers are
+      | Content-Type | application/problem+json |
+    And response body is
+      """
+      {
+        "title": "Provided category violates some of the constraints",
+        "violations": [
+          {
+            "property": "name",
+            "violation": "NonUnique"
+          }
+        ]
+      }
+      """
