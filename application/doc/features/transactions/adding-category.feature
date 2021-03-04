@@ -36,10 +36,11 @@ Feature: New category
       }
       """
 
-  Scenario: Category already exists
-    Given category constraint violations are
-      | property | violation |
-      | name     | NonUnique |
+
+  Scenario Outline: Category violates some constraints
+    Given category violates "<property>" property constraint
+    And violation message pattern is "<message pattern>" with parameters
+      | <parameter name> | <parameter value> |
     When client performs a POST "/categories" request with body
       """
       {
@@ -56,9 +57,19 @@ Feature: New category
         "title": "Provided category violates some of the constraints",
         "violations": [
           {
-            "property": "name",
-            "violation": "NonUnique"
+            "property": "<property>",
+            "message": {
+              "pattern": "<message pattern>",
+              "parameters": {
+                "<parameter name>": "<parameter value>"
+              }
+            }
           }
         ]
       }
       """
+
+    Examples:
+      | property         | message pattern                                                 | parameter name     | parameter value |
+      | name             | Category name contains illegal characters: %illegal-characters% | illegal-characters | !, @, #, $, %   |
+      | awesome property | Just another message for %category%                             | category           | Rent            |
