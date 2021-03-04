@@ -1,6 +1,6 @@
 package com.smtm.application.common.dto
 
-import com.smtm.application.transactions.categories.v1.ConstraintViolation
+import com.smtm.common.ConstraintViolation
 import org.springframework.hateoas.MediaTypes
 import org.springframework.hateoas.mediatype.problem.Problem
 import org.springframework.http.ResponseEntity

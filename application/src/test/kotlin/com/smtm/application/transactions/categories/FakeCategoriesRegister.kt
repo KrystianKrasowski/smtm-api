@@ -1,6 +1,9 @@
 package com.smtm.application.transactions.categories
 
 import com.smtm.application.transactions.categories.v1.*
+import com.smtm.common.ConstraintViolation
+import com.smtm.common.constraintViolationOf
+import com.smtm.common.messageOf
 
 private val defaultViolation = constraintViolationOf(
     property = "none",

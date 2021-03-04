@@ -17,8 +17,9 @@
 		<mockito.version>1.10.19</mockito.version>
 	</properties>
 	<modules>
-		<module>application</module>
+		<module>common</module>
 		<module>security</module>
+		<module>application</module>
 	</modules>
 	<build>
 		<sourceDirectory>src/main/kotlin</sourceDirectory>
@@ -100,6 +101,11 @@
 				<groupId>com.auth0</groupId>
 				<artifactId>java-jwt</artifactId>
 				<version>3.10.3</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>common</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
