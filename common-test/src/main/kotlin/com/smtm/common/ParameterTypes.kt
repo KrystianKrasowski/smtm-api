@@ -5,9 +5,9 @@ import io.cucumber.java.ParameterType
 
 class ParameterTypes {
 
-    @ParameterType("(([A-Za-z0-9-_ .,]+=[A-Za-z0-9-_ .,@]+(,)?)+)")
+    @ParameterType("(([A-Za-z0-9-_ .,]+=[A-Za-z0-9-_ .,@]+(;)?)+)")
     fun violationMessageParameters(input: String) = input
-        .split(",")
+        .split(";")
         .map { it.trim() }
         .map { parameter ->
             parameter
