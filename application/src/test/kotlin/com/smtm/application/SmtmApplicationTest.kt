@@ -12,7 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
 
 @RunWith(Cucumber::class)
-@CucumberOptions(features = ["doc/features"])
+@CucumberOptions(
+    features = ["doc/features"],
+    glue = [
+        "com.smtm.common",
+        "com.smtm.application"
+    ]
+)
 @CucumberContextConfiguration
 @SpringBootTest(
     classes = [

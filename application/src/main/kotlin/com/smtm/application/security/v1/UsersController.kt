@@ -2,9 +2,7 @@ package com.smtm.application.security.v1
 
 import com.smtm.application.common.dto.toResponse400
 import com.smtm.security.api.UserRegistration
-import com.smtm.security.registration.ConstraintViolation
 import com.smtm.security.registration.UserProfile
-import org.springframework.hateoas.mediatype.problem.Problem
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -34,10 +32,3 @@ class UsersController(private val userRegistration: UserRegistration) {
 }
 
 private fun UserProfile.Valid.toResponse201() = userProfileDtoOf(this).toResponse201()
-
-data class ViolationsProblemDto(val violations: List<ConstraintViolation>)
-
-fun List<ConstraintViolation>.toResponse400(title: String): ResponseEntity<Problem> = Problem.create()
-    .withTitle(title)
-    .withProperties(ViolationsProblemDto(this))
-    .toResponse400()

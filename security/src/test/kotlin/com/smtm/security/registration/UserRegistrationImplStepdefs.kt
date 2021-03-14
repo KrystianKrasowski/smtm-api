@@ -30,15 +30,4 @@ class UserRegistrationImplStepdefs(private val world: World) {
     fun `message for xxx violation is yyy with parameters zzz`(property: String, pattern: String, parameters: Map<String, String>) {
         assertThat(userProfile).hasConstraintViolation(property, pattern, parameters)
     }
-
-    @ParameterType("(([A-Za-z0-9-_ .,]+=[A-Za-z0-9-_ .,@]+(,)?)+)")
-    fun violationMessageParameters(input: String) = input
-        .split(",")
-        .map { it.trim() }
-        .map { parameter ->
-            parameter
-                .split("=")
-                .let { Pair(it[0], it[1]) }
-        }
-        .toMap()
 }

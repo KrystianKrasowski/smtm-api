@@ -35,9 +35,9 @@ Feature: User registration
 
   Scenario: User registration fails due to constraint violations
     Given constraint violations are
-      | property | violation             |
-      | email    | NotAnEmailAddress     |
-      | password | NotEnoughSpecialChars |
+      | property | message                                                     | parameters               |
+      | email    | %email% is not a valid e-mail address                       | email=john.doe#gmail.com |
+      | password | Password should contain at least %num% special character(s) | num=1                    |
     When client performs a POST "/security/users" request with body
       """
       {
@@ -55,11 +55,21 @@ Feature: User registration
         "violations": [
           {
             "property": "email",
-            "violation": "NotAnEmailAddress"
+            "message": {
+              "pattern": "%email% is not a valid e-mail address",
+              "parameters": {
+                "email": "john.doe#gmail.com"
+              }
+            }
           },
           {
             "property": "password",
-            "violation": "NotEnoughSpecialChars"
+            "message": {
+              "pattern": "Password should contain at least %num% special character(s)",
+              "parameters": {
+                "num": "1"
+              }
+            }
           }
         ]
       }
