@@ -1,6 +1,9 @@
 package com.smtm.application.transactions.categories.v1
 
 import com.smtm.application.common.dto.toResponse400
+import com.smtm.transactions.api.AcceptingCategory
+import com.smtm.transactions.api.CategoriesRegister
+import com.smtm.transactions.api.Category
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 

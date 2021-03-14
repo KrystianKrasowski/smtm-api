@@ -1,4 +1,4 @@
-package com.smtm.application.transactions.categories.v1
+package com.smtm.transactions.api
 
 import com.smtm.common.ConstraintViolation
 

@@ -77,12 +77,16 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-kotlin</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>security</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.smtm</groupId>
-			<artifactId>security</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transactions</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-kotlin</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

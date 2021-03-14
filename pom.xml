@@ -21,6 +21,7 @@
 		<module>common-test</module>
 		<module>security</module>
 		<module>application</module>
+		<module>transactions</module>
 	</modules>
 	<build>
 		<sourceDirectory>src/main/kotlin</sourceDirectory>
@@ -74,6 +75,11 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>security</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>transactions</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
