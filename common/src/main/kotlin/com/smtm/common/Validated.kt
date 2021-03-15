@@ -15,4 +15,4 @@ sealed class Validated<T>(private val subject: T?, private val violations: List<
 
 fun <T> validationSuccessOf(subject: T): Validated<T> = Validated.Success(subject)
 
-fun validationFailureOf(violations: List<ConstraintViolation>): Validated<Nothing> = Validated.Failure(violations)
+fun <T> validationFailureOf(violations: List<ConstraintViolation>): Validated<T> = Validated.Failure(violations)

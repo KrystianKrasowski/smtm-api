@@ -30,7 +30,7 @@ class ValidatedTest {
             )
         )
 
-        val result = validationFailureOf(listOf(violation1, violation2))
+        val result = validationFailureOf<Nothing>(listOf(violation1, violation2))
             .map { 12 }
             .map { 34 }
             .orElse { 56 }
