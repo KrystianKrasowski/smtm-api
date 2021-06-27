@@ -5,6 +5,7 @@ sealed class Validated<T>(private val subject: T?, private val violations: List<
     class Success<T> internal constructor(subject: T) : Validated<T>(subject, emptyList())
     class Failure<T> internal constructor(violations: List<ConstraintViolation>) : Validated<T>(null, violations)
 
+    @Suppress("UNCHECKED_CAST")
     fun <R> map(transform: (T) -> R): Validated<R> = subject
         ?.let(transform)
         ?.let { validationSuccessOf(it) }

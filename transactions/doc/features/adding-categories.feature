@@ -33,3 +33,27 @@ Feature: Adding categories
       | name       | message                                            | parameters  |
       | Rent       | Category %name% already exists                     | name=Rent   |
       | $aving$$!^ | Category name contains illegal characters: %chars% | chars=$,!,^ |
+
+
+  Scenario Outline: Category icon is not valid
+    When category is registering as
+      | name  | icon   |
+      | Hobby | <icon> |
+    Then category is not registered
+    And constraint violations contain
+      | property | message   | parameters   |
+      | icon     | <message> | <parameters> |
+
+    Examples:
+      | icon               | message                                            | parameters                  |
+      | !@#$my-icon-%^&*() | Category icon contains illegal characters: %chars% | chars=!,@,#,$,-,%,^,&,*,(,) |
+
+
+  Scenario: Category parent does not exist
+    When category is registering as
+      | name     | icon | parent |
+      | Holidays | Sun  | 4      |
+    Then category is not registered
+    And constraint violations contain
+      | property | message                                   | parameters |
+      | parent   | Category parent of id %id% does not exist | id=4       |

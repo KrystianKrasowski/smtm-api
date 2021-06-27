@@ -8,4 +8,6 @@ interface CategoriesRepository {
     fun add(category: Category): AcceptingCategory
 
     fun hasRegisteredName(name: String): Boolean
+
+    fun hasRegisteredId(id: Long): Boolean
 }

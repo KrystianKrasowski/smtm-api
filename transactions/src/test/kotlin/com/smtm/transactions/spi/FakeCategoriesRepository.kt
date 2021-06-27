@@ -13,7 +13,9 @@ class FakeCategoriesRepository : CategoriesRepository {
         .also { registeredCategories.add(it) }
         .let { acceptedCategoryOf(it) }
 
-    override fun hasRegisteredName(name: String) = registeredCategories.any { it.name == name }
+    override fun hasRegisteredName(name: String): Boolean = registeredCategories.any { it.name == name }
+
+    override fun hasRegisteredId(id: Long): Boolean = registeredCategories.any { it.id == id }
 
     private fun generateId() = registeredCategories
         .maxOf { (it.id ?: 0) }
