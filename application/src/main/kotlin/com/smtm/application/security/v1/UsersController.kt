@@ -1,10 +1,8 @@
 package com.smtm.application.security.v1
 
-import com.smtm.application.common.dto.ViolationsProblemDto
+import com.smtm.application.common.dto.toResponse400
 import com.smtm.security.api.UserRegistration
 import com.smtm.security.registration.UserProfile
-import org.springframework.hateoas.MediaTypes.HTTP_PROBLEM_DETAILS_JSON
-import org.springframework.hateoas.mediatype.problem.Problem
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -27,19 +25,10 @@ class UsersController(private val userRegistration: UserRegistration) {
     )
     fun registerUser(@RequestBody credentials: CredentialsDto): ResponseEntity<*> = when (val profile = credentials.register()) {
         is UserProfile.Valid -> profile.toResponse201()
-        is UserProfile.Invalid -> profile.toResponse400()
+        is UserProfile.Invalid -> profile.violations.toResponse400("Provided credentials violate some of the constraints")
     }
 
     private fun CredentialsDto.register() = userRegistration.register(email, password)
 }
 
 private fun UserProfile.Valid.toResponse201() = userProfileDtoOf(this).toResponse201()
-
-private fun UserProfile.Invalid.toResponse400() = Problem.create()
-    .withTitle("Provided credentials violate some of the constraints")
-    .withProperties(ViolationsProblemDto(violations))
-    .toResponse400()
-
-private fun Problem.toResponse400() = ResponseEntity.badRequest()
-    .contentType(HTTP_PROBLEM_DETAILS_JSON)
-    .body(this)

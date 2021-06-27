@@ -17,8 +17,11 @@
 		<mockito.version>1.10.19</mockito.version>
 	</properties>
 	<modules>
-		<module>application</module>
+		<module>common</module>
+		<module>common-test</module>
 		<module>security</module>
+		<module>application</module>
+		<module>transactions</module>
 	</modules>
 	<build>
 		<sourceDirectory>src/main/kotlin</sourceDirectory>
@@ -60,8 +63,23 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.smtm</groupId>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>common-test</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>security</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>transactions</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

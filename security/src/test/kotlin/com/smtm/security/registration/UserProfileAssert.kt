@@ -1,5 +1,7 @@
 package com.smtm.security.registration
 
+import com.smtm.common.constraintViolationOf
+import com.smtm.common.messageOf
 import org.assertj.core.api.AbstractAssert
 import org.assertj.core.api.Assertions.assertThat
 
@@ -17,14 +19,9 @@ class UserProfileAssert(userProfile: UserProfile?) : AbstractAssert<UserProfileA
         return myself
     }
 
-    fun hasConstraintViolation(key: String, violation: Violation) {
+    fun hasConstraintViolation(property: String, pattern: String, parameters: Map<String, String>) {
         isInvalid()
-        assertThat(actualAsInvalid.violations).contains(constraintViolationOf(key, violation))
-    }
-
-    fun hasAnyConstraintViolationFor(key: String) {
-        isInvalid()
-        assertThat(actualAsInvalid.violations.find { it.property == key }).isNotNull
+        assertThat(actualAsInvalid.violations).contains(constraintViolationOf(property, messageOf(pattern, parameters)))
     }
 
     private fun isValid(): UserProfileAssert {

@@ -6,6 +6,10 @@ import org.junit.runner.RunWith
 
 @RunWith(Cucumber::class)
 @CucumberOptions(
-    features = ["doc/features"]
+    features = ["doc/features"],
+    glue = [
+        "com.smtm.common",
+        "com.smtm.security"
+    ]
 )
 class SecurityTest

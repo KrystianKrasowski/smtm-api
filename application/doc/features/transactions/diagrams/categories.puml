@@ -1,0 +1,20 @@
+@startuml
+
+component Transactions
+interface CategoryRegister
+interface CategoriesRepository
+
+package "Infrastructure" {
+    rectangle CategoriesRepositoryAdapter <<database>>
+    CategoriesRepositoryAdapter -down-( CategoriesRepository
+}
+
+Transactions -up- CategoriesRepository
+Transactions -down- CategoryRegister
+
+package "Application" {
+    rectangle CategoriesController <<resource>>
+    CategoriesController -up-> CategoryRegister
+}
+
+@enduml

@@ -1,6 +1,6 @@
 package com.smtm.application
 
-import com.smtm.application.categories.TestCategoriesConfiguration
+import com.smtm.application.transactions.categories.TestCategoriesConfiguration
 import com.smtm.application.security.TestSecurityConfiguration
 import com.smtm.application.security.WebSecurityConfiguration
 import io.cucumber.junit.Cucumber
@@ -12,7 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
 
 @RunWith(Cucumber::class)
-@CucumberOptions(features = ["doc/features"])
+@CucumberOptions(
+    features = ["doc/features"],
+    glue = [
+        "com.smtm.common",
+        "com.smtm.application"
+    ]
+)
 @CucumberContextConfiguration
 @SpringBootTest(
     classes = [

@@ -1,5 +1,7 @@
 package com.smtm.security.registration
 
+import com.smtm.common.ConstraintViolation
+
 sealed class UserProfile {
 
     data class Valid internal constructor(val id: Long, val email: EmailAddress) : UserProfile()
