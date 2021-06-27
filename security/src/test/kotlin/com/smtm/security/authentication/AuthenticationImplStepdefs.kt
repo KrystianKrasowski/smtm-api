@@ -20,13 +20,13 @@ class AuthenticationImplStepdefs(private val world: World) {
         token = authentication.authenticate(emailAddress, password)
     }
 
-    @Then("authorization token is empty")
-    fun `authorization token is empty`() {
+    @Then("access token is empty")
+    fun `access token is empty`() {
         assertThat(token).isNull()
     }
 
-    @Then("authorization token is not empty")
-    fun `authorization token is not empty`() {
+    @Then("access token is not empty")
+    fun `access token is not empty`() {
         assertThat(token).isNotNull
     }
 

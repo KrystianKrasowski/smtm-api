@@ -9,13 +9,13 @@ Feature: Authentication
 
   Scenario: User authenticates successfully
     When user authenticates with email "john.doe@gmail.com" and password "Sup3r$ecret"
-    Then authorization token is not empty
+    Then access token is not empty
     And user id is 11
 
 
   Scenario Outline: User authentication fails
     When user authenticates with email "<email>" and password "<password>"
-    Then authorization token is empty
+    Then access token is empty
 
     Examples:
       | email              | password    |
