@@ -2,15 +2,20 @@ package com.smtm.application.security
 
 import com.smtm.application.security.v1.CredentialsDto
 import com.smtm.application.security.v1.credentialsDtoOf
-import com.smtm.security.token.tokenOf
+import com.smtm.security.authentication.tokenOf
 import io.cucumber.java.DataTableType
 import io.cucumber.java.en.Given
 
 class AuthenticationStepdefs(private val fakeAuthentication: FakeAuthentication) {
 
-    @Given("token {string} is produced by credentials")
-    fun tokenIsProducedByCredentials(token: String, credentials: CredentialsDto) {
-        fakeAuthentication.validTokens[credentials] = tokenOf(token, 1)
+    @Given("access token {string} is produced by credentials")
+    fun accessTokenIsProducedByCredentials(token: String, credentials: CredentialsDto) {
+        fakeAuthentication.validAccessTokens[credentials] = tokenOf(token, 1)
+    }
+
+    @Given("refresh token {string} is produced by credentials")
+    fun refreshTokenIsProducedByCredentials(token: String, credentials: CredentialsDto) {
+        fakeAuthentication.validRefreshTokens[credentials] = tokenOf(token, 1)
     }
 
     @DataTableType

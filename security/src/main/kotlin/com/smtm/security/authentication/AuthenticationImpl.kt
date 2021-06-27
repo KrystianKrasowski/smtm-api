@@ -3,30 +3,36 @@ package com.smtm.security.authentication
 import com.smtm.security.api.Authentication
 import com.smtm.security.registration.EmailAddress
 import com.smtm.security.registration.UnencryptedPassword
+import com.smtm.security.spi.AuthenticationSettings
 import com.smtm.security.spi.UsersRepository
-import com.smtm.security.token.Token
 import java.time.Clock
 import java.util.*
 
 internal class AuthenticationImpl(
     private val usersRepository: UsersRepository,
-    private val secret: String,
-    private val validityTime: Int,
+    private val authenticationSettings: AuthenticationSettings,
     private val clock: Clock
 ) : Authentication {
 
-    override fun authenticate(emailAddress: EmailAddress, password: UnencryptedPassword): Token? = usersRepository
+    override fun authenticate(emailAddress: EmailAddress, password: UnencryptedPassword): Tokens? = usersRepository
         .findAuthorized(emailAddress, password)
-        ?.let { createToken(it.id, Date.from(specifyExpirationDate()), secret) }
+        ?.let {
+            tokensOf(
+                accessToken = createToken(it.id, authenticationSettings.accessTokenValidTime),
+                refreshToken = createToken(it.id, authenticationSettings.refreshTokenValidTime)
+            )
+        }
 
-    private fun specifyExpirationDate() = clock
+    private fun createToken(userId: Long, validTime: Int) = createToken(userId, specifyExpirationDate(validTime), authenticationSettings.secret)
+
+    private fun specifyExpirationDate(time: Int) = clock
         .instant()
-        .plusSeconds(validityTime.toLong())
+        .plusSeconds(time.toLong())
+        .let { Date.from(it) }
 }
 
 fun authenticationOf(
     usersRepository: UsersRepository,
-    secret: String,
-    validityTime: Int,
+    authenticationSettings: AuthenticationSettings,
     clock: Clock
-): Authentication = AuthenticationImpl(usersRepository, secret, validityTime, clock)
+): Authentication = AuthenticationImpl(usersRepository, authenticationSettings, clock)

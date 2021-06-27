@@ -14,7 +14,7 @@ class WebSecurityConfiguration(private val authorization: Authorization) : WebSe
     override fun configure(web: WebSecurity) {
         web.ignoring()
             .antMatchers(HttpMethod.POST, "/security/users")
-            .antMatchers(HttpMethod.POST, "/security/token")
+            .antMatchers(HttpMethod.POST, "/security/tokens")
     }
 
     override fun configure(http: HttpSecurity) {

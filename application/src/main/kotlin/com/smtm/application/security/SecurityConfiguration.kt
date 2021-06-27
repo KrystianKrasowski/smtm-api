@@ -8,6 +8,7 @@ import com.smtm.security.api.UserRegistration
 import com.smtm.security.authentication.authenticationOf
 import com.smtm.security.authorization.authorizationOf
 import com.smtm.security.registration.userRegistrationOf
+import com.smtm.security.spi.AuthenticationSettings
 import com.smtm.security.spi.UsersRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -30,16 +31,22 @@ class SecurityConfiguration {
     }
 
     @Bean
+    fun authenticationSettings(@Value("\${smtm.security.jwt.secret}") secret: String,
+                               @Value("\${smtm.security.jwt.access-token-validity}") accessTokenValidity: Int,
+                               @Value("\${smtm.security.jwt.refresh-token-validity}") refreshTokenValidity: Int): AuthenticationSettings {
+        return AuthenticationSettingsAdapter(secret, accessTokenValidity, refreshTokenValidity)
+    }
+
+    @Bean
     fun userRegistration(usersRepository: UsersRepository): UserRegistration {
         return userRegistrationOf(usersRepository)
     }
 
     @Bean
     fun authentication(usersRepository: UsersRepository,
-                       @Value("\${smtm.security.jwt.secret}") secret: String,
-                       @Value("\${smtm.security.jwt.validity}") validityTime: Int,
+                       authenticationSettings: AuthenticationSettings,
                        clock: Clock): Authentication {
-        return authenticationOf(usersRepository, secret, validityTime, clock)
+        return authenticationOf(usersRepository, authenticationSettings, clock)
     }
 
     @Bean

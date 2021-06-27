@@ -1,8 +1,8 @@
 package com.smtm.application.security
 
 import com.smtm.security.api.Authorization
-import com.smtm.security.token.Token
-import com.smtm.security.token.tokenOf
+import com.smtm.security.authentication.Token
+import com.smtm.security.authentication.tokenOf
 
 class FakeAuthorization : Authorization {
 
