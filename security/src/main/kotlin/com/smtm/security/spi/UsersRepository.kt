@@ -10,5 +10,7 @@ interface UsersRepository {
 
     fun isRegistered(email: EmailAddress): Boolean
 
+    fun isRegistered(userId: Long): Boolean
+
     fun findAuthorized(email: EmailAddress, password: UnencryptedPassword): UserProfile.Valid?
 }

@@ -21,6 +21,8 @@ class FakeUserRepository : UsersRepository {
 
     override fun isRegistered(email: EmailAddress): Boolean = users.values.any { it.email == email }
 
+    override fun isRegistered(userId: Long): Boolean = users.values.any { it.id == userId }
+
     override fun findAuthorized(email: EmailAddress, password: UnencryptedPassword): UserProfile.Valid? {
         return users["$email.$password"]
     }

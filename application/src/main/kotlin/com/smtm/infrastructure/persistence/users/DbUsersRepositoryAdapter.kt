@@ -15,6 +15,8 @@ class DbUsersRepositoryAdapter(private val usersRepository: DbUsersRepository, p
 
     override fun isRegistered(email: EmailAddress): Boolean = usersRepository.findByEmail(email.toString()) != null
 
+    override fun isRegistered(userId: Long): Boolean = usersRepository.findById(userId).isPresent
+
     override fun findAuthorized(email: EmailAddress, password: UnencryptedPassword): Valid? = usersRepository.findByEmail(email.toString())
         ?.takeIf { passwordEncoder.matches(password.toString(), it.password) }
         ?.toUserProfile()

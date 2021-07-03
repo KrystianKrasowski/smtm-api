@@ -2,11 +2,9 @@ package com.smtm.security.authorization
 
 import com.smtm.security.api.Authorization
 import com.smtm.security.authentication.Token
-import com.smtm.security.authentication.createToken
+import com.smtm.security.authentication.TokenFactory
 
-internal class AuthorizationImpl(private val secret: String) : Authorization {
+class AuthorizationImpl(private val tokenFactory: TokenFactory) : Authorization {
 
-    override fun authorize(token: String): Token? = createToken(token, secret)
+    override fun authorize(token: String): Token? = tokenFactory.create(token)
 }
-
-fun authorizationOf(secret: String): Authorization = AuthorizationImpl(secret)

@@ -4,7 +4,7 @@ class FakeAuthenticationSettings : AuthenticationSettings {
 
     override val secret = "aaa"
 
-    override val accessTokenValidTime = 300
+    override var accessTokenValidTime = 300
 
-    override val refreshTokenValidTime = 900
+    override var refreshTokenValidTime = 900
 }

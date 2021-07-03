@@ -8,7 +8,7 @@ import com.smtm.security.spi.UsersRepository
 
 private const val EmailPattern = "^[A-Za-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ0-9._%+-]+@[A-ZęóąśłżźćńĘÓĄŚŁŻŹĆŃa-z0-9.-]+\\.[A-ZęóąśłżźćńĘÓĄŚŁŻŹĆŃa-z]{2,6}$"
 
-internal class NewUserValidator(private val usersRepository: UsersRepository) {
+class NewUserValidator(private val usersRepository: UsersRepository) {
 
     private val passwordValidator = basicPasswordValidatorOf()
 
@@ -22,5 +22,3 @@ internal class NewUserValidator(private val usersRepository: UsersRepository) {
 
     private fun UnencryptedPassword.unsecure() = getViolations(passwordValidator)
 }
-
-internal fun newUserValidatorOf(usersRepository: UsersRepository) = NewUserValidator(usersRepository)

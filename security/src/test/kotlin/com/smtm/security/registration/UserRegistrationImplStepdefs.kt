@@ -3,7 +3,6 @@ package com.smtm.security.registration
 import com.smtm.security.World
 import com.smtm.security.api.UserRegistration
 import com.smtm.security.assertThat
-import io.cucumber.java.ParameterType
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat
@@ -11,7 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 class UserRegistrationImplStepdefs(private val world: World) {
 
     private val userRegistration: UserRegistration
-        get() = userRegistrationOf(world.userRepository)
+        get() = UserRegistrationImpl(NewUserValidator(world.userRepository), world.userRepository)
 
     private var userProfile: UserProfile? = null
 

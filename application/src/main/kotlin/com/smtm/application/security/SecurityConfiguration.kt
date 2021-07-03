@@ -5,9 +5,11 @@ import com.smtm.infrastructure.persistence.users.DbUsersRepositoryAdapter
 import com.smtm.security.api.CredentialsAuthentication
 import com.smtm.security.api.Authorization
 import com.smtm.security.api.UserRegistration
-import com.smtm.security.authentication.authenticationOf
-import com.smtm.security.authorization.authorizationOf
-import com.smtm.security.registration.userRegistrationOf
+import com.smtm.security.authentication.AuthenticationImpl
+import com.smtm.security.authentication.TokenFactory
+import com.smtm.security.authorization.AuthorizationImpl
+import com.smtm.security.registration.NewUserValidator
+import com.smtm.security.registration.UserRegistrationImpl
 import com.smtm.security.spi.AuthenticationSettings
 import com.smtm.security.spi.UsersRepository
 import org.springframework.beans.factory.annotation.Value
@@ -39,18 +41,34 @@ class SecurityConfiguration {
 
     @Bean
     fun userRegistration(usersRepository: UsersRepository): UserRegistration {
-        return userRegistrationOf(usersRepository)
+        return UserRegistrationImpl(
+            newUserValidator = NewUserValidator(
+                usersRepository = usersRepository
+            ),
+            usersRepository = usersRepository
+        )
     }
 
     @Bean
     fun authentication(usersRepository: UsersRepository,
                        authenticationSettings: AuthenticationSettings,
                        clock: Clock): CredentialsAuthentication {
-        return authenticationOf(usersRepository, authenticationSettings, clock)
+        return AuthenticationImpl(
+            usersRepository = usersRepository,
+            tokenFactory = TokenFactory(
+                authenticationSettings = authenticationSettings,
+                clock = clock
+            )
+        )
     }
 
     @Bean
-    fun authorization(@Value("\${smtm.security.jwt.secret}") secret: String): Authorization {
-        return authorizationOf(secret)
+    fun authorization(authenticationSettings: AuthenticationSettings, clock: Clock): Authorization {
+        return AuthorizationImpl(
+            tokenFactory = TokenFactory(
+                authenticationSettings = authenticationSettings,
+                clock = clock
+            )
+        )
     }
 }

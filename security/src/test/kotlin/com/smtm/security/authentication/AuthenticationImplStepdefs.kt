@@ -10,7 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 class AuthenticationImplStepdefs(private val world: World) {
 
     private val authentication
-        get() = authenticationOf(world.userRepository, world.authenticationSettings, world.clock)
+        get() = AuthenticationImpl(world.userRepository, world.tokenFactory)
 
     private var tokens: Tokens? = null
 
@@ -19,18 +19,28 @@ class AuthenticationImplStepdefs(private val world: World) {
         tokens = authentication.authenticate(emailAddress, password)
     }
 
+    @When("user authenticates with refresh token")
+    fun `user authenticates with token`(token: String) {
+        tokens = authentication.authenticate(token)
+    }
+
     @Then("access token is empty")
     fun `access token is empty`() {
         assertThat(tokens?.accessToken).isNull()
     }
 
-    @Then("access token is not empty")
-    fun `access token is not empty`() {
-        assertThat(tokens?.accessToken).isNotNull
+    @Then("refresh token is empty")
+    fun `refresh token is empty`() {
+        assertThat(tokens?.refreshToken).isNull()
     }
 
-    @Then("user id is {int}")
-    fun `user id is xxx`(id: Long) {
-        assertThat(tokens?.accessToken?.userId).isEqualTo(id)
+    @Then("access token is")
+    fun `access token is`(token: Token) {
+        assertThat(tokens?.accessToken).isEqualTo(token)
+    }
+
+    @Then("refresh token is")
+    fun `refresh token is`(token: Token) {
+        assertThat(tokens?.refreshToken).isEqualTo(token)
     }
 }

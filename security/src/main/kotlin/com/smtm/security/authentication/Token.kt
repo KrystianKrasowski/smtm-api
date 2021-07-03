@@ -3,8 +3,8 @@ package com.smtm.security.authentication
 data class Tokens internal constructor(val accessToken: Token, val refreshToken: Token)
 
 data class Token internal constructor(val value: String, val userId: Long) {
-    override fun toString() = value
 
+    override fun toString() = value
 }
 
 fun tokensOf(accessToken: Token, refreshToken: Token) = Tokens(accessToken, refreshToken)
