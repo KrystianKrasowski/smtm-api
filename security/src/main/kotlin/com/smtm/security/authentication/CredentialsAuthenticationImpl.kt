@@ -1,6 +1,6 @@
 package com.smtm.security.authentication
 
-import com.smtm.security.api.Authentication
+import com.smtm.security.api.CredentialsAuthentication
 import com.smtm.security.registration.EmailAddress
 import com.smtm.security.registration.UnencryptedPassword
 import com.smtm.security.spi.AuthenticationSettings
@@ -8,11 +8,11 @@ import com.smtm.security.spi.UsersRepository
 import java.time.Clock
 import java.util.*
 
-internal class AuthenticationImpl(
+internal class CredentialsAuthenticationImpl(
     private val usersRepository: UsersRepository,
     private val authenticationSettings: AuthenticationSettings,
     private val clock: Clock
-) : Authentication {
+) : CredentialsAuthentication {
 
     override fun authenticate(emailAddress: EmailAddress, password: UnencryptedPassword): Tokens? = usersRepository
         .findAuthorized(emailAddress, password)
@@ -35,4 +35,4 @@ fun authenticationOf(
     usersRepository: UsersRepository,
     authenticationSettings: AuthenticationSettings,
     clock: Clock
-): Authentication = AuthenticationImpl(usersRepository, authenticationSettings, clock)
+): CredentialsAuthentication = CredentialsAuthenticationImpl(usersRepository, authenticationSettings, clock)

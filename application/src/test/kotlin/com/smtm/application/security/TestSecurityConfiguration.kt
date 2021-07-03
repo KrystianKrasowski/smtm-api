@@ -1,9 +1,10 @@
 package com.smtm.application.security
 
-import com.smtm.application.security.v1.TokenController
+import com.smtm.application.security.v1.TokensController
 import com.smtm.application.security.v1.UsersController
-import com.smtm.security.api.Authentication
+import com.smtm.security.api.CredentialsAuthentication
 import com.smtm.security.api.Authorization
+import com.smtm.security.api.RefreshTokenAuthentication
 import com.smtm.security.api.UserRegistration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,13 +19,17 @@ class TestSecurityConfiguration {
     fun authorization(): Authorization = FakeAuthorization()
 
     @Bean
-    fun authentication(): Authentication = FakeAuthentication()
+    fun credentialsAuthentication(): CredentialsAuthentication = FakeCredentialsAuthentication()
+
+    @Bean
+    fun refreshTokenAuthentication(): RefreshTokenAuthentication = FakeRefreshTokenAuthentication()
 
     @Bean
     fun usersController(userRegistration: UserRegistration): UsersController = UsersController(userRegistration)
 
     @Bean
-    fun tokenController(authentication: Authentication): TokenController = TokenController(authentication)
+    fun tokenController(credentialsAuthentication: CredentialsAuthentication,
+                        refreshTokenAuthentication: RefreshTokenAuthentication): TokensController = TokensController(credentialsAuthentication, refreshTokenAuthentication)
 
     @Bean
     fun testProtectedResourceController(): TestProtectedResourceController = TestProtectedResourceController()

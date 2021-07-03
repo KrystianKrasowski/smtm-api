@@ -1,6 +1,7 @@
 package com.smtm.application.security.v1
 
-import com.smtm.security.api.Authentication
+import com.smtm.security.api.CredentialsAuthentication
+import com.smtm.security.api.RefreshTokenAuthentication
 import com.smtm.security.authentication.Tokens
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -10,7 +11,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping(path = ["/security/tokens"])
-class TokenController(private val authentication: Authentication) {
+class TokensController(private val credentialsAuthentication: CredentialsAuthentication,
+                       private val refreshTokenAuthentication: RefreshTokenAuthentication) {
 
     @PostMapping(
         consumes = [CredentialsDto.MediaTypeValue],
@@ -21,8 +23,18 @@ class TokenController(private val authentication: Authentication) {
         ?.toResponseEntity()
         ?: unauthorized
 
-    private fun CredentialsDto.authenticate() = authentication.authenticate(email, password)
+    @PostMapping(
+        consumes = [RefreshTokenDto.MediaTypeValue],
+        produces = [TokensDto.MediaTypeValue]
+    )
+    fun createTokens(@RequestBody refreshToken: RefreshTokenDto): ResponseEntity<*> = refreshToken
+        .authenticate()
+        ?.toResponseEntity()
+        ?: unauthorized
 
+    private fun CredentialsDto.authenticate() = credentialsAuthentication.authenticate(email, password)
+
+    private fun RefreshTokenDto.authenticate() = refreshTokenAuthentication.authenticate(token)
 }
 
 private fun Tokens.toResponseEntity() = tokensDtoOf(accessToken.value, refreshToken.value)

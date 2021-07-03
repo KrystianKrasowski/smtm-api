@@ -2,7 +2,7 @@ package com.smtm.application.security
 
 import com.smtm.infrastructure.persistence.users.DbUsersRepository
 import com.smtm.infrastructure.persistence.users.DbUsersRepositoryAdapter
-import com.smtm.security.api.Authentication
+import com.smtm.security.api.CredentialsAuthentication
 import com.smtm.security.api.Authorization
 import com.smtm.security.api.UserRegistration
 import com.smtm.security.authentication.authenticationOf
@@ -45,7 +45,7 @@ class SecurityConfiguration {
     @Bean
     fun authentication(usersRepository: UsersRepository,
                        authenticationSettings: AuthenticationSettings,
-                       clock: Clock): Authentication {
+                       clock: Clock): CredentialsAuthentication {
         return authenticationOf(usersRepository, authenticationSettings, clock)
     }
 
