@@ -1,32 +1,29 @@
 package com.smtm.security.authentication
 
-import com.smtm.security.api.Authentication
+import com.smtm.security.api.CredentialsAuthentication
+import com.smtm.security.api.RefreshTokenAuthentication
 import com.smtm.security.registration.EmailAddress
 import com.smtm.security.registration.UnencryptedPassword
+import com.smtm.security.spi.AuthenticationSettings
 import com.smtm.security.spi.UsersRepository
-import com.smtm.security.token.Token
 import java.time.Clock
 import java.util.*
 
-internal class AuthenticationImpl(
+class AuthenticationImpl(
     private val usersRepository: UsersRepository,
-    private val secret: String,
-    private val validityTime: Int,
-    private val clock: Clock
-) : Authentication {
+    private val tokenFactory: TokenFactory
+) : CredentialsAuthentication, RefreshTokenAuthentication {
 
-    override fun authenticate(emailAddress: EmailAddress, password: UnencryptedPassword): Token? = usersRepository
+    override fun authenticate(emailAddress: EmailAddress, password: UnencryptedPassword): Tokens? = usersRepository
         .findAuthorized(emailAddress, password)
-        ?.let { createToken(it.id, Date.from(specifyExpirationDate()), secret) }
+        ?.let { createTokens(it.id) }
 
-    private fun specifyExpirationDate() = clock
-        .instant()
-        .plusSeconds(validityTime.toLong())
+    override fun authenticate(token: String): Tokens? = tokenFactory.create(token)
+        ?.takeIf { usersRepository.isRegistered(it.userId) }
+        ?.let { createTokens(it.userId) }
+
+    private fun createTokens(userId: Long) = tokensOf(
+        accessToken = tokenFactory.createAccessToken(userId),
+        refreshToken = tokenFactory.createRefreshToken(userId)
+    )
 }
-
-fun authenticationOf(
-    usersRepository: UsersRepository,
-    secret: String,
-    validityTime: Int,
-    clock: Clock
-): Authentication = AuthenticationImpl(usersRepository, secret, validityTime, clock)

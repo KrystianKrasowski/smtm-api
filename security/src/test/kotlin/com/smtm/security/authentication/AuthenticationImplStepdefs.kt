@@ -3,7 +3,6 @@ package com.smtm.security.authentication
 import com.smtm.security.World
 import com.smtm.security.registration.EmailAddress
 import com.smtm.security.registration.UnencryptedPassword
-import com.smtm.security.token.Token
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat
@@ -11,27 +10,37 @@ import org.assertj.core.api.Assertions.assertThat
 class AuthenticationImplStepdefs(private val world: World) {
 
     private val authentication
-        get() = authenticationOf(world.userRepository, world.tokenGenerationKey, world.tokenValidityTime, world.clock)
+        get() = AuthenticationImpl(world.userRepository, world.tokenFactory)
 
-    private var token: Token? = null
+    private var tokens: Tokens? = null
 
     @When("user authenticates with email \"{emailAddress}\" and password \"{unencryptedPassword}\"")
     fun `user authenticates with email xxx and password xxx`(emailAddress: EmailAddress, password: UnencryptedPassword) {
-        token = authentication.authenticate(emailAddress, password)
+        tokens = authentication.authenticate(emailAddress, password)
     }
 
-    @Then("authorization token is empty")
-    fun `authorization token is empty`() {
-        assertThat(token).isNull()
+    @When("user authenticates with refresh token")
+    fun `user authenticates with token`(token: String) {
+        tokens = authentication.authenticate(token)
     }
 
-    @Then("authorization token is not empty")
-    fun `authorization token is not empty`() {
-        assertThat(token).isNotNull
+    @Then("access token is empty")
+    fun `access token is empty`() {
+        assertThat(tokens?.accessToken).isNull()
     }
 
-    @Then("user id is {int}")
-    fun `user id is xxx`(id: Long) {
-        assertThat(token?.userId).isEqualTo(id)
+    @Then("refresh token is empty")
+    fun `refresh token is empty`() {
+        assertThat(tokens?.refreshToken).isNull()
+    }
+
+    @Then("access token is")
+    fun `access token is`(token: Token) {
+        assertThat(tokens?.accessToken).isEqualTo(token)
+    }
+
+    @Then("refresh token is")
+    fun `refresh token is`(token: Token) {
+        assertThat(tokens?.refreshToken).isEqualTo(token)
     }
 }

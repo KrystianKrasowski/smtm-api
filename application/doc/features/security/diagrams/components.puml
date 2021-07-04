@@ -2,7 +2,8 @@
 
 component Security
 interface UserRegistration
-interface Authentication
+interface CredentialsAuthentication
+interface RefreshTokenAuthentication
 interface Authorization
 interface UsersRepository
 
@@ -13,15 +14,17 @@ package "Infrastructure" {
 
 Security -up- UsersRepository
 Security -down- UserRegistration
-Security -down- Authentication
+Security -down- CredentialsAuthentication
+Security -down- RefreshTokenAuthentication
 Security -down- Authorization
 
 package "Application" {
     rectangle UsersController <<resource>>
-    rectangle TokenController <<resource>>
+    rectangle TokensController <<resource>>
     rectangle JwtAuthorizationFilter <<filter>>
     JwtAuthorizationFilter -up-> Authorization
-    TokenController -up->Authentication
+    TokensController -up->CredentialsAuthentication
+    TokensController -up->RefreshTokenAuthentication
     UsersController -up-> UserRegistration
 }
 
