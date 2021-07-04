@@ -9,7 +9,7 @@ import java.time.Instant
 import java.util.*
 import com.auth0.jwt.interfaces.Clock as Auth0Clock
 
-class TokenFactory(private val authenticationSettings: AuthenticationSettings, private val clock: Clock) {
+class JwtTokenFactory(private val authenticationSettings: AuthenticationSettings, private val clock: Clock) {
 
     private val algorithm: Algorithm
         get() = Algorithm.HMAC512(authenticationSettings.secret)
@@ -27,13 +27,13 @@ class TokenFactory(private val authenticationSettings: AuthenticationSettings, p
         .withSubject(subject.toString())
         .withExpiresAt(Date.from(expiresAt))
         .sign(algorithm)
-        .let { tokenOf(it, subject) }
+        .let { JwtToken(subject, it) }
 
     internal fun create(token: String) = JWT.require(algorithm)
         .let { it as JWTVerifier.BaseVerification }
         .build(auth0Clock)
         .runCatching { verify(token) }
-        .map { tokenOf(token, it.subject.toLong()) }
+        .map { JwtToken(it.subject.toLong(), token) }
         .getOrNull()
 
     private fun getExpirationDate(validityTime: Int) = clock

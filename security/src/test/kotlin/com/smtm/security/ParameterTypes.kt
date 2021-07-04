@@ -1,6 +1,6 @@
 package com.smtm.security
 
-import com.smtm.security.authentication.Token
+import com.smtm.security.api.Token
 import com.smtm.security.registration.*
 import io.cucumber.java.DataTableType
 import io.cucumber.java.ParameterType
@@ -41,7 +41,7 @@ class ParameterTypes(private val world: World) {
 
     @DataTableType
     fun tokenString(entry: Map<String, String>): String {
-        return token(entry).value
+        return token(entry).toString()
     }
 }
 

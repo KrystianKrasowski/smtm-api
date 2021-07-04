@@ -1,8 +1,7 @@
 package com.smtm.application.security
 
 import com.smtm.security.api.Authorization
-import com.smtm.security.authentication.Token
-import com.smtm.security.authentication.tokenOf
+import com.smtm.security.api.Token
 
 class FakeAuthorization : Authorization {
 
@@ -10,5 +9,5 @@ class FakeAuthorization : Authorization {
 
     override fun authorize(token: String): Token? = token
         .takeIf { validTokens.contains(it) }
-        ?.let { tokenOf(it, 1) }
+        ?.let { tokenOf(it) }
 }

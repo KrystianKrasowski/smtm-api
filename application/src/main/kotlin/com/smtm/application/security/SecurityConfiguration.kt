@@ -6,7 +6,7 @@ import com.smtm.security.api.CredentialsAuthentication
 import com.smtm.security.api.Authorization
 import com.smtm.security.api.UserRegistration
 import com.smtm.security.authentication.AuthenticationImpl
-import com.smtm.security.authentication.TokenFactory
+import com.smtm.security.authentication.JwtTokenFactory
 import com.smtm.security.authorization.AuthorizationImpl
 import com.smtm.security.registration.NewUserValidator
 import com.smtm.security.registration.UserRegistrationImpl
@@ -55,7 +55,7 @@ class SecurityConfiguration {
                        clock: Clock): CredentialsAuthentication {
         return AuthenticationImpl(
             usersRepository = usersRepository,
-            tokenFactory = TokenFactory(
+            tokenFactory = JwtTokenFactory(
                 authenticationSettings = authenticationSettings,
                 clock = clock
             )
@@ -65,7 +65,7 @@ class SecurityConfiguration {
     @Bean
     fun authorization(authenticationSettings: AuthenticationSettings, clock: Clock): Authorization {
         return AuthorizationImpl(
-            tokenFactory = TokenFactory(
+            tokenFactory = JwtTokenFactory(
                 authenticationSettings = authenticationSettings,
                 clock = clock
             )
