@@ -22,8 +22,8 @@ class AuthenticationImplStepdefs(private val world: World) {
     }
 
     @When("user authenticates with refresh token")
-    fun `user authenticates with token`(token: String) {
-        tokenPair = authentication.authenticate(token)
+    fun `user authenticates with token`(token: Token) {
+        tokenPair = authentication.authenticate(token.toString())
     }
 
     @Then("access token is empty")

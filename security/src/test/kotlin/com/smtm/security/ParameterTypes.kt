@@ -34,14 +34,10 @@ class ParameterTypes(private val world: World) {
     @DataTableType
     fun token(entry: Map<String, String>): Token {
         return world.tokenFactory.create(
-            subject = entry.getValue("sub").toLong(),
-            expiresAt = instant(entry.getValue("exp"))
+            subject = entry.getValue("subject").toLong(),
+            expiresAt = instant(entry.getValue("expires at")),
+            id = entry["id"]
         )
-    }
-
-    @DataTableType
-    fun tokenString(entry: Map<String, String>): String {
-        return token(entry).toString()
     }
 }
 
