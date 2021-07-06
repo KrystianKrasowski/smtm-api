@@ -1,7 +1,9 @@
 package com.smtm.security
 
-import com.smtm.security.authentication.Token
+import com.smtm.security.api.AccessToken
+import com.smtm.security.api.RefreshToken
 import com.smtm.security.registration.*
+import com.smtm.security.spi.FakeRefreshTokensRepository
 import io.cucumber.java.DataTableType
 import io.cucumber.java.ParameterType
 import java.time.Instant
@@ -32,16 +34,28 @@ class ParameterTypes(private val world: World) {
     }
 
     @DataTableType
-    fun token(entry: Map<String, String>): Token {
-        return world.tokenFactory.create(
-            subject = entry.getValue("sub").toLong(),
-            expiresAt = instant(entry.getValue("exp"))
+    fun accessToken(entry: Map<String, String>): AccessToken {
+        return world.tokenFactory.createAccessToken(
+            subject = entry.getValue("subject").toLong(),
+            expiresAt = instant(entry.getValue("expires at"))
         )
     }
 
     @DataTableType
-    fun tokenString(entry: Map<String, String>): String {
-        return token(entry).value
+    fun refreshToken(entry: Map<String, String>): RefreshToken {
+        return world.tokenFactory.createRefreshToken(
+            subject = entry.getValue("subject").toLong(),
+            expiresAt = instant(entry.getValue("expires at")),
+            id = entry.getValue("id")
+        )
+    }
+
+    @DataTableType
+    fun fakeRefreshTokenRepositoryRecord(entry: Map<String, String>): FakeRefreshTokensRepository.Record {
+        return FakeRefreshTokensRepository.Record(
+            subject = entry.getValue("subject").toLong(),
+            id = entry.getValue("id")
+        )
     }
 }
 

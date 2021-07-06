@@ -1,21 +1,17 @@
 package com.smtm.application.security
 
-import com.smtm.security.api.RefreshTokenAuthentication
-import com.smtm.security.authentication.Token
-import com.smtm.security.authentication.Tokens
-import com.smtm.security.authentication.tokensOf
+import com.smtm.security.api.*
 
 class FakeRefreshTokenAuthentication : RefreshTokenAuthentication {
 
-
-    val accessTokens = mutableMapOf<String, Token>()
-    val refreshTokens = mutableMapOf<String, Token>()
+    val accessTokens = mutableMapOf<String, AccessToken>()
+    val refreshTokens = mutableMapOf<String, RefreshToken>()
     var invalidRefreshToken = ""
 
-    override fun authenticate(token: String): Tokens? {
+    override fun authenticate(token: String): TokenPair? {
         if (token == invalidRefreshToken) {
             return null
         }
-        return tokensOf(accessTokens.getValue(token), refreshTokens.getValue(token))
+        return tokenPairOf(accessTokens.getValue(token), refreshTokens.getValue(token))
     }
 }

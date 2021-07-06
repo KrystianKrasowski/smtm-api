@@ -2,7 +2,7 @@ package com.smtm.application.security.v1
 
 import com.smtm.security.api.CredentialsAuthentication
 import com.smtm.security.api.RefreshTokenAuthentication
-import com.smtm.security.authentication.Tokens
+import com.smtm.security.api.TokenPair
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -37,7 +37,7 @@ class TokensController(private val credentialsAuthentication: CredentialsAuthent
     private fun RefreshTokenDto.authenticate() = refreshTokenAuthentication.authenticate(token)
 }
 
-private fun Tokens.toResponseEntity() = tokensDtoOf(accessToken.value, refreshToken.value)
+private fun TokenPair.toResponseEntity() = tokensDtoOf(accessToken.toString(), refreshToken.toString())
     .let { ResponseEntity.ok(it) }
 
 private val unauthorized = ResponseEntity.status(401).build<Nothing>()
