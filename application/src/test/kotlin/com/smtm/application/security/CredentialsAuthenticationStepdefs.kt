@@ -9,12 +9,12 @@ class CredentialsAuthenticationStepdefs(private val fakeAuthentication: FakeCred
 
     @Given("new access token {string} is produced by credentials")
     fun accessTokenIsProducedByCredentials(token: String, credentials: CredentialsDto) {
-        fakeAuthentication.validAccessTokens[credentials] = tokenOf(token)
+        fakeAuthentication.validAccessTokens[credentials] = accessTokenOf(token)
     }
 
     @Given("new refresh token {string} is produced by credentials")
     fun refreshTokenIsProducedByCredentials(token: String, credentials: CredentialsDto) {
-        fakeAuthentication.validRefreshTokens[credentials] = tokenOf(token)
+        fakeAuthentication.validRefreshTokens[credentials] = refreshTokenOf(token)
     }
 
     @DataTableType

@@ -1,5 +1,7 @@
 package com.smtm.application.security
 
+import com.smtm.infrastructure.persistence.refresh.tokens.DbRefreshTokensRepository
+import com.smtm.infrastructure.persistence.refresh.tokens.RefreshTokensRepositoryAdapter
 import com.smtm.infrastructure.persistence.users.DbUsersRepository
 import com.smtm.infrastructure.persistence.users.DbUsersRepositoryAdapter
 import com.smtm.security.api.CredentialsAuthentication
@@ -12,6 +14,7 @@ import com.smtm.security.registration.NewUserValidator
 import com.smtm.security.registration.UserRegistrationImpl
 import com.smtm.security.spi.AuthenticationSettings
 import com.smtm.security.spi.GuidGenerator
+import com.smtm.security.spi.RefreshTokensRepository
 import com.smtm.security.spi.UsersRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -34,15 +37,22 @@ class SecurityConfiguration {
     }
 
     @Bean
-    fun authenticationSettings(@Value("\${smtm.security.jwt.secret}") secret: String,
-                               @Value("\${smtm.security.jwt.access-token-validity}") accessTokenValidity: Int,
-                               @Value("\${smtm.security.jwt.refresh-token-validity}") refreshTokenValidity: Int): AuthenticationSettings {
+    fun authenticationSettings(
+        @Value("\${smtm.security.jwt.secret}") secret: String,
+        @Value("\${smtm.security.jwt.access-token-validity}") accessTokenValidity: Int,
+        @Value("\${smtm.security.jwt.refresh-token-validity}") refreshTokenValidity: Int
+    ): AuthenticationSettings {
         return AuthenticationSettingsAdapter(secret, accessTokenValidity, refreshTokenValidity)
     }
 
     @Bean
     fun guidGenerator(): GuidGenerator {
         return GuidGeneratorAdapter()
+    }
+
+    @Bean
+    fun refreshTokensRepository(dbRefreshTokensRepository: DbRefreshTokensRepository): RefreshTokensRepository {
+        return RefreshTokensRepositoryAdapter(dbRefreshTokensRepository)
     }
 
     @Bean
@@ -56,17 +66,21 @@ class SecurityConfiguration {
     }
 
     @Bean
-    fun authentication(usersRepository: UsersRepository,
-                       authenticationSettings: AuthenticationSettings,
-                       clock: Clock,
-                       guidGenerator: GuidGenerator): CredentialsAuthentication {
+    fun authentication(
+        usersRepository: UsersRepository,
+        authenticationSettings: AuthenticationSettings,
+        clock: Clock,
+        guidGenerator: GuidGenerator,
+        refreshTokensRepository: RefreshTokensRepository
+    ): CredentialsAuthentication {
         return AuthenticationImpl(
             usersRepository = usersRepository,
             tokenFactory = JwtTokenFactory(
                 authenticationSettings = authenticationSettings,
                 clock = clock,
                 guidGenerator = guidGenerator
-            )
+            ),
+            refreshTokensRepository = refreshTokensRepository
         )
     }
 

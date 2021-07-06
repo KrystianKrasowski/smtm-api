@@ -6,12 +6,12 @@ class RefreshTokenAuthenticationStepdefs(private val authentication: FakeRefresh
 
     @Given("new access token {string} is produced by refresh token {string}")
     fun `new access token is produced by refresh token`(accessToken: String, previousRefreshToken: String) {
-        authentication.accessTokens[previousRefreshToken] = tokenOf(accessToken)
+        authentication.accessTokens[previousRefreshToken] = accessTokenOf(accessToken)
     }
 
     @Given("new refresh token {string} is produced by refresh token {string}")
     fun `new refresh token is produced by refresh token`(refreshToken: String, previousRefreshToken: String) {
-        authentication.refreshTokens[previousRefreshToken] = tokenOf(refreshToken)
+        authentication.refreshTokens[previousRefreshToken] = refreshTokenOf(refreshToken)
     }
 
     @Given("invalid refresh token is {string}")

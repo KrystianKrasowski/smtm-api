@@ -2,7 +2,7 @@ package com.smtm.security.registration
 
 import com.smtm.security.World
 import com.smtm.security.api.UserRegistration
-import com.smtm.security.assertThat
+import com.smtm.security.assertions.assertThat
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat

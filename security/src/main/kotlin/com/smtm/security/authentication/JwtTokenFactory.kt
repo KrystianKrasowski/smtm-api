@@ -22,18 +22,36 @@ class JwtTokenFactory(private val authenticationSettings: AuthenticationSettings
             return com.auth0.jwt.interfaces.Clock { Date.from(clock.instant()) }
         }
 
-    internal fun createAccessToken(subject: Long) = create(subject, getExpirationDate(authenticationSettings.accessTokenValidTime))
+    internal fun createAccessToken(subject: Long) = createAccessToken(subject, getExpirationDate(authenticationSettings.accessTokenValidTime))
 
-    internal fun createRefreshToken(subject: Long) = create(subject, getExpirationDate(authenticationSettings.refreshTokenValidTime), guidGenerator.generate())
-
-    internal fun create(token: String) = JWT.require(algorithm)
+    internal fun createAccessToken(token: String) = JWT.require(algorithm)
         .let { it as JWTVerifier.BaseVerification }
         .build(auth0Clock)
         .runCatching { verify(token) }
-        .map { create(it.subject.toLong(), it.expiresAt.toInstant(), it.id) }
+        .map { createAccessToken(it.subject.toLong(), it.expiresAt.toInstant()) }
         .getOrNull()
 
-    internal fun create(subject: Long, expiresAt: Instant, id: String? = null) = JwtToken(subject, expiresAt, id, authenticationSettings.secret)
+    internal fun createAccessToken(subject: Long, expiresAt: Instant) = JwtAccessToken(
+        subject = subject,
+        expiresAt = expiresAt,
+        secret = authenticationSettings.secret
+    )
+
+    internal fun createRefreshToken(subject: Long) = createRefreshToken(subject, getExpirationDate(authenticationSettings.refreshTokenValidTime), guidGenerator.generate())
+
+    internal fun createRefreshToken(token: String) = JWT.require(algorithm)
+        .let { it as JWTVerifier.BaseVerification }
+        .build(auth0Clock)
+        .runCatching { verify(token) }
+        .map { createRefreshToken(it.subject.toLong(), it.expiresAt.toInstant(), it.id) }
+        .getOrNull()
+
+    internal fun createRefreshToken(subject: Long, expiresAt: Instant, id: String) = JwtRefreshToken(
+        subject = subject,
+        expiresAt = expiresAt,
+        id = id,
+        secret = authenticationSettings.secret
+    )
 
     private fun getExpirationDate(validityTime: Int) = clock
         .instant()

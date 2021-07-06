@@ -1,7 +1,8 @@
 package com.smtm.security.authentication
 
 import com.smtm.security.World
-import com.smtm.security.api.Token
+import com.smtm.security.api.AccessToken
+import com.smtm.security.api.RefreshToken
 import com.smtm.security.api.TokenPair
 import com.smtm.security.registration.EmailAddress
 import com.smtm.security.registration.UnencryptedPassword
@@ -12,7 +13,7 @@ import org.assertj.core.api.Assertions.assertThat
 class AuthenticationImplStepdefs(private val world: World) {
 
     private val authentication
-        get() = AuthenticationImpl(world.userRepository, world.tokenFactory)
+        get() = AuthenticationImpl(world.userRepository, world.tokenFactory, world.refreshTokenRepository)
 
     private var tokenPair: TokenPair? = null
 
@@ -22,7 +23,7 @@ class AuthenticationImplStepdefs(private val world: World) {
     }
 
     @When("user authenticates with refresh token")
-    fun `user authenticates with token`(token: Token) {
+    fun `user authenticates with token`(token: RefreshToken) {
         tokenPair = authentication.authenticate(token.toString())
     }
 
@@ -37,12 +38,12 @@ class AuthenticationImplStepdefs(private val world: World) {
     }
 
     @Then("access token is")
-    fun `access token is`(token: Token) {
-        assertThat(tokenPair?.accessToken).isEqualTo(token)
+    fun `access token is`(accessToken: AccessToken) {
+        assertThat(tokenPair?.accessToken).isEqualTo(accessToken)
     }
 
     @Then("refresh token is")
-    fun `refresh token is`(token: Token) {
+    fun `refresh token is`(token: RefreshToken) {
         assertThat(tokenPair?.refreshToken).isEqualTo(token)
     }
 }

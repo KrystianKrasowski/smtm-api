@@ -1,11 +1,14 @@
-package com.smtm.security.registration
+package com.smtm.security.assertions
 
 import com.smtm.common.constraintViolationOf
 import com.smtm.common.messageOf
+import com.smtm.security.registration.EmailAddress
+import com.smtm.security.registration.UserProfile
 import org.assertj.core.api.AbstractAssert
 import org.assertj.core.api.Assertions.assertThat
 
-class UserProfileAssert(userProfile: UserProfile?) : AbstractAssert<UserProfileAssert, UserProfile>(userProfile, UserProfileAssert::class.java) {
+class UserProfileAssert private constructor(userProfile: UserProfile?) :
+    AbstractAssert<UserProfileAssert, UserProfile>(userProfile, UserProfileAssert::class.java) {
 
     private val actualAsValid
         get() = actual as UserProfile.Valid
@@ -34,5 +37,10 @@ class UserProfileAssert(userProfile: UserProfile?) : AbstractAssert<UserProfileA
         isNotNull
         isInstanceOf(UserProfile.Invalid::class.java)
         return myself
+    }
+
+    companion object {
+
+        fun assertThat(userProfile: UserProfile?) = UserProfileAssert(userProfile)
     }
 }

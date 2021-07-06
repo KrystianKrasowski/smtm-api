@@ -13,13 +13,21 @@ interface RefreshTokenAuthentication {
     fun authenticate(token: String): TokenPair?
 }
 
-data class TokenPair internal constructor(val accessToken: Token, val refreshToken: Token)
+data class TokenPair internal constructor(val accessToken: AccessToken, val refreshToken: RefreshToken)
 
-interface Token {
+interface AccessToken {
 
     val userId: Long
 
     override fun toString(): String
 }
 
-fun tokenPairOf(accessToken: Token, refreshToken: Token) = TokenPair(accessToken, refreshToken)
+interface RefreshToken {
+
+    val userId: Long
+    val tokenId: String
+
+    override fun toString(): String
+}
+
+fun tokenPairOf(accessToken: AccessToken, refreshToken: RefreshToken) = TokenPair(accessToken, refreshToken)
