@@ -11,6 +11,7 @@ services:
       - DB_URL=jdbc:mysql://db:3306/${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
+      - STAGE=${STAGE}
     ports:
       - 8080:8080
     depends_on:
