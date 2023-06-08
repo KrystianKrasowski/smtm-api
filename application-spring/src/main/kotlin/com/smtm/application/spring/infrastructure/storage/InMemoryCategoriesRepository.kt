@@ -1,7 +1,6 @@
 package com.smtm.application.spring.infrastructure.storage
 
 import arrow.core.Either
-import arrow.core.left
 import arrow.core.right
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.categories.Categories
@@ -29,7 +28,7 @@ class InMemoryCategoriesRepository : CategoriesRepository {
 
     override fun save(categories: Categories): Either<CategoriesProblem, List<Category>> {
         val newCategories = categories.newCategories
-            .mapIndexed { index, category -> category.copy(id = index + categories.categories.size.toLong()) }
+            .mapIndexed { index, category -> category.copy(id = index + categories.list.size.toLong()) }
 
         categoryList += newCategories
 

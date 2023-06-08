@@ -43,7 +43,7 @@ class CategoriesAssert(result: Categories) :
     AbstractAssert<CategoriesAssert, Categories>(result, CategoriesAssert::class.java) {
 
     fun contains(category: Category): CategoriesAssert {
-        Assertions.assertThat(actual.categories).contains(category)
+        Assertions.assertThat(actual.list).contains(category)
         return myself
     }
 }

@@ -11,7 +11,7 @@ class CategoriesService(private val repository: CategoriesRepository) {
     fun getAll(): Either<CategoriesProblem, List<Category>> {
         return repository
             .getCategories()
-            .map { it.categories }
+            .map { it.list }
     }
 
     fun create(category: Category): Either<CategoriesProblem, Category> {
