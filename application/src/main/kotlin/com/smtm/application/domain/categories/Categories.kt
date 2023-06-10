@@ -6,7 +6,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
 import com.smtm.application.domain.Aggregate
-import com.smtm.application.domain.UserId
+import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Version
 import com.smtm.application.domain.Violation
 import com.smtm.application.domain.emptyViolationOf
@@ -17,10 +17,10 @@ import com.smtm.application.domain.violationPathOf
 typealias CategoriesActionResult = Either<CategoriesProblem, Categories>
 
 data class Categories(
-    override val id: UserId,
+    override val id: OwnerId,
     override val version: Version,
     val list: List<Category>
-) : Aggregate<UserId> {
+) : Aggregate<OwnerId> {
 
     val newCategories = list.filter { it.isNew() }
     val newCategoryNames = newCategories.map { it.name }
@@ -37,8 +37,8 @@ data class Categories(
 
     companion object {
 
-        fun empty(userId: UserId) = Categories(
-            id = userId,
+        fun empty(ownerId: OwnerId) = Categories(
+            id = ownerId,
             version = versionOf(1),
             list = emptyList()
         )

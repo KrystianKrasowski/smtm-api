@@ -4,10 +4,11 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.smtm.application.domain.Icon
+import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.categories.Categories
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.userIdOf
+import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
 import com.smtm.application.repository.CategoriesRepository
 import jakarta.persistence.CascadeType
@@ -25,12 +26,10 @@ import org.springframework.stereotype.Repository
 
 class CategoriesRepositoryAdapter(private val jpaRepository: CategorySetsJpaRepository) : CategoriesRepository {
 
-    private val ownerId = 1L
-
-    override fun getCategories(): Either<CategoriesProblem, Categories> {
+    override fun getCategories(ownerId: OwnerId): Either<CategoriesProblem, Categories> {
         return jpaRepository
-            .runCatching { findByOwnerId(ownerId) }
-            .map { it?.toDomain() ?: Categories.empty(userIdOf(ownerId)) }
+            .runCatching { findByOwnerId(ownerId.value) }
+            .map { it?.toDomain() ?: Categories.empty(ownerId) }
             .map { it.right() }
             .getOrElse { it.toCategoriesProblem().left() }
     }
@@ -73,7 +72,7 @@ open class CategorySetEntity {
 
     fun toDomain(): Categories {
         return Categories(
-            id = userIdOf(ownerId!!),
+            id = ownerIdOf(ownerId!!),
             version = versionOf(version!!.toLong()),
             list = categories.map { it.toDomain() }
         )

@@ -3,7 +3,7 @@ package com.smtm.application.domain.categories
 import arrow.core.Either
 import com.smtm.application.domain.Violation
 import com.smtm.application.domain.categories.assertions.assertThat
-import com.smtm.application.domain.userIdOf
+import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -21,7 +21,7 @@ class UserCategoriesStepdefs {
 
     @When("user creates category")
     fun `user creates category`(category: Category) {
-        categories = Categories(userIdOf(1), versionOf(1), userCurrentCategories)
+        categories = Categories(ownerIdOf(1), versionOf(1), userCurrentCategories)
             .add(category)
     }
 

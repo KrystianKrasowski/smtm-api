@@ -4,6 +4,7 @@ import com.smtm.application.HalCollection
 import com.smtm.application.Link
 import com.smtm.application.MediaType
 import com.smtm.application.domain.Icon
+import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Violation
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
@@ -23,7 +24,10 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/categories")
-class CategoriesResource(private val categoriesService: CategoriesService) : CategoriesApi {
+class CategoriesResource(
+    private val categoriesService: CategoriesService,
+    private val ownerIdProvider: () -> OwnerId
+) : CategoriesApi {
 
     private val collectionLinks = mapOf(
         "self" to Link("http://localhost:8080/categories")
@@ -33,8 +37,8 @@ class CategoriesResource(private val categoriesService: CategoriesService) : Cat
         produces = [MediaType.VERSION_1_JSON]
     )
     override fun getAll(): HalCollection<CategoryDto> {
-        return categoriesService
-            .getAll()
+        return ownerIdProvider()
+            .let { categoriesService.getAll(it) }
             .fold(CategoriesProblemHandler::handle, this::createDto)
     }
 
@@ -45,7 +49,7 @@ class CategoriesResource(private val categoriesService: CategoriesService) : Cat
     override fun save(@RequestBody category: NewCategoryDto): CategoryDto {
         return category
             .toDomain()
-            .let { categoriesService.create(it) }
+            .let { categoriesService.create(it, ownerIdProvider()) }
             .fold(CategoriesProblemHandler::handle, this::createDto)
     }
 
