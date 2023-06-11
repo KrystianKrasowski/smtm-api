@@ -28,6 +28,11 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'org.flywaydb:flyway-core:9.19.3'
     implementation 'org.postgresql:postgresql:42.6.0'
+
+    runtimeOnly 'com.h2database:h2'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 }
 
 tasks.withType(KotlinCompile) {

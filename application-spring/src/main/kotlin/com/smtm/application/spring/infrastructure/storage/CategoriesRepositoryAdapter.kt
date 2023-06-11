@@ -14,11 +14,11 @@ import com.smtm.application.repository.CategoriesRepository
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
@@ -66,8 +66,7 @@ open class CategorySetEntity {
     @Column(name = "version")
     open var version: Int? = null
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "owner_id")
+    @OneToMany(mappedBy = "set", cascade = [CascadeType.ALL])
     open var categories: MutableList<CategoryEntity> = mutableListOf()
 
     fun toDomain(): Categories {
@@ -81,15 +80,15 @@ open class CategorySetEntity {
     companion object {
 
         fun fromDomain(categories: Categories): CategorySetEntity {
-            val entity = CategorySetEntity()
+            val categorySet = CategorySetEntity()
 
-            entity.ownerId = categories.id.value
-            entity.version = categories.version.value.toInt()
-            entity.categories = categories.list
-                .map { CategoryEntity.fromDomain(it, categories.id.value) }
+            categorySet.ownerId = categories.id.value
+            categorySet.version = categories.version.value.toInt()
+            categorySet.categories = categories.list
+                .map { CategoryEntity.fromDomain(it, categorySet) }
                 .toMutableList()
 
-            return entity
+            return categorySet
         }
     }
 }
@@ -102,8 +101,9 @@ open class CategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     open var id: Long? = null
 
-    @Column(name = "owner_id")
-    open var ownerId: Long? = null
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    open var set: CategorySetEntity? = null
 
     @Column(name = "name")
     open var name: String? = null
@@ -121,10 +121,10 @@ open class CategoryEntity {
 
     companion object {
 
-        fun fromDomain(category: Category, ownerId: Long): CategoryEntity {
+        fun fromDomain(category: Category, set: CategorySetEntity): CategoryEntity {
             val entity = CategoryEntity()
             entity.id = category.id
-            entity.ownerId = ownerId
+            entity.set = set
             entity.name = category.name
             entity.icon = category.icon.name
             return entity

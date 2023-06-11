@@ -5,6 +5,8 @@ enum class Icon {
     HOUSE,
     PIGGY_BANK,
     LIGHTENING,
+    SHOPPING_CART,
+    SUNGLASSES
     ;
 
     companion object {
