@@ -49,7 +49,7 @@ class CategoriesResource(
     override fun save(@RequestBody category: NewCategoryDto): CategoryDto {
         return category
             .toDomain()
-            .let { categoriesService.create(it, ownerIdProvider()) }
+            .let { categoriesService.save(it, ownerIdProvider()) }
             .fold(CategoriesProblemHandler::handle, this::createDto)
     }
 

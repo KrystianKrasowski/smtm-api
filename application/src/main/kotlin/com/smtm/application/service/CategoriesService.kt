@@ -15,7 +15,7 @@ class CategoriesService(private val repository: CategoriesRepository) {
             .map { it.list }
     }
 
-    fun create(category: Category, ownerId: OwnerId): Either<CategoriesProblem, Category> {
+    fun save(category: Category, ownerId: OwnerId): Either<CategoriesProblem, Category> {
         return repository
             .getCategories(ownerId)
             .flatMap { it.add(category) }

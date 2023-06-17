@@ -18,8 +18,22 @@ class InMemoryCategoriesRepository : CategoriesRepository {
     }
 
     override fun save(categories: Categories): Either<CategoriesProblem, Categories> {
-        this.version = categories.version
-        this.categoryList = categories.list
-        return categories.right()
+        val categoriesWithAppliedIds = categories.applyIds()
+        this.version = categoriesWithAppliedIds.version
+        this.categoryList = categoriesWithAppliedIds.list
+        return categoriesWithAppliedIds.right()
     }
+
+    private fun Categories.applyIds(): Categories {
+        val categoriesWithId: MutableList<Category> = list.filter { it.id != null }.toMutableList()
+        list
+            .filter { it.id == null }
+            .forEach { categoriesWithId.add(it.copy(id = categoriesWithId.getMaxId() + 1)) }
+        return copy(list = categoriesWithId.toList())
+    }
+
+    private fun Iterable<Category>.getMaxId() = this
+        .filter { it.id != null }
+        .maxBy { it.id!! }
+        .id!!
 }

@@ -10,7 +10,7 @@ Feature: Categories
 
 
   Scenario: The one where category is successfully added
-    When user creates category
+    When user saves category
       | name      | icon   |
       | Groceries | FOLDER |
     Then user categories contains
@@ -19,7 +19,7 @@ Feature: Categories
 
 
   Scenario Outline: The one where provided category is not valid
-    When user creates category
+    When user saves category
       | name   | icon   |
       | <name> | FOLDER |
     Then constraint violations set contains

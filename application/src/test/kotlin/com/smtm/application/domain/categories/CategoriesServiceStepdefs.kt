@@ -7,17 +7,17 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions
 
-class UserCategoriesStepdefs(private val world: World) {
+class CategoriesServiceStepdefs(private val world: World) {
 
     private val service get() = CategoriesService(world.categoriesRepository)
 
     private var addedCategory: Category? = null
     private var problem: CategoriesProblem? = null
 
-    @When("user creates category")
-    fun `user creates category`(category: Category) {
+    @When("user saves category")
+    fun `user saves category`(category: Category) {
         service
-            .create(category, world.ownerId)
+            .save(category, world.ownerId)
             .onLeft { this.problem = it }
             .onRight { this.addedCategory = it }
     }
