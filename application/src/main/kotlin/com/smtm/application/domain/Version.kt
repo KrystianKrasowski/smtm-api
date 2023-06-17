@@ -7,3 +7,4 @@ value class Version(val value: Long) {
 }
 
 fun versionOf(number: Long) = Version(number)
+fun versionOf(number: Int) = versionOf(number.toLong())

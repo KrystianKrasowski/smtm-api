@@ -20,6 +20,6 @@ class CategoriesService(private val repository: CategoriesRepository) {
             .getCategories(ownerId)
             .flatMap { it.add(category) }
             .flatMap { repository.save(it) }
-            .map { it.first() }
+            .map { it.getByName(category.name) }
     }
 }

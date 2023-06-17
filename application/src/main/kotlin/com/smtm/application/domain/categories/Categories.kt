@@ -11,7 +11,6 @@ import com.smtm.application.domain.Version
 import com.smtm.application.domain.Violation
 import com.smtm.application.domain.emptyViolationOf
 import com.smtm.application.domain.nonUniqueViolationOf
-import com.smtm.application.domain.versionOf
 import com.smtm.application.domain.violationPathOf
 
 typealias CategoriesActionResult = Either<CategoriesProblem, Categories>
@@ -22,27 +21,19 @@ data class Categories(
     val list: List<Category>
 ) : Aggregate<OwnerId> {
 
-    val newCategories = list.filter { it.isNew() }
-    val newCategoryNames = newCategories.map { it.name }
-
     fun add(category: Category): CategoriesActionResult {
         return category
             .validate()
             .map { Categories(id, version.increment(), list + it) }
     }
 
+    fun getByName(name: String): Category = list.first { it.name == name }
+
+    fun isFirstVersion(): Boolean = version.value == 1L
+
     private fun Category.validate() = CategoryValidator(list, this)
         .validate()
         .mapLeft { CategoriesProblem.Violations(it) }
-
-    companion object {
-
-        fun empty(ownerId: OwnerId) = Categories(
-            id = ownerId,
-            version = versionOf(1),
-            list = emptyList()
-        )
-    }
 }
 
 private class CategoryValidator(currentCategories: List<Category>, private val newCategory: Category) {

@@ -4,10 +4,15 @@ import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.repository.CategoriesRepository
 import com.smtm.application.service.CategoriesService
-import com.smtm.application.spring.infrastructure.storage.CategoriesRepositoryAdapter
-import com.smtm.application.spring.infrastructure.storage.CategorySetsJpaRepository
+import com.smtm.application.spring.infrastructure.persistence.CategoriesRepositoryJdbcAdapter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.jdbc.core.JdbcOperations
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.support.TransactionOperations
+import org.springframework.transaction.support.TransactionTemplate
+import javax.sql.DataSource
 
 @Configuration
 class ApplicationBeansConfiguration {
@@ -21,7 +26,17 @@ class ApplicationBeansConfiguration {
     }
 
     @Bean
-    fun categoriesRepository(jpaRepository: CategorySetsJpaRepository): CategoriesRepository {
-        return CategoriesRepositoryAdapter(jpaRepository)
+    fun categoriesRepository(jdbc: JdbcOperations, transactions: TransactionOperations): CategoriesRepository {
+        return CategoriesRepositoryJdbcAdapter(jdbc, transactions)
+    }
+
+    @Bean
+    fun jdbc(dataSource: DataSource): JdbcOperations {
+        return JdbcTemplate(dataSource)
+    }
+
+    @Bean
+    fun transactions(transactionManager: PlatformTransactionManager): TransactionOperations {
+        return TransactionTemplate(transactionManager)
     }
 }
