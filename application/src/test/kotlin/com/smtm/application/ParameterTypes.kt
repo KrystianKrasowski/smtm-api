@@ -1,5 +1,7 @@
-package com.smtm.application.domain
+package com.smtm.application
 
+import com.smtm.application.domain.Violation
+import com.smtm.application.domain.violationPathOf
 import io.cucumber.java.DataTableType
 
 class ParameterTypes {

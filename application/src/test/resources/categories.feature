@@ -1,6 +1,7 @@
 Feature: Categories
 
   Background:
+    * user categories version is 1
     * user has categories defined
       | id | name           | icon       |
       | 1  | Rent           | HOUSE      |
@@ -13,8 +14,8 @@ Feature: Categories
       | name      | icon   |
       | Groceries | FOLDER |
     Then user categories contains
-      | name      | icon   |
-      | Groceries | FOLDER |
+      | id | name      | icon   |
+      | 4  | Groceries | FOLDER |
 
 
   Scenario Outline: The one where provided category is not valid

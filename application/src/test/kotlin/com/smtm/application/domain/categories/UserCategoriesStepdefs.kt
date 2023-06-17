@@ -1,42 +1,38 @@
 package com.smtm.application.domain.categories
 
-import arrow.core.Either
+import com.smtm.application.World
 import com.smtm.application.domain.Violation
-import com.smtm.application.domain.categories.assertions.assertThat
-import com.smtm.application.domain.ownerIdOf
-import com.smtm.application.domain.versionOf
-import io.cucumber.java.en.Given
+import com.smtm.application.service.CategoriesService
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import org.assertj.core.api.Assertions
 
-class UserCategoriesStepdefs {
+class UserCategoriesStepdefs(private val world: World) {
 
-    private lateinit var userCurrentCategories: List<Category>
-    private lateinit var categories: Either<CategoriesProblem, Categories>
+    private val service get() = CategoriesService(world.categoriesRepository)
 
-    @Given("user has categories defined")
-    fun `user has categories defined`(categories: List<Category>) {
-        userCurrentCategories = categories
-    }
+    private var addedCategory: Category? = null
+    private var problem: CategoriesProblem? = null
 
     @When("user creates category")
     fun `user creates category`(category: Category) {
-        categories = Categories(ownerIdOf(1), versionOf(1), userCurrentCategories)
-            .add(category)
+        service
+            .create(category, world.ownerId)
+            .onLeft { this.problem = it }
+            .onRight { this.addedCategory = it }
     }
 
     @Then("user categories contains")
     fun `user categories contains`(category: Category) {
-        assertThat(categories)
-            .isSuccess()
-            .contains(category)
+        val categories = service.getAll(world.ownerId).getOrNull()
+        Assertions.assertThat(categories).contains(category)
     }
 
     @Then("constraint violations set contains")
     fun `constraint violations set contains`(violation: Violation) {
-        assertThat(categories)
-            .isViolationsProblem()
-            .contains(violation)
+        Assertions.assertThat(this.problem).isInstanceOf(CategoriesProblem.Violations::class.java)
+        val problem = this.problem as CategoriesProblem.Violations
+        Assertions.assertThat(problem.violations).contains(violation)
     }
 }
 
