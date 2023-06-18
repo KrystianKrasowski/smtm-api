@@ -1,26 +1,21 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.8.21'
-}
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'java-library'
 
 group = 'com.smtm.application'
-version = '1.0.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
+sourceCompatibility = '17'
 
 dependencies {
-    implementation 'io.arrow-kt:arrow-core:1.2.0-RC'
-    implementation 'io.arrow-kt:arrow-fx-coroutines:1.2.0-RC'
+    implementation "io.arrow-kt:arrow-core:$ARROW_VERSION"
+    implementation "io.arrow-kt:arrow-fx-coroutines:$ARROW_VERSION"
 
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.3'
-    testImplementation 'io.cucumber:cucumber-java:7.12.1'
-    testImplementation 'io.cucumber:cucumber-junit:7.12.1'
-    testImplementation 'io.cucumber:cucumber-picocontainer:7.12.1'
-    testImplementation 'org.junit.vintage:junit-vintage-engine:5.7.2'
-    testImplementation 'org.assertj:assertj-core:3.24.2'
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:$JUNIT5_VERSION"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$JUNIT5_VERSION"
+    testImplementation "org.junit.vintage:junit-vintage-engine:$JUNIT5_VERSION"
+    testImplementation "io.cucumber:cucumber-java:$CUCUMBER_VERSION"
+    testImplementation "io.cucumber:cucumber-junit:$CUCUMBER_VERSION"
+    testImplementation "io.cucumber:cucumber-picocontainer:$CUCUMBER_VERSION"
+    testImplementation "org.assertj:assertj-core:$ASSERTJ_VERSION"
 }
 
 test {
