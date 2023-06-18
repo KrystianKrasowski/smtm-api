@@ -1,6 +1,5 @@
 package com.smtm.application.v1
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.smtm.application.HalCollection
 import com.smtm.application.HalResource
@@ -11,6 +10,8 @@ interface CategoriesApi {
     fun getAll(): HalCollection<CategoryDto>
 
     fun save(category: NewCategoryDto): CategoryDto
+
+    fun delete(id: Long)
 }
 
 data class CategoryDto(

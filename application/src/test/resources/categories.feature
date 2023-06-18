@@ -9,13 +9,23 @@ Feature: Categories
       | 3  | House services | LIGHTENING |
 
 
-  Scenario: The one where category is successfully added
+  Scenario: The one where category is deleted
+    When user deletes category of id 2
+    Then user category is deleted successfully
+    And user categories contain
+      | id | name    | icon       | status  |
+      | 2  | Savings | PIGGY_BANK | DELETED |
+    And user categories version is incremented to 2
+
+
+  Scenario: The one where category is successfully saved
     When user saves category
       | name      | icon   |
       | Groceries | FOLDER |
-    Then user categories contains
-      | id | name      | icon   |
-      | 4  | Groceries | FOLDER |
+    Then user categories contain
+      | name      | icon   | status |
+      | Groceries | FOLDER | NEW    |
+    And user categories version is incremented to 2
 
 
   Scenario Outline: The one where provided category is not valid

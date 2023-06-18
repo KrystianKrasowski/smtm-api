@@ -16,10 +16,14 @@ import com.smtm.application.v1.CategoriesApi
 import com.smtm.application.v1.CategoryDto
 import com.smtm.application.v1.NewCategoryDto
 import com.smtm.application.v1.ApiProblemDto
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -51,6 +55,14 @@ class CategoriesResource(
             .toDomain()
             .let { categoriesService.save(it, ownerIdProvider()) }
             .fold(CategoriesProblemHandler::handle, this::createDto)
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    override fun delete(@PathVariable("id") id: Long) {
+        categoriesService
+            .delete(id, ownerIdProvider())
+            .onLeft { CategoriesProblemHandler.handle(it) }
     }
 
     private fun createDto(categories: List<Category>) = categories

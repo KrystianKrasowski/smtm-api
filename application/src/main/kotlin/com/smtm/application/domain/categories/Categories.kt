@@ -29,7 +29,16 @@ data class Categories(
 
     fun getByName(name: String): Category = list.first { it.name == name }
 
-    fun isFirstVersion(): Boolean = version.value == 1L
+    fun delete(id: Long): CategoriesActionResult {
+        val categoryToDelete = list.first { it.id == id }
+        val newList = list
+            .toMutableList()
+            .apply { remove(categoryToDelete) }
+            .apply { add(categoryToDelete.copy(status = Category.Status.DELETED)) }
+            .toList()
+
+        return copy(version = version.increment(), list = newList).right()
+    }
 
     private fun Category.validate() = CategoryValidator(list, this)
         .validate()

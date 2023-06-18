@@ -9,7 +9,7 @@ import com.smtm.application.domain.Version
 import com.smtm.application.domain.categories.Categories
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.categories.categoryOf
+import com.smtm.application.domain.categories.existingCategoryOf
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
 import com.smtm.application.repository.CategoriesRepository
@@ -35,46 +35,59 @@ class CategoriesRepositoryJdbcAdapter(
             .getOrElse { otherCategoriesProblemOf("Cannot fetch categories") }
     }
 
-    override fun save(categories: Categories): Either<CategoriesProblem, Categories> = transactions.execute { trn ->
-        categories
+    override fun save(categories: Categories): Either<CategoriesProblem, Categories> = categories
+        .takeIf { it.isModificationNeeded() }
+        ?.applyChanges()
+        ?: categories.right()
+
+    private fun Categories.isModificationNeeded() = list
+        .any { setOf(Category.Status.NEW, Category.Status.DELETED).contains(it.status) }
+
+    private fun Categories.applyChanges() = transactions.execute { trn ->
+        this
             .runCatching { incrementVersion(this) }
-            .mapCatching { insert(it) }
+            .mapCatching { it.insertAllMarked() }
+            .mapCatching { it.deleteAllMarked() }
             .onFailure { trn.setRollbackOnly() }
             .onFailure { logger.error("Cannot save categories", it) }
-            .map { getCategories(categories.id) }
+            .map { getCategories(id) }
             .getOrElse { otherCategoriesProblemOf("Cannot save categories") }
-    }!!
-
-    private fun List<CategorySetEntryEntity>.toCategories(ownerId: OwnerId) = Categories(
-        id = firstOrNull()?.ownerId ?: ownerId,
-        version = firstOrNull()?.setVersion ?: versionOf(0),
-        list = map { categoryOf(it.id, it.name, it.icon) }
-    )
-
-    private fun otherCategoriesProblemOf(message: String) = CategoriesProblem.Other(message).left()
+    }
 
     private fun incrementVersion(categories: Categories) = lazy { createFirstVersionOf(categories) }
         .takeIf { categories.isFirstVersion() }
         ?.value
         ?: updateVersionOf(categories)
 
+    private fun Categories.insertAllMarked() = apply {
+        list.filter { it.status == Category.Status.NEW }
+            .forEach { insert(it, id) }
+    }
+
+    private fun Categories.deleteAllMarked() = apply {
+        list.filter { it.status == Category.Status.DELETED }
+            .forEach { delete(it) }
+    }
+
+    private fun otherCategoriesProblemOf(message: String) = CategoriesProblem.Other(message).left()
+
     private fun createFirstVersionOf(categories: Categories) =
         "INSERT INTO CATEGORY_SETS (OWNER_ID, VERSION) VALUES (?, ?)"
             .let { jdbc.update(it, categories.id.value, 1) }
             .let { categories }
 
-    private fun updateVersionOf(categories: Categories) = "UPDATE CATEGORY_SETS SET VERSION = ? WHERE OWNER_ID = ?"
-        .let { jdbc.update(it, categories.version.value, categories.id.value) }
-        .let { categories }
-
-    private fun insert(categories: Categories) = categories
-        .list
-        .filter { it.isNew() }
-        .forEach { insert(it, categories.id) }
+    private fun updateVersionOf(categories: Categories) =
+        "UPDATE CATEGORY_SETS SET VERSION = ? WHERE OWNER_ID = ?"
+            .let { jdbc.update(it, categories.version.value, categories.id.value) }
+            .let { categories }
 
     private fun insert(category: Category, ownerId: OwnerId) =
         "INSERT INTO CATEGORIES (NAME, ICON, OWNER_ID) VALUES (?, ?, ?)"
             .let { jdbc.update(it, category.name, category.icon.name, ownerId.value) }
+
+    private fun delete(category: Category) =
+        "DELETE FROM CATEGORIES WHERE ID = ?"
+            .let { jdbc.update(it, category.id) }
 }
 
 private data class CategorySetEntryEntity(
@@ -83,7 +96,10 @@ private data class CategorySetEntryEntity(
     val icon: Icon,
     val ownerId: OwnerId,
     val setVersion: Version
-)
+) {
+
+    fun toDomain() = existingCategoryOf(id, name, icon)
+}
 
 private class CategorySetEntryEntityMapper : RowMapper<CategorySetEntryEntity> {
 
@@ -98,8 +114,16 @@ private class CategorySetEntryEntityMapper : RowMapper<CategorySetEntryEntity> {
     }
 }
 
+private fun List<CategorySetEntryEntity>.toCategories(ownerId: OwnerId) = Categories(
+    id = firstOrNull()?.ownerId ?: ownerId,
+    version = firstOrNull()?.setVersion ?: versionOf(0),
+    list = map { it.toDomain() }
+)
+
 private fun String.toIcon() = Icon.valueOfOrNull(this) ?: Icon.FOLDER
 
 private fun Long.toOwnerId() = ownerIdOf(this)
 
 private fun Int.toVersion() = versionOf(this)
+
+private fun Categories.isFirstVersion() = version.value == 1L

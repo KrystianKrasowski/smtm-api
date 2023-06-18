@@ -12,12 +12,14 @@ class InMemoryCategoriesRepository : CategoriesRepository {
 
     var version = versionOf(0)
     var categoryList = emptyList<Category>()
+    var categories: Categories? = null
 
     override fun getCategories(ownerId: OwnerId): Either<CategoriesProblem, Categories> {
         return Categories(ownerId, version, categoryList).right()
     }
 
     override fun save(categories: Categories): Either<CategoriesProblem, Categories> {
+        this.categories = categories
         val categoriesWithAppliedIds = categories.applyIds()
         this.version = categoriesWithAppliedIds.version
         this.categoryList = categoriesWithAppliedIds.list

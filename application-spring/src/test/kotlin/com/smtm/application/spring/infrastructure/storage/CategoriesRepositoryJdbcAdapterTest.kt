@@ -3,7 +3,8 @@ package com.smtm.application.spring.infrastructure.storage
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.categories.Categories
 import com.smtm.application.domain.categories.CategoriesProblem
-import com.smtm.application.domain.categories.categoryOf
+import com.smtm.application.domain.categories.deletedCategoryOf
+import com.smtm.application.domain.categories.existingCategoryOf
 import com.smtm.application.domain.categories.newCategoryOf
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
@@ -24,9 +25,9 @@ class CategoriesRepositoryJdbcAdapterTest {
     private lateinit var jdbc: JdbcOperations
 
     @Autowired
-    private lateinit var transacrtions: TransactionOperations
+    private lateinit var transactions: TransactionOperations
 
-    private val adapter get() = CategoriesRepositoryJdbcAdapter(jdbc, transacrtions)
+    private val adapter get() = CategoriesRepositoryJdbcAdapter(jdbc, transactions)
 
     private val initialSqlQueries = listOf(
         "INSERT INTO CATEGORY_SETS (OWNER_ID, VERSION) VALUES (1, 1)",
@@ -54,9 +55,9 @@ class CategoriesRepositoryJdbcAdapterTest {
 
         // then
         assertThat(categories?.list).containsOnly(
-            categoryOf(1, "Rent", Icon.HOUSE),
-            categoryOf(2, "Savings", Icon.PIGGY_BANK),
-            categoryOf(3, "Services", Icon.LIGHTENING)
+            existingCategoryOf(1, "Rent", Icon.HOUSE),
+            existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
+            existingCategoryOf(3, "Services", Icon.LIGHTENING)
         )
     }
 
@@ -76,9 +77,9 @@ class CategoriesRepositoryJdbcAdapterTest {
         // when
         val categories = Categories(
             id = ownerIdOf(1), version = versionOf(2), list = listOf(
-                categoryOf(1, "Rent", Icon.HOUSE),
-                categoryOf(2, "Savings", Icon.PIGGY_BANK),
-                categoryOf(3, "Services", Icon.LIGHTENING),
+                existingCategoryOf(1, "Rent", Icon.HOUSE),
+                existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
+                existingCategoryOf(3, "Services", Icon.LIGHTENING),
                 newCategoryOf("Groceries", Icon.SHOPPING_CART)
             )
         )
@@ -96,9 +97,9 @@ class CategoriesRepositoryJdbcAdapterTest {
         // when
         val categories = Categories(
             id = ownerIdOf(1), version = versionOf(2), list = listOf(
-                categoryOf(1, "Rent", Icon.HOUSE),
-                categoryOf(2, "Savings", Icon.PIGGY_BANK),
-                categoryOf(3, "Services", Icon.LIGHTENING),
+                existingCategoryOf(1, "Rent", Icon.HOUSE),
+                existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
+                existingCategoryOf(3, "Services", Icon.LIGHTENING),
                 newCategoryOf("Rent", Icon.SHOPPING_CART)
             )
         )
@@ -109,5 +110,25 @@ class CategoriesRepositoryJdbcAdapterTest {
         // then
         assertThat(problem).isEqualTo(CategoriesProblem.Other("Cannot save categories"))
         assertThat(version).isEqualTo(versionOf(1))
+    }
+
+    @Test
+    fun `should delete category`() {
+        // when
+        val givenCategories = Categories(
+            id = ownerIdOf(1), version = versionOf(2), list = listOf(
+                existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
+                existingCategoryOf(3, "Services", Icon.LIGHTENING),
+                deletedCategoryOf(1, "Rent", Icon.SHOPPING_CART)
+            )
+        )
+
+        val categories = adapter.save(givenCategories).getOrNull()
+
+        // then
+        assertThat(categories?.list).containsExactlyInAnyOrder(
+            existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
+            existingCategoryOf(3, "Services", Icon.LIGHTENING)
+        )
     }
 }

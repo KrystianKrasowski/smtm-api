@@ -7,25 +7,18 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions
 
-class CategoriesServiceStepdefs(private val world: World) {
+class CategoriesServiceSaveStepdefs(private val world: World) {
 
     private val service get() = CategoriesService(world.categoriesRepository)
-
     private var addedCategory: Category? = null
     private var problem: CategoriesProblem? = null
 
     @When("user saves category")
     fun `user saves category`(category: Category) {
-        service
-            .save(category, world.ownerId)
-            .onLeft { this.problem = it }
+        category.copy(status = Category.Status.NEW)
+            .let { service.save(it, world.ownerId) }
             .onRight { this.addedCategory = it }
-    }
-
-    @Then("user categories contains")
-    fun `user categories contains`(category: Category) {
-        val categories = service.getAll(world.ownerId).getOrNull()
-        Assertions.assertThat(categories).contains(category)
+            .onLeft { this.problem = it }
     }
 
     @Then("constraint violations set contains")
