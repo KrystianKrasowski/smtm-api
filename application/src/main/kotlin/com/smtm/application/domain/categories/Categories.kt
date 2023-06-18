@@ -21,28 +21,29 @@ data class Categories(
     val list: List<Category>
 ) : Aggregate<OwnerId> {
 
-    fun add(category: Category): CategoriesActionResult {
-        return category
-            .validate()
-            .map { Categories(id, version.increment(), list + it) }
-    }
+    fun add(category: Category): CategoriesActionResult = category
+        .validate()
+        .map { Categories(id, version.increment(), list + it) }
 
     fun getByName(name: String): Category = list.first { it.name == name }
 
-    fun delete(id: Long): CategoriesActionResult {
-        val categoryToDelete = list.first { it.id == id }
-        val newList = list
-            .toMutableList()
-            .apply { remove(categoryToDelete) }
-            .apply { add(categoryToDelete.copy(status = Category.Status.DELETED)) }
-            .toList()
-
-        return copy(version = version.increment(), list = newList).right()
-    }
+    fun delete(id: Long): CategoriesActionResult = findById(id)
+        ?.let { delete(it) }
+        ?: CategoriesProblem.Unknown.left()
 
     private fun Category.validate() = CategoryValidator(list, this)
         .validate()
         .mapLeft { CategoriesProblem.Violations(it) }
+
+    private fun findById(id: Long) = list.firstOrNull { it.id == id }
+
+    private fun delete(category: Category) = list
+        .toMutableList()
+        .apply { remove(category) }
+        .apply { add(category.copy(status = Category.Status.DELETED)) }
+        .toList()
+        .let { copy(version = version.increment(), list = it) }
+        .right()
 }
 
 private class CategoryValidator(currentCategories: List<Category>, private val newCategory: Category) {

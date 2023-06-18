@@ -62,6 +62,20 @@ class CategoriesRepositoryJdbcAdapterTest {
     }
 
     @Test
+    fun `should get empty, non-first version categories`() {
+        // given
+        jdbc.execute("DELETE FROM CATEGORIES")
+        jdbc.execute("UPDATE CATEGORY_SETS SET VERSION = 2 WHERE OWNER_ID = 1")
+
+        // when
+        val result = adapter.getCategories(ownerIdOf(1)).getOrNull()
+
+        // then
+        assertThat(result?.version).isEqualTo(versionOf(2))
+        assertThat(result?.list).isEmpty()
+    }
+
+    @Test
     fun `should get empty categories for new owner`() {
         // when
         val categories = adapter.getCategories(ownerIdOf(99)).getOrNull()

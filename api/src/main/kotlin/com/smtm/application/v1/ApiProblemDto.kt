@@ -7,7 +7,15 @@ sealed class ApiProblemDto(
     @JsonProperty("title") val title: String
 ) {
 
-    class Undefined : ApiProblemDto("https://api.smtm.com/problems/undefined", "Some undefined problem occured")
+    class Undefined : ApiProblemDto(
+        type = "https://api.smtm.com/problems/undefined",
+        title = "Some undefined problem occured"
+    )
+
+    class UnknownResource : ApiProblemDto(
+        type = "https://api.smtm.com/problems/unknown-resource",
+        title = "Requested resource is unknown"
+    )
 
     data class ConstraintViolations(
         val violations: Iterable<Violation>

@@ -18,6 +18,11 @@ Feature: Categories
     And user categories version is incremented to 2
 
 
+  Scenario: The one where deleting category is unknown
+    When user deletes category of id 99
+    Then user category is not deleted because it is unknown
+
+
   Scenario: The one where category is successfully saved
     When user saves category
       | name      | icon   |

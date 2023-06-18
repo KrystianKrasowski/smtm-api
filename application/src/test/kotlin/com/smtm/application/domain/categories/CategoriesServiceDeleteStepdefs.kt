@@ -24,4 +24,10 @@ class CategoriesServiceDeleteStepdefs(private val world: World) {
         assertThat(problem).isNull()
         assertThat(deleted).isTrue()
     }
+
+    @Then("user category is not deleted because it is unknown")
+    fun `user category is not deleted because it is unknown`() {
+        assertThat(deleted).isFalse()
+        assertThat(problem).isEqualTo(CategoriesProblem.Unknown)
+    }
 }

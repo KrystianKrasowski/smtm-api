@@ -18,9 +18,9 @@ class ResourceExceptionsHandler {
     }
 
     @ExceptionHandler(ApiProblemException::class)
-    fun handleApiProblemException(exception: ApiProblemException): ResponseEntity<ApiProblemDto.Undefined> {
+    fun handleApiProblemException(exception: ApiProblemException): ResponseEntity<ApiProblemDto> {
         return ResponseEntity
-            .internalServerError()
+            .status(exception.status)
             .contentType(MediaType.APPLICATION_PROBLEM_JSON)
             .body(exception.dto)
     }

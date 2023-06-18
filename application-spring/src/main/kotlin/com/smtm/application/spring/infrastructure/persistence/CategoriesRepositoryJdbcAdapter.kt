@@ -27,7 +27,7 @@ class CategoriesRepositoryJdbcAdapter(
 ) : CategoriesRepository {
 
     override fun getCategories(ownerId: OwnerId): Either<CategoriesProblem, Categories> {
-        return "SELECT C.ID, C.NAME, C.ICON, C.OWNER_ID, CS.VERSION FROM CATEGORIES C JOIN CATEGORY_SETS CS ON C.OWNER_ID = CS.OWNER_ID WHERE C.OWNER_ID = ?"
+        return "SELECT CS.OWNER_ID, CS.VERSION, C.ID, C.NAME, C.ICON FROM CATEGORY_SETS CS LEFT JOIN CATEGORIES C ON C.OWNER_ID = CS.OWNER_ID WHERE CS.OWNER_ID = ?"
             .runCatching { jdbc.query(this, CategorySetEntryEntityMapper(), ownerId.value) }
             .mapCatching { it.toCategories(ownerId) }
             .map { it.right() }
@@ -91,14 +91,16 @@ class CategoriesRepositoryJdbcAdapter(
 }
 
 private data class CategorySetEntryEntity(
-    val id: Long,
-    val name: String,
-    val icon: Icon,
+    val id: Long?,
+    val name: String?,
+    val icon: Icon?,
     val ownerId: OwnerId,
     val setVersion: Version
 ) {
 
-    fun toDomain() = existingCategoryOf(id, name, icon)
+    fun toDomain(): Category? = lazy { existingCategoryOf(id!!, name!!, icon!!) }
+        .takeIf { id != null && name != null && icon != null }
+        ?.value
 }
 
 private class CategorySetEntryEntityMapper : RowMapper<CategorySetEntryEntity> {
@@ -107,7 +109,7 @@ private class CategorySetEntryEntityMapper : RowMapper<CategorySetEntryEntity> {
         return CategorySetEntryEntity(
             id = rs.getLong("ID"),
             name = rs.getString("NAME"),
-            icon = rs.getString("ICON").toIcon(),
+            icon = rs.getString("ICON")?.toIcon(),
             ownerId = rs.getLong("OWNER_ID").toOwnerId(),
             setVersion = rs.getInt("VERSION").toVersion()
         )
@@ -117,7 +119,7 @@ private class CategorySetEntryEntityMapper : RowMapper<CategorySetEntryEntity> {
 private fun List<CategorySetEntryEntity>.toCategories(ownerId: OwnerId) = Categories(
     id = firstOrNull()?.ownerId ?: ownerId,
     version = firstOrNull()?.setVersion ?: versionOf(0),
-    list = map { it.toDomain() }
+    list = mapNotNull { it.toDomain() }
 )
 
 private fun String.toIcon() = Icon.valueOfOrNull(this) ?: Icon.FOLDER

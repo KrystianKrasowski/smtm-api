@@ -89,7 +89,8 @@ private object CategoriesProblemHandler {
     fun handle(problem: CategoriesProblem): Nothing {
         when (problem) {
             is CategoriesProblem.Violations -> throw problem.toConstraintViolationsException()
-            is CategoriesProblem.Other -> throw ApiProblemException(ApiProblemDto.Undefined())
+            is CategoriesProblem.Unknown -> throw ApiProblemException(ApiProblemDto.UnknownResource(), 404)
+            is CategoriesProblem.Other -> throw ApiProblemException(ApiProblemDto.Undefined(), 500)
         }
     }
 
