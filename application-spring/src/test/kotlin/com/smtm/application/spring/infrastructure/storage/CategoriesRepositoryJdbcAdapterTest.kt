@@ -3,7 +3,7 @@ package com.smtm.application.spring.infrastructure.storage
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.categories.Categories
 import com.smtm.application.domain.categories.CategoriesProblem
-import com.smtm.application.domain.categories.deletedCategoryOf
+import com.smtm.application.domain.categories.categoryOf
 import com.smtm.application.domain.categories.existingCategoryOf
 import com.smtm.application.domain.categories.newCategoryOf
 import com.smtm.application.domain.ownerIdOf
@@ -13,6 +13,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.JdbcOperations
@@ -26,6 +28,16 @@ class CategoriesRepositoryJdbcAdapterTest {
 
     @Autowired
     private lateinit var transactions: TransactionOperations
+
+    private val categoriesPrototype = Categories.fetched(
+        id = ownerIdOf(1),
+        version = versionOf(2),
+        list = listOf(
+            existingCategoryOf(1, "Rent", Icon.HOUSE),
+            existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
+            existingCategoryOf(3, "Services", Icon.LIGHTENING)
+        )
+    )
 
     private val adapter get() = CategoriesRepositoryJdbcAdapter(jdbc, transactions)
 
@@ -54,7 +66,7 @@ class CategoriesRepositoryJdbcAdapterTest {
         val categories = adapter.getCategories(ownerIdOf(1)).getOrNull()
 
         // then
-        assertThat(categories?.list).containsOnly(
+        assertThat(categories?.current).containsOnly(
             existingCategoryOf(1, "Rent", Icon.HOUSE),
             existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
             existingCategoryOf(3, "Services", Icon.LIGHTENING)
@@ -72,7 +84,7 @@ class CategoriesRepositoryJdbcAdapterTest {
 
         // then
         assertThat(result?.version).isEqualTo(versionOf(2))
-        assertThat(result?.list).isEmpty()
+        assertThat(result?.current).isEmpty()
     }
 
     @Test
@@ -82,23 +94,17 @@ class CategoriesRepositoryJdbcAdapterTest {
 
         // then
         assertThat(categories?.id).isEqualTo(ownerIdOf(99))
-        assertThat(categories?.list).isEmpty()
+        assertThat(categories?.current).isEmpty()
         assertThat(categories?.version).isEqualTo(versionOf(0))
     }
 
     @Test
     fun `should save category`() {
         // when
-        val categories = Categories(
-            id = ownerIdOf(1), version = versionOf(2), list = listOf(
-                existingCategoryOf(1, "Rent", Icon.HOUSE),
-                existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
-                existingCategoryOf(3, "Services", Icon.LIGHTENING),
-                newCategoryOf("Groceries", Icon.SHOPPING_CART)
-            )
-        )
-
-        val result = adapter.save(categories).getOrNull()
+        val result = newCategoryOf("Groceries", Icon.SHOPPING_CART)
+            .let { categoriesPrototype.copy(toSave = listOf(it)) }
+            .let { adapter.save(it) }
+            .getOrNull()
 
 
         // then
@@ -106,20 +112,35 @@ class CategoriesRepositoryJdbcAdapterTest {
         assertThat(result?.getByName("Groceries")?.icon).isEqualTo(Icon.SHOPPING_CART)
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        "1, Awesome rent, HOUSE",
+        "1, Rent, LIGHTENING"
+    )
+    fun `should update category`(id: Long, name: String, icon: Icon) {
+        // when
+        val result = categoryOf(id, name, icon)
+            .let { categoriesPrototype.copy(toSave = listOf(it)) }
+            .let { adapter.save(it) }
+            .getOrNull()
+
+        // then
+        assertThat(result?.getById(id)?.name).isEqualTo(name)
+        assertThat(result?.getById(id)?.icon).isEqualTo(icon)
+    }
+
     @Test
     fun `should violate unique constraint of the name property`() {
         // when
-        val categories = Categories(
-            id = ownerIdOf(1), version = versionOf(2), list = listOf(
-                existingCategoryOf(1, "Rent", Icon.HOUSE),
-                existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
-                existingCategoryOf(3, "Services", Icon.LIGHTENING),
-                newCategoryOf("Rent", Icon.SHOPPING_CART)
-            )
-        )
+        val problem = newCategoryOf("Rent", Icon.SHOPPING_CART)
+            .let { categoriesPrototype.copy(toSave = listOf(it)) }
+            .let { adapter.save(it) }
+            .leftOrNull()
 
-        val problem = adapter.save(categories).leftOrNull()
-        val version = adapter.getCategories(ownerIdOf(1)).map { it.version }.getOrNull()
+        val version = adapter
+            .getCategories(ownerIdOf(1))
+            .map { it.version }
+            .getOrNull()
 
         // then
         assertThat(problem).isEqualTo(CategoriesProblem.Other("Cannot save categories"))
@@ -129,18 +150,13 @@ class CategoriesRepositoryJdbcAdapterTest {
     @Test
     fun `should delete category`() {
         // when
-        val givenCategories = Categories(
-            id = ownerIdOf(1), version = versionOf(2), list = listOf(
-                existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
-                existingCategoryOf(3, "Services", Icon.LIGHTENING),
-                deletedCategoryOf(1, "Rent", Icon.SHOPPING_CART)
-            )
-        )
-
-        val categories = adapter.save(givenCategories).getOrNull()
+        val categories = existingCategoryOf(1, "Rent", Icon.HOUSE)
+            .let { categoriesPrototype.copy(toDelete = listOf(it)) }
+            .let { adapter.save(it) }
+            .getOrNull()
 
         // then
-        assertThat(categories?.list).containsExactlyInAnyOrder(
+        assertThat(categories?.current).containsExactlyInAnyOrder(
             existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
             existingCategoryOf(3, "Services", Icon.LIGHTENING)
         )

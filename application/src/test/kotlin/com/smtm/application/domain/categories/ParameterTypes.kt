@@ -11,7 +11,6 @@ class ParameterTypes {
             id = entry.extractId(),
             name = entry["name"] ?: "",
             icon = entry.extractIcon(),
-            status = entry.extractStatus()
         )
     }
 
@@ -21,8 +20,4 @@ class ParameterTypes {
 
     private fun Map<String, String>.extractIcon() = getValue("icon")
         .let { Icon.valueOf(it) }
-
-    private fun Map<String, String>.extractStatus() = get("status")
-        ?.let { Category.Status.valueOf(it) }
-        ?: Category.Status.EXISTING
 }

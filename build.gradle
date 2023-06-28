@@ -22,7 +22,9 @@ subprojects {
     repositories {
         mavenCentral()
     }
+}
 
+allprojects {
     tasks.withType(KotlinCompile).configureEach {
         kotlinOptions {
             freeCompilerArgs = ['-Xjsr305=strict']

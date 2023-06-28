@@ -1,47 +1,62 @@
 Feature: Categories
 
+
   Background:
     * user categories version is 1
-    * user has categories defined
-      | id | name           | icon       |
-      | 1  | Rent           | HOUSE      |
-      | 2  | Savings        | PIGGY_BANK |
-      | 3  | House services | LIGHTENING |
+    * user categories are
+      | id | name    | icon       |
+      | 1  | Rent    | HOUSE      |
+      | 2  | Savings | PIGGY_BANK |
 
 
-  Scenario: The one where category is deleted
-    When user deletes category of id 2
-    Then user category is deleted successfully
-    And user categories contain
-      | id | name    | icon       | status  |
-      | 2  | Savings | PIGGY_BANK | DELETED |
-    And user categories version is incremented to 2
+  Scenario: The one where saving category has not unique name
+    When user saves category with name "Rent"
+    Then category is not saved due to constraint violation
+      | path | code       |
+      | name | NON_UNIQUE |
 
 
-  Scenario: The one where deleting category is unknown
-    When user deletes category of id 99
-    Then user category is not deleted because it is unknown
+  Scenario: The one where saving category has empty name
+    When user saves category with empty name
+    Then category is not saved due to constraint violation
+      | path | code  |
+      | name | EMPTY |
 
 
-  Scenario: The one where category is successfully saved
+  Scenario: The one where deleting category does not exist
+    When used deletes category of id 3
+    Then category is not deleted because it is unknown
+
+
+  Scenario: The one where category is created successfully
+    Given next category id is 4
     When user saves category
-      | name      | icon   |
-      | Groceries | FOLDER |
-    Then user categories contain
-      | name      | icon   | status |
-      | Groceries | FOLDER | NEW    |
-    And user categories version is incremented to 2
+      | name      | icon          |
+      | Groceries | SHOPPING_CART |
+    Then saved category is
+      | id | name      | icon          |
+      | 4  | Groceries | SHOPPING_CART |
+    And user categories version is updated to 2
 
 
-  Scenario Outline: The one where provided category is not valid
+  Scenario Outline: The one where category is updated successfully
     When user saves category
-      | name   | icon   |
-      | <name> | FOLDER |
-    Then constraint violations set contains
-      | path | code   | parameters   |
-      | name | <code> | <parameters> |
+      | id | name   | icon   |
+      | 1  | <name> | <icon> |
+    Then saved category is
+      | id | name   | icon   |
+      | 1  | <name> | <icon> |
 
     Examples:
-      | name | code       |
-      |      | EMPTY      |
-      | Rent | NON_UNIQUE |
+      | name         | icon       |
+      | Awesome rent | HOUSE      |
+      | Awesome rent | LIGHTENING |
+      | Rent         | LIGHTENING |
+
+
+  Scenario: The one where category is deleted successfully
+    When used deletes category of id 2
+    Then user categories contains
+      | id | name | icon  |
+      | 1  | Rent | HOUSE |
+    And user categories version is updated to 2

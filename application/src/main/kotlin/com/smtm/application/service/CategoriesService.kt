@@ -13,13 +13,13 @@ class CategoriesService(private val repository: CategoriesRepository) {
     fun getAll(ownerId: OwnerId): Either<CategoriesProblem, List<Category>> {
         return repository
             .getCategories(ownerId)
-            .map { it.list }
+            .map { it.current }
     }
 
     fun save(category: Category, ownerId: OwnerId): Either<CategoriesProblem, Category> {
         return repository
             .getCategories(ownerId)
-            .flatMap { it.add(category) }
+            .flatMap { it.store(category) }
             .flatMap { repository.save(it) }
             .map { it.getByName(category.name) }
     }

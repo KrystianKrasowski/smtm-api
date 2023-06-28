@@ -40,13 +40,13 @@ class CategoriesRepositoryJdbcAdapter(
         ?.applyChanges()
         ?: categories.right()
 
-    private fun Categories.isModificationNeeded() = list
-        .any { setOf(Category.Status.NEW, Category.Status.DELETED).contains(it.status) }
+    private fun Categories.isModificationNeeded() = toDelete.isNotEmpty() || toSave.isNotEmpty()
 
     private fun Categories.applyChanges() = transactions.execute { trn ->
         this
             .runCatching { incrementVersion(this) }
             .mapCatching { it.insertAllMarked() }
+            .mapCatching { it.updateAllMarked() }
             .mapCatching { it.deleteAllMarked() }
             .onFailure { trn.setRollbackOnly() }
             .onFailure { logger.error("Cannot save categories", it) }
@@ -60,12 +60,19 @@ class CategoriesRepositoryJdbcAdapter(
         ?: updateVersionOf(categories)
 
     private fun Categories.insertAllMarked() = apply {
-        list.filter { it.status == Category.Status.NEW }
+        toSave
+            .filter { it.id == null }
             .forEach { insert(it, id) }
     }
 
+    private fun Categories.updateAllMarked() = apply {
+        toSave
+            .filter { it.id != null }
+            .forEach { update(it) }
+    }
+
     private fun Categories.deleteAllMarked() = apply {
-        list.filter { it.status == Category.Status.DELETED }
+        toDelete
             .forEach { delete(it) }
     }
 
@@ -84,6 +91,10 @@ class CategoriesRepositoryJdbcAdapter(
     private fun insert(category: Category, ownerId: OwnerId) =
         "INSERT INTO CATEGORIES (NAME, ICON, OWNER_ID) VALUES (?, ?, ?)"
             .let { jdbc.update(it, category.name, category.icon.name, ownerId.value) }
+
+    private fun update(category: Category) =
+        "UPDATE CATEGORIES SET NAME = ?, ICON = ? WHERE ID = ?"
+            .let { jdbc.update(it, category.name, category.icon.name, category.id) }
 
     private fun delete(category: Category) =
         "DELETE FROM CATEGORIES WHERE ID = ?"
@@ -116,7 +127,7 @@ private class CategorySetEntryEntityMapper : RowMapper<CategorySetEntryEntity> {
     }
 }
 
-private fun List<CategorySetEntryEntity>.toCategories(ownerId: OwnerId) = Categories(
+private fun List<CategorySetEntryEntity>.toCategories(ownerId: OwnerId) = Categories.fetched(
     id = firstOrNull()?.ownerId ?: ownerId,
     version = firstOrNull()?.setVersion ?: versionOf(0),
     list = mapNotNull { it.toDomain() }

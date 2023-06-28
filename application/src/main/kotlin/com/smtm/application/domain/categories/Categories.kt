@@ -18,49 +18,62 @@ typealias CategoriesActionResult = Either<CategoriesProblem, Categories>
 data class Categories(
     override val id: OwnerId,
     override val version: Version,
-    val list: List<Category>
+    val current: List<Category>,
+    val toSave: List<Category>,
+    val toDelete: List<Category>
 ) : Aggregate<OwnerId> {
 
-    fun add(category: Category): CategoriesActionResult = category
-        .validate()
-        .map { Categories(id, version.increment(), list + it) }
+    fun store(category: Category): CategoriesActionResult = category
+        .takeUnless { contains(category) }
+        ?.validate()
+        ?.map { copy(toSave = listOf(it), version = version.increment()) }
+        ?: this.right()
 
-    fun getByName(name: String): Category = list.first { it.name == name }
+    fun getByName(name: String): Category = current.first { it.name == name }
+
+    fun getById(id: Long): Category = current.first { it.id == id }
 
     fun delete(id: Long): CategoriesActionResult = findById(id)
-        ?.let { delete(it) }
+        ?.let { copy(version = version.increment(), toDelete = listOf(it)) }
+        ?.right()
         ?: CategoriesProblem.Unknown.left()
 
-    private fun Category.validate() = CategoryValidator(list, this)
+    private fun contains(category: Category) = current
+        .any { it.id == category.id && it.name == category.name && it.icon == category.icon }
+
+    private fun Category.validate() = CategoryValidator(current, this)
         .validate()
         .mapLeft { CategoriesProblem.Violations(it) }
 
-    private fun findById(id: Long) = list.firstOrNull { it.id == id }
+    private fun findById(id: Long) = current.firstOrNull { it.id == id }
 
-    private fun delete(category: Category) = list
-        .toMutableList()
-        .apply { remove(category) }
-        .apply { add(category.copy(status = Category.Status.DELETED)) }
-        .toList()
-        .let { copy(version = version.increment(), list = it) }
-        .right()
+    companion object {
+
+        fun fetched(id: OwnerId, version: Version, list: List<Category>) = Categories(
+            id = id,
+            version = version,
+            current = list,
+            toSave = emptyList(),
+            toDelete = emptyList()
+        )
+    }
 }
 
-private class CategoryValidator(currentCategories: List<Category>, private val newCategory: Category) {
+private class CategoryValidator(currentCategories: List<Category>, private val category: Category) {
 
     private val currentCategoryNames = currentCategories.map { it.name }
 
     private val emptyNameViolation = emptyViolationOf(violationPathOf("name"))
-        .takeIf { newCategory.name.isBlank() }
+        .takeIf { category.name.isBlank() }
 
     private val nonUniqueViolation = nonUniqueViolationOf(violationPathOf("name"))
-        .takeIf { currentCategoryNames.contains(newCategory.name) }
+        .takeIf { category.id == null && currentCategoryNames.contains(category.name) }
 
     fun validate(): Either<Nel<Violation>, Category> {
         return getViolationsOrNull()
             .toNonEmptyListOrNull()
             ?.left()
-            ?: newCategory.right()
+            ?: category.right()
     }
 
     fun getViolationsOrNull() = listOfNotNull(

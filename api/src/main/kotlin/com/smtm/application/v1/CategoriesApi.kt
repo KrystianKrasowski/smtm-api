@@ -11,11 +11,13 @@ interface CategoriesApi {
 
     fun save(category: NewCategoryDto): CategoryDto
 
+    fun update(category: CategoryDto)
+
     fun delete(id: Long)
 }
 
 data class CategoryDto(
-    @JsonProperty("_links") override val links: Map<String, Link>,
+    @JsonProperty("_links") override val links: Map<String, Link> = emptyMap(),
     @JsonProperty("id") val id: Long,
     @JsonProperty("name") val name: String,
     @JsonProperty("icon") val icon: String

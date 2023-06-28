@@ -9,25 +9,23 @@ import org.assertj.core.api.Assertions.*
 
 class CategoriesRepositoryStepdefs(private val world: World) {
 
-    private val modifiedCategories get() = world.categoriesRepository.categories
-
     @Given("user categories version is {long}")
     fun `user categories version is N`(version: Long) {
         world.categoriesRepository.version = versionOf(version)
     }
 
-    @Given("user has categories defined")
-    fun `user has categories defined`(categories: List<Category>) {
-        world.categoriesRepository.categoryList = categories
+    @Given("user categories are")
+    fun `user categories are`(categories: List<Category>) {
+        world.categoriesRepository.list = categories
     }
 
-    @Then("user categories contain")
-    fun `user categories contains`(category: Category) {
-        assertThat(modifiedCategories?.list).contains(category)
+    @Given("next category id is {long}")
+    fun `next category id is N`(id: Long) {
+        world.categoriesRepository.nextCategoryId = id
     }
 
-    @Then("user categories version is incremented to {long}")
-    fun `user categories version is incremented to N`(version: Long) {
-        assertThat(modifiedCategories?.version).isEqualTo(versionOf(version))
+    @Then("user categories version is updated to {long}")
+    fun `user categories version is updated to N`(version: Long) {
+        assertThat(world.categoriesRepository.savedCategories?.version).isEqualTo(versionOf(version))
     }
 }

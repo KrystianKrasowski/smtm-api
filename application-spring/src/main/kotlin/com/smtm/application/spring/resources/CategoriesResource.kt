@@ -8,6 +8,7 @@ import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Violation
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
+import com.smtm.application.domain.categories.existingCategoryOf
 import com.smtm.application.domain.categories.newCategoryOf
 import com.smtm.application.service.CategoriesService
 import com.smtm.application.spring.exceptions.ApiProblemException
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -57,12 +59,24 @@ class CategoriesResource(
             .fold(CategoriesProblemHandler::handle, this::createDto)
     }
 
+    @PutMapping(
+        path = ["/{id}"],
+        consumes = [MediaType.VERSION_1_JSON],
+        produces = [MediaType.VERSION_1_JSON]
+    )
+    override fun update(@RequestBody category: CategoryDto) {
+        category
+            .toDomain()
+            .let { categoriesService.save(it, ownerIdProvider()) }
+            .onLeft(CategoriesProblemHandler::handle)
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     override fun delete(@PathVariable("id") id: Long) {
         categoriesService
             .delete(id, ownerIdProvider())
-            .onLeft { CategoriesProblemHandler.handle(it) }
+            .onLeft(CategoriesProblemHandler::handle)
     }
 
     private fun createDto(categories: List<Category>) = categories
@@ -79,6 +93,12 @@ class CategoriesResource(
     )
 
     private fun NewCategoryDto.toDomain() = newCategoryOf(
+        name = name,
+        icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
+    )
+
+    private fun CategoryDto.toDomain() = existingCategoryOf(
+        id = id,
         name = name,
         icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
     )
