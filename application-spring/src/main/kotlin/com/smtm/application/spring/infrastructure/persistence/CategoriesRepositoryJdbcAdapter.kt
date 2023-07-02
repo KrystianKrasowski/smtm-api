@@ -12,7 +12,7 @@ import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.categories.existingCategoryOf
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
-import com.smtm.application.repository.CategoriesRepository
+import com.smtm.application.spi.CategoriesRepository
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcOperations
 import org.springframework.jdbc.core.RowMapper

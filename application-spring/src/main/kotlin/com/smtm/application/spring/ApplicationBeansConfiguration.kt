@@ -1,10 +1,10 @@
 package com.smtm.application.spring
 
 import com.smtm.application.LinkFactory
+import com.smtm.application.api.CategoriesApi
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.ownerIdOf
-import com.smtm.application.repository.CategoriesRepository
-import com.smtm.application.service.CategoriesService
+import com.smtm.application.spi.CategoriesRepository
 import com.smtm.application.spring.infrastructure.persistence.CategoriesRepositoryJdbcAdapter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -27,8 +27,8 @@ class ApplicationBeansConfiguration {
     }
 
     @Bean
-    fun categoriesService(repository: CategoriesRepository): CategoriesService {
-        return CategoriesService(repository)
+    fun categoriesService(repository: CategoriesRepository): CategoriesApi {
+        return CategoriesApi.create(repository)
     }
 
     @Bean

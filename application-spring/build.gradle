@@ -8,8 +8,8 @@ group = 'com.smtm.application.spring'
 sourceCompatibility = '17'
 
 dependencies {
-    implementation project(':api')
-    implementation project(':application')
+    implementation project(':dto')
+    implementation project(':core')
 
     implementation "io.arrow-kt:arrow-core:$ARROW_VERSION"
     implementation "io.arrow-kt:arrow-fx-coroutines:$ARROW_VERSION"
