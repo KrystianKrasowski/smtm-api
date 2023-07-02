@@ -10,6 +10,7 @@ import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Version
 import com.smtm.application.domain.Violation
 import com.smtm.application.domain.emptyViolationOf
+import com.smtm.application.domain.illegalCharactersViolationOf
 import com.smtm.application.domain.nonUniqueViolationOf
 import com.smtm.application.domain.violationPathOf
 
@@ -69,15 +70,32 @@ private class CategoryValidator(currentCategories: List<Category>, private val c
     private val nonUniqueViolation = nonUniqueViolationOf(violationPathOf("name"))
         .takeIf { category.id == null && currentCategoryNames.contains(category.name) }
 
+    private val illegalCharactersViolation = NAME_REGEX
+        .toRegex()
+        .extractIllegalCharactersFrom(category.name)
+        .takeIf { it.isNotEmpty() }
+        ?.let { illegalCharactersViolationOf(violationPathOf("name"), it) }
+
     fun validate(): Either<Nel<Violation>, Category> {
-        return getViolationsOrNull()
+        return getViolations()
             .toNonEmptyListOrNull()
             ?.left()
             ?: category.right()
     }
 
-    fun getViolationsOrNull() = listOfNotNull(
+    fun getViolations() = listOfNotNull(
         emptyNameViolation,
-        nonUniqueViolation
+        nonUniqueViolation,
+        illegalCharactersViolation
     )
+
+    companion object {
+
+        private const val NAME_REGEX = "[\\p{IsLatin}0-9 ]+"
+    }
 }
+
+private fun Regex.extractIllegalCharactersFrom(text: String) = replace(text, "")
+    .toCharArray()
+    .distinct()
+    .toCharArray()
