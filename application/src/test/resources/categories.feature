@@ -23,6 +23,18 @@ Feature: Categories
       | name | EMPTY |
 
 
+  Scenario Outline: The one where saving category has invalid name
+    When user saves category with name "<name>"
+    Then category is not saved due to constraint violation
+      | path | code               | illegal characters   |
+      | name | ILLEGAL_CHARACTERS | <illegal characters> |
+
+    Examples:
+      | name      | illegal characters |
+      | Rent<>    | <, >               |
+      | Awesome!! | !                  |
+
+
   Scenario: The one where deleting category does not exist
     When used deletes category of id 3
     Then category is not deleted because it is unknown
