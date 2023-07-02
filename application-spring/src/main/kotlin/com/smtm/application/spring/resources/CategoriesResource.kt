@@ -1,7 +1,7 @@
 package com.smtm.application.spring.resources
 
 import com.smtm.application.HalCollection
-import com.smtm.application.Link
+import com.smtm.application.LinkFactory
 import com.smtm.application.MediaType
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.OwnerId
@@ -13,10 +13,10 @@ import com.smtm.application.domain.categories.newCategoryOf
 import com.smtm.application.service.CategoriesService
 import com.smtm.application.spring.exceptions.ApiProblemException
 import com.smtm.application.spring.exceptions.ConstraintViolationsException
+import com.smtm.application.v1.ApiProblemDto
 import com.smtm.application.v1.CategoriesApi
 import com.smtm.application.v1.CategoryDto
 import com.smtm.application.v1.NewCategoryDto
-import com.smtm.application.v1.ApiProblemDto
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -29,14 +29,15 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping(CategoriesResource.PATH)
 class CategoriesResource(
+    private val linkFactory: LinkFactory,
     private val categoriesService: CategoriesService,
     private val ownerIdProvider: () -> OwnerId
 ) : CategoriesApi {
 
     private val collectionLinks = mapOf(
-        "self" to Link("http://localhost:8080/categories")
+        "self" to linkFactory.create(PATH)
     )
 
     @GetMapping(
@@ -85,7 +86,7 @@ class CategoriesResource(
 
     private fun createDto(category: Category) = CategoryDto(
         links = mapOf(
-            "self" to Link("http://localhost:8080/categories/${category.id!!}")
+            "self" to linkFactory.create("$PATH/${category.id!!}")
         ),
         id = category.id!!,
         name = category.name,
@@ -102,6 +103,10 @@ class CategoriesResource(
         name = name,
         icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
     )
+
+    companion object {
+        const val PATH = "/categories"
+    }
 }
 
 private object CategoriesProblemHandler {

@@ -1,5 +1,6 @@
 package com.smtm.application.spring
 
+import com.smtm.application.LinkFactory
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.repository.CategoriesRepository
@@ -19,6 +20,11 @@ class ApplicationBeansConfiguration {
 
     @Bean
     fun ownerIdProvider(): () -> OwnerId = { ownerIdOf(1) }
+
+    @Bean
+    fun linkFactory(): LinkFactory {
+        return LinkFactory("http", "localhost", 8080)
+    }
 
     @Bean
     fun categoriesService(repository: CategoriesRepository): CategoriesService {
