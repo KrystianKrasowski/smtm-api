@@ -17,7 +17,8 @@ class RootResource(private val linkFactory: LinkFactory) {
     fun getRoot(): RootDto {
         return RootDto(links = mapOf(
             "self" to linkFactory.create("/"),
-            "categories" to linkFactory.create(CategoriesResource.PATH)
+            "categories" to linkFactory.create(CategoriesResource.PATH),
+            "plans" to linkFactory.create(PlanSummariesResource.PATH)
         ))
     }
 }

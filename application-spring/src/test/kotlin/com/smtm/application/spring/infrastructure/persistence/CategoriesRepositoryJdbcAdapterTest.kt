@@ -1,4 +1,4 @@
-package com.smtm.application.spring.infrastructure.storage
+package com.smtm.application.spring.infrastructure.persistence
 
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.categories.Categories
@@ -8,7 +8,6 @@ import com.smtm.application.domain.categories.existingCategoryOf
 import com.smtm.application.domain.categories.newCategoryOf
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
-import com.smtm.application.spring.infrastructure.persistence.CategoriesRepositoryJdbcAdapter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
