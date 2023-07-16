@@ -2,11 +2,10 @@ package com.smtm.application.spring
 
 import com.smtm.application.LinkFactory
 import com.smtm.application.api.CategoriesApi
-import com.smtm.application.api.PlanSummariesApi
+import com.smtm.application.api.PlansQueries
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.spi.CategoriesRepository
-import com.smtm.application.spi.PlansRepository
 import com.smtm.application.spring.infrastructure.persistence.CategoriesRepositoryJdbcAdapter
 import com.smtm.application.spring.infrastructure.persistence.PlansRepositoryJdbcAdapter
 import org.springframework.context.annotation.Bean
@@ -41,8 +40,8 @@ class ApplicationBeansConfiguration {
     }
 
     @Bean
-    fun planSummaryListApi(repository: PlansRepository): PlanSummariesApi {
-        return PlanSummariesApi.create(repository)
+    fun plansQueries(repository: PlansRepositoryJdbcAdapter): PlansQueries {
+        return repository
     }
 
     @Bean
@@ -51,7 +50,7 @@ class ApplicationBeansConfiguration {
     }
 
     @Bean
-    fun plansRepository(clock: Clock, jdbc: JdbcOperations, transactions: TransactionOperations): PlansRepository {
+    fun plansRepositoryJdbcAdapter(clock: Clock, jdbc: JdbcOperations, transactions: TransactionOperations): PlansRepositoryJdbcAdapter {
         return PlansRepositoryJdbcAdapter(clock, jdbc)
     }
 
