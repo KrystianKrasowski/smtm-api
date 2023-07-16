@@ -15,10 +15,14 @@ class RootResource(private val linkFactory: LinkFactory) {
         produces = [MediaType.VERSION_1_JSON]
     )
     fun getRoot(): RootDto {
-        return RootDto(links = mapOf(
-            "self" to linkFactory.create("/"),
-            "categories" to linkFactory.create(CategoriesResource.PATH),
-            "plans" to linkFactory.create(PlanSummariesResource.PATH)
-        ))
+        return RootDto(
+            links = mapOf(
+                "self" to linkFactory.create("/"),
+                "categories" to linkFactory.create(CategoriesResource.PATH),
+                "current-plans" to linkFactory.create(PlanDefinitionsResource.CURRENT_PLANS_PATH),
+                "upcoming-plans" to linkFactory.create(PlanDefinitionsResource.UPCOMING_PLANS_PATH),
+                "archived-plans" to linkFactory.create(PlanDefinitionsResource.ARCHIVED_PLANS_PATH),
+            )
+        )
     }
 }
