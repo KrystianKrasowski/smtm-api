@@ -1,11 +1,14 @@
 package com.smtm.application.spring
 
 import com.smtm.application.LinkFactory
+import com.smtm.application.api.CategoriesApi
+import com.smtm.application.api.PlanSummariesApi
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.ownerIdOf
-import com.smtm.application.repository.CategoriesRepository
-import com.smtm.application.service.CategoriesService
+import com.smtm.application.spi.CategoriesRepository
+import com.smtm.application.spi.PlansRepository
 import com.smtm.application.spring.infrastructure.persistence.CategoriesRepositoryJdbcAdapter
+import com.smtm.application.spring.infrastructure.persistence.PlansRepositoryJdbcAdapter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcOperations
@@ -27,13 +30,23 @@ class ApplicationBeansConfiguration {
     }
 
     @Bean
-    fun categoriesService(repository: CategoriesRepository): CategoriesService {
-        return CategoriesService(repository)
+    fun categoriesService(repository: CategoriesRepository): CategoriesApi {
+        return CategoriesApi.create(repository)
+    }
+
+    @Bean
+    fun planSummaryListApi(repository: PlansRepository): PlanSummariesApi {
+        return PlanSummariesApi.create(repository)
     }
 
     @Bean
     fun categoriesRepository(jdbc: JdbcOperations, transactions: TransactionOperations): CategoriesRepository {
         return CategoriesRepositoryJdbcAdapter(jdbc, transactions)
+    }
+
+    @Bean
+    fun plansRepository(jdbc: JdbcOperations, transactions: TransactionOperations): PlansRepository {
+        return PlansRepositoryJdbcAdapter(jdbc)
     }
 
     @Bean

@@ -1,5 +1,4 @@
 rootProject.name = 'smtm-api'
-include 'api'
+include 'dto'
 include 'application-spring'
-include 'application'
-
+include 'core'
