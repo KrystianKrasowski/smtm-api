@@ -11,8 +11,6 @@ import java.time.ZoneId
 
 class PlanSummariesTest {
 
-    private val clock = Clock.fixed(Instant.parse("2023-07-16T15:48:35.000Z"), ZoneId.of("UTC"))
-
     private val planSummariesPrototype = fetchedPlanSummariesOf(
         id = ownerIdOf(1),
         version = versionOf(4),
@@ -41,16 +39,14 @@ class PlanSummariesTest {
                 start = LocalDateTime.parse("2023-08-01T00:00:00"),
                 end = LocalDateTime.parse("2023-08-31T23:59:59")
             ),
-        )
+        ),
+        clock = Clock.fixed(Instant.parse("2023-07-16T15:48:35.000Z"), ZoneId.of("UTC"))
     )
 
     @Test
     fun `should return active plans`() {
-        // when
-        val activePlans = planSummariesPrototype.getActivePlans(clock)
-
         // then
-        assertThat(activePlans).contains(
+        assertThat(planSummariesPrototype.activePlans).contains(
             existingPlanSummaryOf(
                 id = 3,
                 name = "July",
@@ -62,11 +58,8 @@ class PlanSummariesTest {
 
     @Test
     fun `should return future plans`() {
-        // when
-        val futurePlans = planSummariesPrototype.getFuturePlans(clock)
-
         // then
-        assertThat(futurePlans).contains(
+        assertThat(planSummariesPrototype.futurePlans).contains(
             existingPlanSummaryOf(
                 id = 4,
                 name = "August",
@@ -78,11 +71,8 @@ class PlanSummariesTest {
 
     @Test
     fun `should return past plans`() {
-        // when
-        val pastPlans = planSummariesPrototype.getPastPlans(clock)
-
         // then
-        assertThat(pastPlans).contains(
+        assertThat(planSummariesPrototype.pastPlans).contains(
             existingPlanSummaryOf(
                 id = 1,
                 name = "May",

@@ -6,30 +6,23 @@ import com.smtm.application.domain.Version
 import java.time.Clock
 import java.time.LocalDateTime
 
-data class PlanSummaries(
+data class PlanSummaries internal constructor(
     override val id: OwnerId,
     override val version: Version,
-    val current: List<PlanSummary>
+    val allPlans: List<PlanSummary>,
+    private val clock: Clock
 ) : Aggregate<OwnerId> {
 
-    fun getActivePlans(clock: Clock): List<PlanSummary> {
-        return current
-            .filter { it.period.contains(LocalDateTime.now(clock)) }
-    }
+    private val now = LocalDateTime.now(clock)
 
-    fun getFuturePlans(clock: Clock): List<PlanSummary> {
-        return current
-            .filter { it.period.start > LocalDateTime.now(clock) }
-    }
-
-    fun getPastPlans(clock: Clock): List<PlanSummary> {
-        return current
-            .filter { it.period.endInclusive < LocalDateTime.now(clock) }
-    }
+    val activePlans = allPlans.filter { it.period.contains(now) }
+    val futurePlans = allPlans.filter { it.period.start > now }
+    val pastPlans = allPlans.filter { it.period.endInclusive < now }
 }
 
-fun fetchedPlanSummariesOf(id: OwnerId, version: Version, plans: List<PlanSummary>) = PlanSummaries(
+fun fetchedPlanSummariesOf(clock: Clock, id: OwnerId, version: Version, plans: List<PlanSummary>) = PlanSummaries(
     id = id,
     version = version,
-    current = plans
+    allPlans = plans,
+    clock = clock
 )

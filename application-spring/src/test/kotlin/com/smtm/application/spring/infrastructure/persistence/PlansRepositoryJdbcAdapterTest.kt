@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.JdbcOperations
+import java.time.Clock
 import java.time.LocalDateTime
 
 @SpringBootTest
@@ -18,7 +19,9 @@ class PlansRepositoryJdbcAdapterTest {
     @Autowired
     private lateinit var jdbc: JdbcOperations
 
-    private val adapter get() = PlansRepositoryJdbcAdapter(jdbc)
+    private val clock = Clock.systemUTC()
+
+    private val adapter get() = PlansRepositoryJdbcAdapter(clock, jdbc)
 
     private val initialSqlQueries = listOf(
         "insert into plan_sets (owner_id, version, last_modified) values (1, 1, timestamp '2023-07-05 12:48:56')",
@@ -47,7 +50,7 @@ class PlansRepositoryJdbcAdapterTest {
         // then
         assertThat(plans?.id).isEqualTo(ownerIdOf(1))
         assertThat(plans?.version).isEqualTo(versionOf(1))
-        assertThat(plans?.current).containsExactlyInAnyOrder(
+        assertThat(plans?.allPlans).containsExactlyInAnyOrder(
             existingPlanSummaryOf(
                 id = 2,
                 name = "July 2023",

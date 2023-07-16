@@ -16,11 +16,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcOperations
 import org.springframework.jdbc.core.RowMapper
 import java.sql.ResultSet
+import java.time.Clock
 import java.time.LocalDateTime
 
 private val logger = LoggerFactory.getLogger(PlansRepositoryJdbcAdapter::class.java)
 
 class PlansRepositoryJdbcAdapter(
+    private val clock: Clock,
     private val jdbc: JdbcOperations
 ) : PlansRepository {
 
@@ -40,7 +42,7 @@ class PlansRepositoryJdbcAdapter(
     override fun getAllPlanSummaries(ownerId: OwnerId): Either<PlanSummariesProblem, PlanSummaries> {
         return selectAllPlanSummaries
             .runCatching { jdbc.query(this, PlanEntityMapper(), ownerId.value) }
-            .map { it.toPlanSummaries(ownerId) }
+            .map { it.toPlanSummaries(clock, ownerId) }
             .map { it.right() }
             .onFailure { logger.error("Cannot fetch plan summaries", it) }
             .getOrElse { PlanSummariesProblem.RepositoryFailure.left() }
@@ -78,7 +80,8 @@ private class PlanEntityMapper : RowMapper<PlanEntity> {
     }
 }
 
-private fun List<PlanEntity>.toPlanSummaries(ownerId: OwnerId) = fetchedPlanSummariesOf(
+private fun List<PlanEntity>.toPlanSummaries(clock: Clock, ownerId: OwnerId) = fetchedPlanSummariesOf(
+    clock = clock,
     id = firstOrNull()?.ownerId ?: ownerId,
     version = firstOrNull()?.version ?: versionOf(0),
     plans = map { it.toPlanSummary() }
