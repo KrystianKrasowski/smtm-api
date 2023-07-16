@@ -6,23 +6,23 @@ import com.smtm.application.LinkFactory
 import com.smtm.application.MediaType
 import com.smtm.application.api.PlanSummariesApi
 import com.smtm.application.domain.OwnerId
-import com.smtm.application.domain.plans.PlanStatus
 import com.smtm.application.domain.plans.PlanSummary
 import com.smtm.application.domain.plans.PlanSummaries
 import com.smtm.application.domain.plans.PlanSummariesProblem
 import com.smtm.application.v1.ApiProblemDto
 import com.smtm.application.v1.PeriodDto
-import com.smtm.application.v1.PlanStatusDto
 import com.smtm.application.v1.PlanSummaryDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.Clock
 
 @RestController
 @RequestMapping(PlanSummariesResource.PATH)
 class PlanSummariesResource(
     private val planSummaryListApi: PlanSummariesApi,
+    private val clock: Clock,
     private val linkFactory: LinkFactory,
     private val ownerIdProvider: () -> OwnerId
 ) {
@@ -41,23 +41,24 @@ class PlanSummariesResource(
             .getOrElse { it.toProblem() }
     }
 
-    private fun PlanStatusDto.toDomain() = when (this) {
-        PlanStatusDto.ACTIVE -> PlanStatus.ACTIVE
-        PlanStatusDto.FUTURE -> PlanStatus.FUTURE
-        PlanStatusDto.PAST -> PlanStatus.PAST
-    }
-
-    private fun PlanStatus.toDto() = when (this) {
-        PlanStatus.ACTIVE -> PlanStatusDto.ACTIVE
-        PlanStatus.FUTURE -> PlanStatusDto.FUTURE
-        PlanStatus.PAST -> PlanStatusDto.PAST
-    }
-
     private fun PlanSummaries.toResponse() = toDto()
         .let { ResponseEntity.ok(it) }
 
-    private fun PlanSummariesProblem.toProblem() = ApiProblemDto.Undefined()
-        .let { ResponseEntity.status(500).body(it) }
+    private fun PlanSummariesProblem.toProblem() = when (this) {
+        PlanSummariesProblem.RepositoryFailure -> ApiProblemDto.Undefined()
+            .let { ResponseEntity.status(500).body(it) }
+    }
+
+    private fun PlanSummaries.toDto() = HalCollection(
+        links = collectionLinks,
+        count = current.size,
+        total = current.size,
+        embedded = mapOf(
+            "active" to getActivePlans(clock).map { it.toDto() },
+            "future" to getFuturePlans(clock).map { it.toDto() },
+            "past" to getPastPlans(clock).map { it.toDto() }
+        )
+    )
 
     private fun PlanSummary.toDto() = PlanSummaryDto(
         links = mapOf(
@@ -68,13 +69,8 @@ class PlanSummariesResource(
         period = PeriodDto(
             start = period.start,
             end = period.endInclusive
-        ),
-        status = status.toDto()
+        )
     )
-
-    private fun PlanSummaries.toDto() = current
-        .map { it.toDto() }
-        .let { HalCollection(collectionLinks, it.size, it.size, mapOf("plans" to it)) }
 
     companion object {
 

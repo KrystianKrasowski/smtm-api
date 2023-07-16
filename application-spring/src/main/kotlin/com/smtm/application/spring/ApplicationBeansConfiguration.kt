@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionOperations
 import org.springframework.transaction.support.TransactionTemplate
+import java.time.Clock
 import javax.sql.DataSource
 
 @Configuration
@@ -27,6 +28,11 @@ class ApplicationBeansConfiguration {
     @Bean
     fun linkFactory(): LinkFactory {
         return LinkFactory("http", "localhost", 8080)
+    }
+
+    @Bean
+    fun clock(): Clock {
+        return Clock.systemUTC()
     }
 
     @Bean
