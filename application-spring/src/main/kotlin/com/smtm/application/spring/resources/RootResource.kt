@@ -19,9 +19,9 @@ class RootResource(private val linkFactory: LinkFactory) {
             links = mapOf(
                 "self" to linkFactory.create("/"),
                 "categories" to linkFactory.create(CategoriesResource.PATH),
-                "current-plans" to linkFactory.create(PlanDefinitionsResource.CURRENT_PLANS_PATH),
-                "upcoming-plans" to linkFactory.create(PlanDefinitionsResource.UPCOMING_PLANS_PATH),
-                "archived-plans" to linkFactory.create(PlanDefinitionsResource.ARCHIVED_PLANS_PATH),
+                "current-plan-definitions" to linkFactory.create(PlanDefinitionsResource.CURRENT_PLANS_PATH),
+                "upcoming-plan-definitions" to linkFactory.create(PlanDefinitionsResource.UPCOMING_PLANS_PATH),
+                "archived-plan-definitions" to linkFactory.create(PlanDefinitionsResource.ARCHIVED_PLANS_PATH),
             )
         )
     }
