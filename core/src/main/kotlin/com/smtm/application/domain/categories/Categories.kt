@@ -32,6 +32,9 @@ data class Categories(
 
     fun getByName(name: String): Category = current.first { it.name == name }
 
+    fun findByName(name: String): Category? =
+        current.firstOrNull { it.name == name }
+
     fun getById(id: Long): Category = current.first { it.id == id }
 
     fun delete(id: Long): CategoriesActionResult = findById(id)

@@ -13,5 +13,8 @@ enum class Icon {
 
         fun valueOfOrNull(value: String) = runCatching { Icon.valueOf(value) }
             .getOrNull()
+
+        fun valueOfOrDefault(value: String, default: Icon = FOLDER): Icon =
+            valueOfOrNull(value) ?: default
     }
 }

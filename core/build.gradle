@@ -7,6 +7,7 @@ sourceCompatibility = '17'
 dependencies {
     implementation "io.arrow-kt:arrow-core:$ARROW_VERSION"
     implementation "io.arrow-kt:arrow-fx-coroutines:$ARROW_VERSION"
+    implementation "org.javamoney:moneta:$MONETA_VERSION"
 
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$JUNIT5_VERSION"

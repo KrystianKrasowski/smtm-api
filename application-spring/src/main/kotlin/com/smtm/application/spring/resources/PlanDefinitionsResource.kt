@@ -65,7 +65,7 @@ class PlanDefinitionsResource(
         links = mapOf(
             "self" to linkFactory.create("${PlansResource.PATH}/$id")
         ),
-        id = id,
+        id = id.value,
         name = name,
         period = PeriodDto(
             start = period.start,

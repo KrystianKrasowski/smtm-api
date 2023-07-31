@@ -20,6 +20,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     implementation "org.flywaydb:flyway-core:9.19.3"
     implementation "org.postgresql:postgresql:42.6.0"
+    implementation "org.javamoney:moneta:$MONETA_VERSION"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:postgresql:1.17.3'

@@ -51,7 +51,7 @@ class ApplicationBeansConfiguration {
 
     @Bean
     fun plansRepositoryJdbcAdapter(clock: Clock, jdbc: JdbcOperations, transactions: TransactionOperations): PlansRepositoryJdbcAdapter {
-        return PlansRepositoryJdbcAdapter(clock, jdbc)
+        return PlansRepositoryJdbcAdapter(clock, jdbc, transactions)
     }
 
     @Bean

@@ -11,7 +11,8 @@ data class Violation(val path: Path, val code: Code, val parameters: Map<String,
     enum class Code {
         EMPTY,
         ILLEGAL_CHARACTERS,
-        NON_UNIQUE
+        NON_UNIQUE,
+        UNKNOWN
     }
 }
 
@@ -33,4 +34,9 @@ fun illegalCharactersViolationOf(path: Violation.Path, illegalCharacters: CharAr
     parameters = mapOf(
         "illegal-characters" to illegalCharacters.joinToString(", ")
     )
+)
+
+fun unknownViolationOf(path: Violation.Path) = Violation(
+    path = path,
+    code = Violation.Code.UNKNOWN
 )

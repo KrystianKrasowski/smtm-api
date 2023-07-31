@@ -5,103 +5,85 @@ import arrow.core.left
 import arrow.core.right
 import com.smtm.application.api.PlansQueries
 import com.smtm.application.domain.OwnerId
-import com.smtm.application.domain.Version
-import com.smtm.application.domain.ownerIdOf
+import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.domain.plans.existingPlanDefinitionOf
-import com.smtm.application.domain.versionOf
+import com.smtm.application.domain.plans.PlanId
+import com.smtm.application.domain.plans.PlannedCategory
+import com.smtm.application.domain.plans.PlansProblem
+import com.smtm.application.domain.plans.toPlanId
+import com.smtm.application.spi.PlansRepository
+import com.smtm.application.spring.infrastructure.persistence.categories.CategoriesResultSet
+import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntity
+import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntryEntity
+import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntriesJoinedResultSet
+import com.smtm.application.spring.infrastructure.persistence.plans.PlansJdbcRepository
+import com.smtm.application.spring.infrastructure.persistence.plans.PlansResultSet
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcOperations
-import org.springframework.jdbc.core.RowMapper
-import java.sql.ResultSet
+import org.springframework.transaction.support.TransactionOperations
 import java.time.Clock
 import java.time.LocalDateTime
 
-private val logger = LoggerFactory.getLogger(PlansRepositoryJdbcAdapter::class.java)
-
 class PlansRepositoryJdbcAdapter(
     private val clock: Clock,
-    private val jdbc: JdbcOperations
-) : PlansQueries {
+    private val jdbc: JdbcOperations,
+    private val transactions: TransactionOperations
+) : PlansQueries, PlansRepository {
 
-    private val selectCurrentPlans = """
-        SELECT
-            *
-        FROM plans
-        WHERE owner_id = ?
-        AND start <= ?
-        AND "end" >= ?
-    """.trimIndent()
+    private val plansRepository = PlansJdbcRepository(clock, jdbc)
 
-    private val selectUpcomingPlans = """
-        SELECT
-            *
-        FROM plans
-        WHERE owner_id = ?
-        AND start > ?
-    """.trimIndent()
-
-    private val selectArchivedPlans = """
-        SELECT
-            *
-        FROM plans
-        WHERE owner_id = ?
-        AND "end" < ?
-    """.trimIndent()
-
-    override fun getCurrentPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>> {
-        return LocalDateTime.now(clock)
-            .runCatching { jdbc.query(selectCurrentPlans, PlanEntityMapper(), ownerId.value, this, this) }
+    override fun getCurrentPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>> =
+        jdbc.runCatching { PlansResultSet.getByOwnerIdAndPeriodAround(ownerId.value, LocalDateTime.now(clock), this) }
             .toQueryResult()
-    }
 
-    override fun getUpcomingPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>> {
-        return LocalDateTime.now(clock)
-            .runCatching { jdbc.query(selectUpcomingPlans, PlanEntityMapper(), ownerId.value, this) }
+    override fun getUpcomingPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>> =
+        jdbc.runCatching { PlansResultSet.getByOwnerIdAndPeriodAfter(ownerId.value, LocalDateTime.now(clock), this) }
             .toQueryResult()
-    }
 
-    override fun getArchivedPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>> {
-        return LocalDateTime.now(clock)
-            .runCatching { jdbc.query(selectArchivedPlans, PlanEntityMapper(), ownerId.value, this) }
+    override fun getArchivedPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>> =
+        jdbc.runCatching { PlansResultSet.getByOwnerIdAndPeriodBefore(ownerId.value, LocalDateTime.now(clock), this) }
             .toQueryResult()
-    }
 
-    private fun Result<List<PlanEntity>>.toQueryResult() = map { it.toPlanDefinitions() }
-        .map { it.right() }
-        .onFailure { logger.error("Cannot fetch plan summaries", it) }
-        .getOrElse { it.left() }
+    override fun save(plan: Plan): Either<PlansProblem, Plan> =
+        plan.takeIf { it.isModificationNeeded() }
+            ?.applyChanges()
+            ?: plan.right()
+
+    fun getPlan(id: PlanId): Either<PlansProblem, Plan> =
+        PlanEntriesJoinedResultSet.selectByPlanId(id.value, jdbc)
+            .takeUnless { it.empty }
+            ?.let { it.toPlan(CategoriesResultSet.selectByOwnerId(it.ownerId, jdbc)) }
+            ?.right()
+            ?: error("No plan for id $id")
+
+    private fun Result<PlansResultSet>.toQueryResult() =
+        this.map { it.toPlanDefinitionList() }
+            .map { it.right() }
+            .onFailure { logger.error("Cannot fetch plan definitions", it) }
+            .getOrElse { it.left() }
+
+    private fun Plan.applyChanges(): Either<PlansProblem, Plan> =
+        transactions.execute { trn ->
+            runCatching { upsertPlanDefinition(this) }
+                .mapCatching { addNewEntries(it) }
+                .map { getPlan(it.id) }
+                .onFailure { trn.setRollbackOnly() }
+                .onFailure { logger.error(it.message, it) }
+                .getOrElse { PlansProblem.RepositoryProblem(it).left() }
+        }!!
+
+    private fun upsertPlanDefinition(plan: Plan): Plan = PlanEntity.of(plan)
+        .runCatching { plansRepository.upsert(this) }
+        .map { plan.definition.copy(id = it.id!!.toPlanId()) }
+        .map { plan.copy(definition = it) }
+        .getOrThrow()
+
+    private fun addNewEntries(plan: Plan): Plan =
+        plan.onEachNewEntry { plansRepository.insert(PlanEntryEntity.of(plan.id.value, it)) }
 }
 
-private data class PlanEntity(
-    val ownerId: OwnerId,
-    val version: Version,
-    val id: Long?,
-    val name: String?,
-    val start: LocalDateTime?,
-    val end: LocalDateTime?
-) {
+private val logger = LoggerFactory.getLogger(PlansRepositoryJdbcAdapter::class.java)
 
-    fun toPlanDefinition() = existingPlanDefinitionOf(
-        id = id!!,
-        name = name!!,
-        start = start!!,
-        end = end!!
-    )
-}
+private fun Plan.onEachNewEntry(block: (PlannedCategory) -> Unit) = apply { newEntries.onEach(block) }
 
-private class PlanEntityMapper : RowMapper<PlanEntity> {
-
-    override fun mapRow(rs: ResultSet, rowNum: Int): PlanEntity {
-        return PlanEntity(
-            ownerId = ownerIdOf(rs.getLong("owner_id")),
-            version = versionOf(rs.getInt("version")),
-            id = rs.getLong("id"),
-            name = rs.getString("name"),
-            start = rs.getTimestamp("start").toLocalDateTime(),
-            end = rs.getTimestamp("end").toLocalDateTime()
-        )
-    }
-}
-
-private fun List<PlanEntity>.toPlanDefinitions() = map { it.toPlanDefinition() }
+private fun Plan.isModificationNeeded(): Boolean = newEntries.isNotEmpty()

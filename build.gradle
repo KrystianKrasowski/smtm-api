@@ -14,6 +14,7 @@ ext {
     JUNIT5_VERSION = '5.9.3'
     ASSERTJ_VERSION = '3.24.2'
     CUCUMBER_VERSION = '7.12.1'
+    MONETA_VERSION = '1.1'
 }
 
 subprojects {
