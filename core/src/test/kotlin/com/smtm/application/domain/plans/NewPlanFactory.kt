@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import javax.money.MonetaryAmount
 
-class ParameterTypes(world: World) {
+class NewPlanFactory(world: World) {
 
     private val categories: Categories =
         world.categoriesRepository
@@ -18,7 +18,7 @@ class ParameterTypes(world: World) {
             ?: error("Cannot get categories aggregate")
 
     @DataTableType
-    fun newPlan(entry: Map<String, String>): NewPlan =
+    fun create(entry: Map<String, String>): NewPlan =
         NewPlan(
             definition = PlanDefinition(
                 id = PlanId.UNSETTLED,
