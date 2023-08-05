@@ -6,7 +6,6 @@ import com.smtm.application.domain.Violation
 import com.smtm.application.domain.categories.Categories
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.categories.newCategoryOf
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.*
@@ -21,12 +20,12 @@ class CategoriesServiceStepdefs(private val world: World) {
 
     @When("user saves category with name {string}")
     fun `user saves category with name`(name: String) {
-        service.save(newCategoryOf(name, Icon.FOLDER))
+        service.save(Category.newOf(name = name, icon = Icon.FOLDER))
     }
 
     @When("user saves category with empty name")
     fun `user saves category with empty name`() {
-        service.save(newCategoryOf("", Icon.FOLDER))
+        service.save(Category.newOf(name = "", icon = Icon.FOLDER))
     }
 
     @When("user saves category")

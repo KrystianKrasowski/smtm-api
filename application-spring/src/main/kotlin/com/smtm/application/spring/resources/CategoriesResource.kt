@@ -7,11 +7,8 @@ import com.smtm.application.MediaType
 import com.smtm.application.api.CategoriesApi
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.OwnerId
-import com.smtm.application.domain.Violation
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.categories.existingCategoryOf
-import com.smtm.application.domain.categories.newCategoryOf
 import com.smtm.application.v1.ApiProblemDto
 import com.smtm.application.v1.CategoryDto
 import com.smtm.application.v1.NewCategoryDto
@@ -96,25 +93,19 @@ class CategoriesResource(
     private fun create204Response() = ResponseEntity.status(204)
         .build<Nothing>()
 
-    private fun NewCategoryDto.toDomain() = newCategoryOf(
+    private fun NewCategoryDto.toDomain() = Category.newOf(
         name = name,
         icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
     )
 
-    private fun CategoryDto.toDomain() = existingCategoryOf(
+    private fun CategoryDto.toDomain() = Category.of(
         id = id,
         name = name,
         icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
     )
 
-    private fun Category.toDto() = CategoryDto(
-        links = mapOf(
-            "self" to linkFactory.create("$PATH/${id!!}")
-        ),
-        id = id!!,
-        name = name,
-        icon = icon.name
-    )
+    private fun Category.toDto() =
+        DtoFactory(linkFactory).create(this)
 
     private fun CategoryDto.toResponse201() = ResponseEntity.status(201)
         .header("Location", links["self"]?.href)
@@ -131,7 +122,7 @@ private object CategoriesProblemHandler {
     fun handle(problem: CategoriesProblem): ResponseEntity<*> {
         return when (problem) {
             is CategoriesProblem.Violations -> problem.violations
-                .map { it.toDto() }
+                .map { DtoFactory.create(it) }
                 .let { ApiProblemDto.ConstraintViolations(it) }
                 .let { ResponseEntity.status(422).body(it) }
 
@@ -142,11 +133,4 @@ private object CategoriesProblemHandler {
                 .let { ResponseEntity.status(500).body(it) }
         }
     }
-
-    private fun Violation.toDto() = ApiProblemDto.Violation(
-        path = path.toJsonPath(),
-        code = code.name,
-        message = code.name,
-        parameters = parameters
-    )
 }

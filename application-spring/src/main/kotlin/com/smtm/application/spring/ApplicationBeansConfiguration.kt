@@ -2,6 +2,7 @@ package com.smtm.application.spring
 
 import com.smtm.application.LinkFactory
 import com.smtm.application.api.CategoriesApi
+import com.smtm.application.api.PlansApi
 import com.smtm.application.api.PlansQueries
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.ownerIdOf
@@ -35,8 +36,13 @@ class ApplicationBeansConfiguration {
     }
 
     @Bean
-    fun categoriesService(repository: CategoriesRepository): CategoriesApi {
+    fun categoriesApi(repository: CategoriesRepository): CategoriesApi {
         return CategoriesApi.create(repository)
+    }
+
+    @Bean
+    fun plansApi(categoriesRepository: CategoriesRepository, plansRepository: PlansRepositoryJdbcAdapter): PlansApi {
+        return PlansApi.create(categoriesRepository, plansRepository)
     }
 
     @Bean
@@ -51,7 +57,7 @@ class ApplicationBeansConfiguration {
 
     @Bean
     fun plansRepositoryJdbcAdapter(clock: Clock, jdbc: JdbcOperations, transactions: TransactionOperations): PlansRepositoryJdbcAdapter {
-        return PlansRepositoryJdbcAdapter(clock, jdbc)
+        return PlansRepositoryJdbcAdapter(clock, jdbc, transactions)
     }
 
     @Bean
