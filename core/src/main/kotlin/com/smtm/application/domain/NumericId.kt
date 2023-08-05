@@ -9,6 +9,9 @@ value class NumericId private constructor(val value: Long) {
     fun isSettled(): Boolean =
         !isUnsettled()
 
+    override fun toString(): String =
+        value.toString()
+
     operator fun inc(): NumericId =
         of(value + 1)
 

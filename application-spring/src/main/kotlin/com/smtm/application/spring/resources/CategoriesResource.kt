@@ -7,7 +7,6 @@ import com.smtm.application.MediaType
 import com.smtm.application.api.CategoriesApi
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.OwnerId
-import com.smtm.application.domain.Violation
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
 import com.smtm.application.v1.ApiProblemDto
@@ -105,14 +104,8 @@ class CategoriesResource(
         icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
     )
 
-    private fun Category.toDto() = CategoryDto(
-        links = mapOf(
-            "self" to linkFactory.create("$PATH/${id.value}")
-        ),
-        id = id.value,
-        name = name,
-        icon = icon.name
-    )
+    private fun Category.toDto() =
+        DtoFactory(linkFactory).create(this)
 
     private fun CategoryDto.toResponse201() = ResponseEntity.status(201)
         .header("Location", links["self"]?.href)
@@ -129,7 +122,7 @@ private object CategoriesProblemHandler {
     fun handle(problem: CategoriesProblem): ResponseEntity<*> {
         return when (problem) {
             is CategoriesProblem.Violations -> problem.violations
-                .map { it.toDto() }
+                .map { DtoFactory.create(it) }
                 .let { ApiProblemDto.ConstraintViolations(it) }
                 .let { ResponseEntity.status(422).body(it) }
 
@@ -140,11 +133,4 @@ private object CategoriesProblemHandler {
                 .let { ResponseEntity.status(500).body(it) }
         }
     }
-
-    private fun Violation.toDto() = ApiProblemDto.Violation(
-        path = path.toJsonPath(),
-        code = code.name,
-        message = code.name,
-        parameters = parameters
-    )
 }
