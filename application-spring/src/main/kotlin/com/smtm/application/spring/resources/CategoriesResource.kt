@@ -10,8 +10,6 @@ import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Violation
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.categories.existingCategoryOf
-import com.smtm.application.domain.categories.newCategoryOf
 import com.smtm.application.v1.ApiProblemDto
 import com.smtm.application.v1.CategoryDto
 import com.smtm.application.v1.NewCategoryDto
@@ -96,12 +94,12 @@ class CategoriesResource(
     private fun create204Response() = ResponseEntity.status(204)
         .build<Nothing>()
 
-    private fun NewCategoryDto.toDomain() = newCategoryOf(
+    private fun NewCategoryDto.toDomain() = Category.newOf(
         name = name,
         icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
     )
 
-    private fun CategoryDto.toDomain() = existingCategoryOf(
+    private fun CategoryDto.toDomain() = Category.of(
         id = id,
         name = name,
         icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
@@ -109,9 +107,9 @@ class CategoriesResource(
 
     private fun Category.toDto() = CategoryDto(
         links = mapOf(
-            "self" to linkFactory.create("$PATH/${id!!}")
+            "self" to linkFactory.create("$PATH/${id.value}")
         ),
-        id = id!!,
+        id = id.value,
         name = name,
         icon = icon.name
     )

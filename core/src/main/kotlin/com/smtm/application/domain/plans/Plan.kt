@@ -6,6 +6,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
 import com.smtm.application.domain.Aggregate
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Version
 import com.smtm.application.domain.Violation
@@ -21,9 +22,9 @@ data class Plan(
     val entries: List<PlannedCategory>,
     val newEntries: List<PlannedCategory>,
     private val availableCategories: List<Category>
-) : Aggregate<PlanId> {
+) : Aggregate<NumericId> {
 
-    override val id: PlanId
+    override val id: NumericId
         get() = definition.id
 
     val name: String
@@ -35,8 +36,8 @@ data class Plan(
     val end: LocalDateTime
         get() = definition.period.endInclusive
 
-    fun define(newPlan: NewPlan): Either<PlansProblem, Plan> {
-        return newPlan
+    fun define(newPlan: NewPlan): Either<PlansProblem, Plan> =
+        newPlan
             .validate()
             .map {
                 copy(
@@ -45,11 +46,13 @@ data class Plan(
                     newEntries = it.createPlannedCategoriesWith(availableCategories)
                 )
             }
-    }
 
-    private fun NewPlan.validate() = PlanValidator(this, availableCategories.mapNotNull { it.id })
-        .validate()
-        .mapLeft { PlansProblem.Violations(it) }
+    private fun NewPlan.validate() =
+        availableCategories
+            .map { it.id }
+            .let { PlanValidator(this, it) }
+            .validate()
+            .mapLeft { PlansProblem.Violations(it) }
 
     companion object {
 
@@ -64,7 +67,7 @@ data class Plan(
     }
 }
 
-private class PlanValidator(private val plan: NewPlan, private val availableCategories: List<Long>) {
+private class PlanValidator(private val plan: NewPlan, private val availableCategories: List<NumericId>) {
 
     fun validate(): Either<Nel<Violation>, NewPlan> {
         return plan
@@ -76,7 +79,7 @@ private class PlanValidator(private val plan: NewPlan, private val availableCate
             ?: plan.right()
     }
 
-    private fun createUnknownViolationOrNull(index: Int, category: Long) = index
+    private fun createUnknownViolationOrNull(index: Int, category: NumericId) = index
         .takeUnless { availableCategories.contains(category) }
         ?.let { "/entries/$it/category" }
         ?.let { violationPathOf(it) }

@@ -1,12 +1,11 @@
 package com.smtm.application.spring.infrastructure.persistence.plans
 
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Version
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.domain.plans.PlanId
-import com.smtm.application.domain.plans.toPlanId
 import com.smtm.application.domain.versionOf
 import java.sql.ResultSet
 import java.time.LocalDateTime
@@ -21,7 +20,7 @@ internal data class PlanEntity(
 ) {
 
     fun toPlanDefinition() = PlanDefinition.existing(
-        id = id!!.toPlanId(),
+        id = NumericId.of(id),
         name = name!!,
         start = start!!,
         end = end!!
@@ -43,7 +42,7 @@ internal data class PlanEntity(
         fun of(plan: Plan) = PlanEntity(
             ownerId = plan.ownerId,
             version = plan.version,
-            id = plan.id.takeUnless { it == PlanId.UNSETTLED }?.value,
+            id = plan.id.takeUnless { it == NumericId.UNSETTLED }?.value,
             name = plan.name,
             start = plan.start,
             end = plan.end

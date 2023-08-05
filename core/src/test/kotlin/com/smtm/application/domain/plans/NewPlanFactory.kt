@@ -1,6 +1,7 @@
 package com.smtm.application.domain.plans
 
 import com.smtm.application.World
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.categories.Categories
 import io.cucumber.java.DataTableType
 import org.javamoney.moneta.Money
@@ -21,7 +22,7 @@ class NewPlanFactory(world: World) {
     fun create(entry: Map<String, String>): NewPlan =
         NewPlan(
             definition = PlanDefinition(
-                id = PlanId.UNSETTLED,
+                id = NumericId.UNSETTLED,
                 name = entry.getValue("name"),
                 period = entry.getPeriod()
             ),
@@ -45,8 +46,8 @@ class NewPlanFactory(world: World) {
             .map { it.trim() }
             .let { NewPlan.Entry(it[0].toCategoryId(), it[1].toMoney()) }
 
-    private fun String.toCategoryId(): Long =
-        categories.findByName(this)?.id ?: -999
+    private fun String.toCategoryId(): NumericId =
+        categories.findByName(this)?.id ?: NumericId.UNSETTLED
 
     private fun String.toMoney(): MonetaryAmount =
         Money.parse(this)

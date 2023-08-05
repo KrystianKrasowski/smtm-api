@@ -16,7 +16,7 @@ data class PlanEntryEntity(
         fun of(planId: Long, plannedCategory: PlannedCategory) = PlanEntryEntity(
             id = null,
             planId = planId,
-            categoryId = plannedCategory.category.id!!,
+            categoryId = plannedCategory.category.id.value,
             amount = plannedCategory.value.multiply(BigDecimal.TEN.pow(plannedCategory.value.currency.defaultFractionDigits)).number.intValueExact(),
             currency = plannedCategory.value.currency.currencyCode
         )

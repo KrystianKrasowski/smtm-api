@@ -1,6 +1,7 @@
 package com.smtm.application.spring.infrastructure.persistence.categories
 
 import com.smtm.application.domain.Icon
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.categories.Category
 import org.springframework.jdbc.core.JdbcOperations
 import java.sql.ResultSet
@@ -18,7 +19,7 @@ internal data class CategoriesResultSet(private val rows: List<Row>) {
     ) {
 
         fun toCategory() = Category(
-            id = id,
+            id = NumericId.of(id),
             name = name,
             icon = Icon.valueOfOrDefault(icon)
         )

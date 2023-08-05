@@ -1,11 +1,10 @@
 package com.smtm.application.spring.infrastructure.persistence
 
 import com.smtm.application.domain.Icon
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.categories.Categories
 import com.smtm.application.domain.categories.CategoriesProblem
-import com.smtm.application.domain.categories.categoryOf
-import com.smtm.application.domain.categories.existingCategoryOf
-import com.smtm.application.domain.categories.newCategoryOf
+import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
 import org.assertj.core.api.Assertions.assertThat
@@ -32,9 +31,21 @@ class CategoriesRepositoryJdbcAdapterTest {
         id = ownerIdOf(1),
         version = versionOf(2),
         list = listOf(
-            existingCategoryOf(1, "Rent", Icon.HOUSE),
-            existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
-            existingCategoryOf(3, "Services", Icon.LIGHTENING)
+            Category.of(
+                id = 1,
+                name = "Rent",
+                icon = Icon.HOUSE
+            ),
+            Category.of(
+                id = 2,
+                name = "Savings",
+                icon = Icon.PIGGY_BANK
+            ),
+            Category.of(
+                id = 3,
+                name = "Services",
+                icon = Icon.LIGHTENING
+            )
         )
     )
 
@@ -66,9 +77,18 @@ class CategoriesRepositoryJdbcAdapterTest {
 
         // then
         assertThat(categories?.current).containsOnly(
-            existingCategoryOf(1, "Rent", Icon.HOUSE),
-            existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
-            existingCategoryOf(3, "Services", Icon.LIGHTENING)
+            Category.of(
+                1, name = "Rent",
+                icon = Icon.HOUSE
+            ),
+            Category.of(
+                2, name = "Savings",
+                icon = Icon.PIGGY_BANK
+            ),
+            Category.of(
+                3, name = "Services",
+                icon = Icon.LIGHTENING
+            )
         )
     }
 
@@ -100,14 +120,14 @@ class CategoriesRepositoryJdbcAdapterTest {
     @Test
     fun `should save category`() {
         // when
-        val result = newCategoryOf("Groceries", Icon.SHOPPING_CART)
+        val result = Category.newOf(name = "Groceries", icon = Icon.SHOPPING_CART)
             .let { categoriesPrototype.copy(toSave = listOf(it)) }
             .let { adapter.save(it) }
             .getOrNull()
 
 
         // then
-        assertThat(result?.getByName("Groceries")?.id).isEqualTo(4)
+        assertThat(result?.getByName("Groceries")?.id?.value).isEqualTo(4)
         assertThat(result?.getByName("Groceries")?.icon).isEqualTo(Icon.SHOPPING_CART)
     }
 
@@ -118,20 +138,20 @@ class CategoriesRepositoryJdbcAdapterTest {
     )
     fun `should update category`(id: Long, name: String, icon: Icon) {
         // when
-        val result = categoryOf(id, name, icon)
+        val result = Category.of(NumericId.of(id), name, icon)
             .let { categoriesPrototype.copy(toSave = listOf(it)) }
             .let { adapter.save(it) }
             .getOrNull()
 
         // then
-        assertThat(result?.getById(id)?.name).isEqualTo(name)
-        assertThat(result?.getById(id)?.icon).isEqualTo(icon)
+        assertThat(result?.getById(NumericId.of(id))?.name).isEqualTo(name)
+        assertThat(result?.getById(NumericId.of(id))?.icon).isEqualTo(icon)
     }
 
     @Test
     fun `should violate unique constraint of the name property`() {
         // when
-        val problem = newCategoryOf("Rent", Icon.SHOPPING_CART)
+        val problem = Category.newOf(name = "Rent", icon = Icon.SHOPPING_CART)
             .let { categoriesPrototype.copy(toSave = listOf(it)) }
             .let { adapter.save(it) }
             .leftOrNull()
@@ -149,15 +169,24 @@ class CategoriesRepositoryJdbcAdapterTest {
     @Test
     fun `should delete category`() {
         // when
-        val categories = existingCategoryOf(1, "Rent", Icon.HOUSE)
+        val categories = Category.of(
+            1, name = "Rent",
+            icon = Icon.HOUSE
+        )
             .let { categoriesPrototype.copy(toDelete = listOf(it)) }
             .let { adapter.save(it) }
             .getOrNull()
 
         // then
         assertThat(categories?.current).containsExactlyInAnyOrder(
-            existingCategoryOf(2, "Savings", Icon.PIGGY_BANK),
-            existingCategoryOf(3, "Services", Icon.LIGHTENING)
+            Category.of(
+                2, name = "Savings",
+                icon = Icon.PIGGY_BANK
+            ),
+            Category.of(
+                3, name = "Services",
+                icon = Icon.LIGHTENING
+            )
         )
     }
 }

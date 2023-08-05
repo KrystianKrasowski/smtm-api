@@ -1,18 +1,18 @@
 package com.smtm.application.domain.categories
 
 import com.smtm.application.domain.Icon
+import com.smtm.application.domain.NumericId
 import io.cucumber.java.DataTableType
 
 class ParameterTypes {
 
     @DataTableType
-    fun category(entry: Map<String, String>): Category {
-        return categoryOf(
-            id = entry.extractId(),
+    fun category(entry: Map<String, String>): Category =
+        Category.of(
+            id = NumericId.of(id = entry.extractId()),
             name = entry["name"] ?: "",
-            icon = entry.extractIcon(),
+            icon = entry.extractIcon()
         )
-    }
 
     private fun Map<String, String>.extractId() = get("id")
         ?.takeIf { it.isNotBlank() }

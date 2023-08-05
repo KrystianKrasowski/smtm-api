@@ -4,18 +4,17 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.smtm.application.api.PlansQueries
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.domain.plans.PlanId
 import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.plans.PlansProblem
-import com.smtm.application.domain.plans.toPlanId
 import com.smtm.application.spi.PlansRepository
 import com.smtm.application.spring.infrastructure.persistence.categories.CategoriesResultSet
 import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntity
-import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntryEntity
 import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntriesJoinedResultSet
+import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntryEntity
 import com.smtm.application.spring.infrastructure.persistence.plans.PlansJdbcRepository
 import com.smtm.application.spring.infrastructure.persistence.plans.PlansResultSet
 import org.slf4j.LoggerFactory
@@ -49,7 +48,7 @@ class PlansRepositoryJdbcAdapter(
             ?.applyChanges()
             ?: plan.right()
 
-    fun getPlan(id: PlanId): Either<PlansProblem, Plan> =
+    fun getPlan(id: NumericId): Either<PlansProblem, Plan> =
         PlanEntriesJoinedResultSet.selectByPlanId(id.value, jdbc)
             .takeUnless { it.empty }
             ?.let { it.toPlan(CategoriesResultSet.selectByOwnerId(it.ownerId, jdbc)) }
@@ -74,7 +73,7 @@ class PlansRepositoryJdbcAdapter(
 
     private fun upsertPlanDefinition(plan: Plan): Plan = PlanEntity.of(plan)
         .runCatching { plansRepository.upsert(this) }
-        .map { plan.definition.copy(id = it.id!!.toPlanId()) }
+        .map { plan.definition.copy(id = NumericId.of(it.id)) }
         .map { plan.copy(definition = it) }
         .getOrThrow()
 

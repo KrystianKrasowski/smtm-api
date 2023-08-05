@@ -1,5 +1,6 @@
 package com.smtm.application.domain.plans
 
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.categories.Category
 import javax.money.MonetaryAmount
 
@@ -11,7 +12,7 @@ data class NewPlan(
     fun createPlannedCategoriesWith(categories: List<Category>): List<PlannedCategory> =
         entries.mapNotNull { it.toPlannedCategoryOrNull(categories) }
 
-    data class Entry(val categoryId: Long, val value: MonetaryAmount) {
+    data class Entry(val categoryId: NumericId, val value: MonetaryAmount) {
 
         fun toPlannedCategoryOrNull(categories: List<Category>): PlannedCategory? =
             categories

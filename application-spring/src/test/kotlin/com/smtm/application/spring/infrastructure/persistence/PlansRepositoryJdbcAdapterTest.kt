@@ -1,13 +1,12 @@
 package com.smtm.application.spring.infrastructure.persistence
 
 import com.smtm.application.domain.Icon
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.domain.plans.PlanId
 import com.smtm.application.domain.plans.PlannedCategory
-import com.smtm.application.domain.plans.toPlanId
 import com.smtm.application.domain.versionOf
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
@@ -67,7 +66,7 @@ class PlansRepositoryJdbcAdapterTest {
         // then
         assertThat(plans).containsExactly(
             PlanDefinition.existing(
-                id = 2.toPlanId(),
+                id = NumericId.of(2L),
                 name = "July 2023",
                 start = LocalDateTime.parse("2023-07-01T00:00:00"),
                 end = LocalDateTime.parse("2023-07-31T23:59:59")
@@ -83,7 +82,7 @@ class PlansRepositoryJdbcAdapterTest {
         // then
         assertThat(plans).containsExactly(
             PlanDefinition.existing(
-                id = 3.toPlanId(),
+                id = NumericId.of(3L),
                 name = "August 2023",
                 start = LocalDateTime.parse("2023-08-01T00:00:00"),
                 end = LocalDateTime.parse("2023-08-31T23:59:59")
@@ -99,7 +98,7 @@ class PlansRepositoryJdbcAdapterTest {
         // then
         assertThat(plans).containsExactly(
             PlanDefinition.existing(
-                id = 1.toPlanId(),
+                id = NumericId.of(1L),
                 name = "June 2023",
                 start = LocalDateTime.parse("2023-06-01T00:00:00"),
                 end = LocalDateTime.parse("2023-06-30T23:59:59")
@@ -114,7 +113,7 @@ class PlansRepositoryJdbcAdapterTest {
             version = versionOf(1),
             ownerId = ownerIdOf(1),
             definition = PlanDefinition.existing(
-                id = PlanId.UNSETTLED,
+                id = NumericId.UNSETTLED,
                 name = "July 2023",
                 start = LocalDateTime.parse("2023-07-01T00:00:00"),
                 end = LocalDateTime.parse("2023-07-31T23:59:59")
@@ -133,7 +132,7 @@ class PlansRepositoryJdbcAdapterTest {
         val result = adapter.save(plan).getOrNull()
 
         // then
-        assertThat(result?.id).isEqualTo(4.toPlanId())
+        assertThat(result?.id).isEqualTo(NumericId.of(4L))
         assertThat(result?.entries).contains(
             PlannedCategory(
                 category = Category.of(1, "Rent", Icon.HOUSE),

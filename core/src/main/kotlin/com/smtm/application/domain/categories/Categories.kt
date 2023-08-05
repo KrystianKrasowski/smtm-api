@@ -6,6 +6,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
 import com.smtm.application.domain.Aggregate
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Version
 import com.smtm.application.domain.Violation
@@ -35,12 +36,14 @@ data class Categories(
     fun findByName(name: String): Category? =
         current.firstOrNull { it.name == name }
 
-    fun getById(id: Long): Category = current.first { it.id == id }
+    fun getById(id: NumericId): Category =
+        current.first { it.id == id }
 
-    fun delete(id: Long): CategoriesActionResult = findById(id)
-        ?.let { copy(version = version.increment(), toDelete = listOf(it)) }
-        ?.right()
-        ?: CategoriesProblem.Unknown.left()
+    fun delete(id: NumericId): CategoriesActionResult =
+        findById(id)
+            ?.let { copy(version = version.increment(), toDelete = listOf(it)) }
+            ?.right()
+            ?: CategoriesProblem.Unknown.left()
 
     private fun contains(category: Category) = current
         .any { it.id == category.id && it.name == category.name && it.icon == category.icon }
@@ -49,7 +52,8 @@ data class Categories(
         .validate()
         .mapLeft { CategoriesProblem.Violations(it) }
 
-    private fun findById(id: Long) = current.firstOrNull { it.id == id }
+    private fun findById(id: NumericId) =
+        current.firstOrNull { it.id == id }
 
     companion object {
 
@@ -71,7 +75,7 @@ private class CategoryValidator(currentCategories: List<Category>, private val c
         .takeIf { category.name.isBlank() }
 
     private val nonUniqueViolation = nonUniqueViolationOf(violationPathOf("name"))
-        .takeIf { category.id == null && currentCategoryNames.contains(category.name) }
+        .takeIf { category.id == NumericId.UNSETTLED && currentCategoryNames.contains(category.name) }
 
     private val illegalCharactersViolation = NAME_REGEX
         .toRegex()

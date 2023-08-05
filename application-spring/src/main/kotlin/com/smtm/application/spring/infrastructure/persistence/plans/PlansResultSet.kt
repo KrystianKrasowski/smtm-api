@@ -1,8 +1,7 @@
 package com.smtm.application.spring.infrastructure.persistence.plans
 
-import com.smtm.application.domain.OwnerId
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.domain.plans.toPlanId
 import org.springframework.jdbc.core.JdbcOperations
 import java.sql.ResultSet
 import java.time.LocalDateTime
@@ -23,7 +22,7 @@ internal data class PlansResultSet(private val rows: List<Row>) {
 
         fun toPlanDefinition(): PlanDefinition =
             PlanDefinition(
-                id = id.toPlanId(),
+                id = NumericId.of(id),
                 name = name,
                 period = start..end
             )

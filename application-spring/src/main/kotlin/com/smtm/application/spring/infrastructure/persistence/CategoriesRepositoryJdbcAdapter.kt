@@ -9,7 +9,6 @@ import com.smtm.application.domain.Version
 import com.smtm.application.domain.categories.Categories
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.categories.existingCategoryOf
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
 import com.smtm.application.spi.CategoriesRepository
@@ -61,13 +60,13 @@ class CategoriesRepositoryJdbcAdapter(
 
     private fun Categories.insertAllMarked() = apply {
         toSave
-            .filter { it.id == null }
+            .filter { it.id.isUnsettled() }
             .forEach { insert(it, id) }
     }
 
     private fun Categories.updateAllMarked() = apply {
         toSave
-            .filter { it.id != null }
+            .filter { it.id.isSettled() }
             .forEach { update(it) }
     }
 
@@ -94,11 +93,11 @@ class CategoriesRepositoryJdbcAdapter(
 
     private fun update(category: Category) =
         "UPDATE CATEGORIES SET NAME = ?, ICON = ? WHERE ID = ?"
-            .let { jdbc.update(it, category.name, category.icon.name, category.id) }
+            .let { jdbc.update(it, category.name, category.icon.name, category.id.value) }
 
     private fun delete(category: Category) =
         "DELETE FROM CATEGORIES WHERE ID = ?"
-            .let { jdbc.update(it, category.id) }
+            .let { jdbc.update(it, category.id.value) }
 }
 
 private data class CategorySetEntryEntity(
@@ -109,7 +108,12 @@ private data class CategorySetEntryEntity(
     val setVersion: Version
 ) {
 
-    fun toDomain(): Category? = lazy { existingCategoryOf(id!!, name!!, icon!!) }
+    fun toDomain(): Category? = lazy {
+        Category.of(
+            id!!, name = name!!,
+            icon = icon!!
+        )
+    }
         .takeIf { id != null && name != null && icon != null }
         ?.value
 }

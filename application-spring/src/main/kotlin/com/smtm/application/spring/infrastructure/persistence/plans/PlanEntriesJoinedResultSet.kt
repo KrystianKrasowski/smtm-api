@@ -1,12 +1,12 @@
 package com.smtm.application.spring.infrastructure.persistence.plans
 
 import com.smtm.application.domain.Icon
-import com.smtm.application.domain.categories.existingCategoryOf
+import com.smtm.application.domain.NumericId
+import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlannedCategory
-import com.smtm.application.domain.plans.toPlanId
 import com.smtm.application.domain.versionOf
 import com.smtm.application.spring.infrastructure.persistence.categories.CategoriesResultSet
 import org.javamoney.moneta.Money
@@ -27,13 +27,13 @@ internal data class PlanEntriesJoinedResultSet(private val entries: Collection<R
             version = versionOf(first.version),
             ownerId = ownerIdOf(first.ownerId),
             definition = PlanDefinition(
-                id = first.id.toPlanId(),
+                id = NumericId.of(first.id),
                 name = first.name,
                 period = first.start..first.end
             ),
             entries = entries.map {
                 PlannedCategory(
-                    category = existingCategoryOf(
+                    category = Category.of(
                         id = it.categoryId,
                         name = it.categoryName,
                         icon = Icon.valueOfOrNull(it.categoryIcon) ?: Icon.FOLDER

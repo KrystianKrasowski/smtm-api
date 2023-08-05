@@ -1,6 +1,7 @@
 package com.smtm.application.spi
 
 import com.smtm.application.World
+import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.versionOf
 import io.cucumber.java.en.Given
@@ -21,7 +22,7 @@ class CategoriesRepositoryStepdefs(private val world: World) {
 
     @Given("next category id is {long}")
     fun `next category id is N`(id: Long) {
-        world.categoriesRepository.nextCategoryId = id
+        world.categoriesRepository.nextCategoryId = NumericId.of(id)
     }
 
     @Then("user categories version is updated to {long}")
