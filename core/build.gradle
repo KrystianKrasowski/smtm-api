@@ -1,9 +1,6 @@
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'java-library'
 
-group = 'com.smtm.application'
-sourceCompatibility = '17'
-
 dependencies {
     implementation "io.arrow-kt:arrow-core:$ARROW_VERSION"
     implementation "io.arrow-kt:arrow-fx-coroutines:$ARROW_VERSION"

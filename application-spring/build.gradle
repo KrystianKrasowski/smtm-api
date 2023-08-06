@@ -4,9 +4,6 @@ apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.spring'
 apply plugin: 'org.flywaydb.flyway'
 
-group = 'com.smtm.application.spring'
-sourceCompatibility = '17'
-
 dependencies {
     implementation project(':dto')
     implementation project(':core')
@@ -23,7 +20,7 @@ dependencies {
     implementation "org.javamoney:moneta:$MONETA_VERSION"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.testcontainers:postgresql:1.17.3'
+    testImplementation 'org.testcontainers:postgresql:1.18.3'
     testImplementation "org.junit.jupiter:junit-jupiter:$JUNIT5_VERSION"
 }
 
