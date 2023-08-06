@@ -43,17 +43,17 @@ class PlansRepositoryJdbcAdapter(
         jdbc.runCatching { PlansResultSet.getByOwnerIdAndPeriodBefore(ownerId.value, LocalDateTime.now(clock), this) }
             .toQueryResult()
 
-    override fun save(plan: Plan): Either<PlansProblem, Plan> =
-        plan.takeIf { it.isModificationNeeded() }
-            ?.applyChanges()
-            ?: plan.right()
-
-    fun getPlan(id: NumericId): Either<PlansProblem, Plan> =
+    override fun find(id: NumericId): Either<PlansProblem, Plan> =
         PlanEntriesJoinedResultSet.selectByPlanId(id.value, jdbc)
             .takeUnless { it.empty }
             ?.let { it.toPlan(CategoriesResultSet.selectByOwnerId(it.ownerId, jdbc)) }
             ?.right()
-            ?: error("No plan for id $id")
+            ?: PlansProblem.UnknownPlan(id).left()
+
+    override fun save(plan: Plan): Either<PlansProblem, Plan> =
+        plan.takeIf { it.isModificationNeeded() }
+            ?.applyChanges()
+            ?: plan.right()
 
     private fun Result<PlansResultSet>.toQueryResult() =
         this.map { it.toPlanDefinitionList() }
@@ -79,6 +79,11 @@ class PlansRepositoryJdbcAdapter(
 
     private fun addNewEntries(plan: Plan): Plan =
         plan.onEachNewEntry { plansRepository.insert(PlanEntryEntity.of(plan.id.value, it)) }
+
+    private fun getPlan(id: NumericId): Either<PlansProblem, Plan> =
+        find(id)
+            .mapLeft { IllegalStateException("Cannot find plan by id ${id.value}") }
+            .mapLeft { PlansProblem.RepositoryProblem(it) }
 }
 
 private val logger = LoggerFactory.getLogger(PlansRepositoryJdbcAdapter::class.java)

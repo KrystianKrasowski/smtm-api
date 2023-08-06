@@ -20,6 +20,8 @@ import com.smtm.application.v1.PeriodDto
 import com.smtm.application.v1.PlanDto
 import org.javamoney.moneta.Money
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -33,6 +35,16 @@ class PlansResource(
     private val ownerIdProvider: () -> OwnerId,
     private val linksFactory: LinkFactory
 ) {
+
+    @GetMapping(
+        value = ["/{id}"],
+        produces = [MediaType.VERSION_1_JSON]
+    )
+    fun find(@PathVariable("id") id: Long): ResponseEntity<*> =
+        plansApi
+            .find(NumericId.of(id))
+            .map { it.toResponse() }
+            .getOrElse(PlansProblemHandler::handle)
 
     @PostMapping(
         consumes = [MediaType.VERSION_1_JSON],
@@ -104,6 +116,9 @@ private object PlansProblemHandler {
                 .map { DtoFactory.create(it) }
                 .let { ApiProblemDto.ConstraintViolations(it) }
                 .let { ResponseEntity.status(422).body(it) }
+
+            is PlansProblem.UnknownPlan -> ApiProblemDto.UnknownResource()
+                .let { ResponseEntity.status(404).body(it) }
 
             is PlansProblem.RepositoryProblem -> ApiProblemDto.Undefined()
                 .let { ResponseEntity.status(500).body(it) }

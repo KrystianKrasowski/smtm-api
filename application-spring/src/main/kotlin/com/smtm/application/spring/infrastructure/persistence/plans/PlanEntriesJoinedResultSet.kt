@@ -20,7 +20,7 @@ internal data class PlanEntriesJoinedResultSet(private val entries: Collection<R
 
     val empty: Boolean = entries.isEmpty()
     val ownerId: Long get() = first.ownerId
-    private val first = entries.first()
+    private val first: Row get() = entries.first()
 
     fun toPlan(categories: CategoriesResultSet): Plan =
         Plan(
