@@ -1,24 +1,31 @@
 package com.smtm.application.v1
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.smtm.application.HalResource
 import com.smtm.application.Link
 
 data class PlanDto(
-    override val links: Map<String, Link> = emptyMap(),
-    val id: Long,
-    val name: String,
-    val period: PeriodDto,
-    val entries: List<Entry>
+    @JsonProperty("_links") override val links: Map<String, Link> = emptyMap(),
+    @JsonProperty("id") val id: Long,
+    @JsonProperty("name") val name: String,
+    @JsonProperty("period") val period: PeriodDto,
+    @JsonProperty("entries") val entries: List<Entry>
 ) : HalResource(links) {
 
-    data class Entry(val category: CategoryDto, val value: MoneyDto)
+    data class Entry(
+        @JsonProperty("category") val category: CategoryDto,
+        @JsonProperty("value") val value: MoneyDto
+    )
 }
 
 data class NewPlanDto(
-    val name: String,
-    val period: PeriodDto,
-    val entries: List<Entry>
+    @JsonProperty("name") val name: String,
+    @JsonProperty("period") val period: PeriodDto,
+    @JsonProperty("entries") val entries: List<Entry>
 ) {
 
-    data class Entry(val categoryId: Long, val value: MoneyDto)
+    data class Entry(
+        @JsonProperty("categoryId") val categoryId: Long,
+        @JsonProperty("value") val value: MoneyDto
+    )
 }

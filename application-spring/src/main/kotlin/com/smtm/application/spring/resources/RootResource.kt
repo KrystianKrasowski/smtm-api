@@ -22,6 +22,7 @@ class RootResource(private val linkFactory: LinkFactory) {
                 "current-plan-definitions" to linkFactory.create(PlanDefinitionsResource.CURRENT_PLANS_PATH),
                 "upcoming-plan-definitions" to linkFactory.create(PlanDefinitionsResource.UPCOMING_PLANS_PATH),
                 "archived-plan-definitions" to linkFactory.create(PlanDefinitionsResource.ARCHIVED_PLANS_PATH),
+                "plans" to linkFactory.create(PlansResource.PATH)
             )
         )
     }

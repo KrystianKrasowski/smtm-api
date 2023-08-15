@@ -69,7 +69,7 @@ class PlansResource(
     private fun NewPlanDto.Entry.toNewPlanEntry() =
         NewPlan.Entry(
             categoryId = NumericId.of(categoryId),
-            value = Money.of(value.amount, value.currencyCode)
+            value = Money.of(value.amount, value.currency)
         )
 
     private fun Plan.toResponse(): ResponseEntity<PlanDto> =
@@ -93,7 +93,7 @@ class PlansResource(
     private fun PlannedCategory.toDto() =
         PlanDto.Entry(
             category = category.toDto(),
-            value = MoneyDto(
+            value = MoneyDto.of(
                 amount = value.number.numberValue(BigDecimal::class.java),
                 currencyCode = value.currency.currencyCode
             )
