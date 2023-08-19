@@ -18,7 +18,6 @@ import com.smtm.application.v1.MoneyDto
 import com.smtm.application.v1.NewPlanDto
 import com.smtm.application.v1.PeriodDto
 import com.smtm.application.v1.PlanDto
-import org.javamoney.moneta.Money
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.math.BigDecimal
 
 @RestController
 @RequestMapping(PlansResource.PATH)
@@ -69,7 +67,7 @@ class PlansResource(
     private fun NewPlanDto.Entry.toNewPlanEntry() =
         NewPlan.Entry(
             categoryId = NumericId.of(categoryId),
-            value = Money.of(value.amount, value.currency)
+            value = value.monetaryAmount
         )
 
     private fun Plan.toResponse(): ResponseEntity<PlanDto> =
@@ -93,10 +91,7 @@ class PlansResource(
     private fun PlannedCategory.toDto() =
         PlanDto.Entry(
             category = category.toDto(),
-            value = MoneyDto.of(
-                amount = value.number.numberValue(BigDecimal::class.java),
-                currencyCode = value.currency.currencyCode
-            )
+            value = MoneyDto.of(value)
         )
 
     private fun Category.toDto(): CategoryDto =

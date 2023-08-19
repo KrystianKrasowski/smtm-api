@@ -4,6 +4,9 @@ apply plugin: 'java-library'
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_VERSION"
+    implementation "org.javamoney:moneta:$MONETA_VERSION"
+    testImplementation "org.junit.jupiter:junit-jupiter:$JUNIT5_VERSION"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$JUNIT5_VERSION"
 }
 
 test {
