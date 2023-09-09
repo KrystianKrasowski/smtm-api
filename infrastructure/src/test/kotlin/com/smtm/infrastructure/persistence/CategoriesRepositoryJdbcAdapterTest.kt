@@ -1,4 +1,4 @@
-package com.smtm.application.spring.infrastructure.persistence
+package com.smtm.infrastructure.persistence
 
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.NumericId
@@ -7,25 +7,24 @@ import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
+import javax.sql.DataSource
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.jdbc.core.JdbcOperations
-import org.springframework.transaction.support.TransactionOperations
 
-@SpringBootTest
 class CategoriesRepositoryJdbcAdapterTest {
 
-    @Autowired
-    private lateinit var jdbc: JdbcOperations
+    private lateinit var dataSource: DataSource
+    private lateinit var adapter: CategoriesRepositoryJdbcAdapter
 
-    @Autowired
-    private lateinit var transactions: TransactionOperations
+    private val initialSqlQueries = listOf(
+        "INSERT INTO CATEGORY_SETS (OWNER_ID, VERSION) VALUES (1, 1)",
+        "INSERT INTO CATEGORIES (NAME, ICON, OWNER_ID) VALUES ('Rent', 'HOUSE', 1)",
+        "INSERT INTO CATEGORIES (NAME, ICON, OWNER_ID) VALUES ('Savings', 'PIGGY_BANK', 1)",
+        "INSERT INTO CATEGORIES (NAME, ICON, OWNER_ID) VALUES ('Services', 'LIGHTENING', 1)",
+    )
 
     private val categoriesPrototype = Categories.fetched(
         id = ownerIdOf(1),
@@ -49,25 +48,11 @@ class CategoriesRepositoryJdbcAdapterTest {
         )
     )
 
-    private val adapter get() = CategoriesRepositoryJdbcAdapter(jdbc, transactions)
-
-    private val initialSqlQueries = listOf(
-        "INSERT INTO CATEGORY_SETS (OWNER_ID, VERSION) VALUES (1, 1)",
-        "INSERT INTO CATEGORIES (NAME, ICON, OWNER_ID) VALUES ('Rent', 'HOUSE', 1)",
-        "INSERT INTO CATEGORIES (NAME, ICON, OWNER_ID) VALUES ('Savings', 'PIGGY_BANK', 1)",
-        "INSERT INTO CATEGORIES (NAME, ICON, OWNER_ID) VALUES ('Services', 'LIGHTENING', 1)",
-    )
-
     @BeforeEach
     fun setUp() {
-        initialSqlQueries.forEach(jdbc::update)
-    }
-
-    @AfterEach
-    fun tearDown() {
-        jdbc.execute("DELETE FROM CATEGORIES")
-        jdbc.execute("DELETE FROM CATEGORY_SETS")
-        jdbc.execute("ALTER TABLE CATEGORIES ALTER COLUMN ID RESTART WITH 1")
+        dataSource = TestDatabase.setup()
+        adapter = CategoriesRepositoryJdbcAdapter(dataSource)
+        initialSqlQueries.forEach { dataSource.runSql(it) }
     }
 
     @Test
@@ -95,8 +80,8 @@ class CategoriesRepositoryJdbcAdapterTest {
     @Test
     fun `should get empty, non-first version categories`() {
         // given
-        jdbc.execute("DELETE FROM CATEGORIES")
-        jdbc.execute("UPDATE CATEGORY_SETS SET VERSION = 2 WHERE OWNER_ID = 1")
+        dataSource.runSql("DELETE FROM CATEGORIES")
+        dataSource.runSql("UPDATE CATEGORY_SETS SET VERSION = 2 WHERE OWNER_ID = 1")
 
         // when
         val result = adapter.getCategories(ownerIdOf(1)).getOrNull()

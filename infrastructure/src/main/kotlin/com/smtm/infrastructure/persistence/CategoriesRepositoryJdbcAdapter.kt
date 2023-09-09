@@ -1,4 +1,4 @@
-package com.smtm.application.spring.infrastructure.persistence
+package com.smtm.infrastructure.persistence
 
 import arrow.core.Either
 import arrow.core.left
@@ -12,18 +12,20 @@ import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.versionOf
 import com.smtm.application.spi.CategoriesRepository
+import javax.sql.DataSource
 import org.slf4j.LoggerFactory
-import org.springframework.jdbc.core.JdbcOperations
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
-import org.springframework.transaction.support.TransactionOperations
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import java.sql.ResultSet
 
-private val logger = LoggerFactory.getLogger(CategoriesRepositoryJdbcAdapter::class.java)
-
 class CategoriesRepositoryJdbcAdapter(
-    private val jdbc: JdbcOperations,
-    private val transactions: TransactionOperations
+    dataSource: DataSource
 ) : CategoriesRepository {
+
+    private val jdbc = JdbcTemplate(dataSource)
+    private val transactions = TransactionTemplate(DataSourceTransactionManager(dataSource))
 
     override fun getCategories(ownerId: OwnerId): Either<CategoriesProblem, Categories> {
         return "SELECT CS.OWNER_ID, CS.VERSION, C.ID, C.NAME, C.ICON FROM CATEGORY_SETS CS LEFT JOIN CATEGORIES C ON C.OWNER_ID = CS.OWNER_ID WHERE CS.OWNER_ID = ?"
@@ -75,7 +77,9 @@ class CategoriesRepositoryJdbcAdapter(
             .forEach { delete(it) }
     }
 
-    private fun otherCategoriesProblemOf(message: String) = CategoriesProblem.Other(message).left()
+    private fun otherCategoriesProblemOf(message: String) = CategoriesProblem.Other(
+        message
+    ).left()
 
     private fun createFirstVersionOf(categories: Categories) =
         "INSERT INTO CATEGORY_SETS (OWNER_ID, VERSION) VALUES (?, ?)"
@@ -99,6 +103,8 @@ class CategoriesRepositoryJdbcAdapter(
         "DELETE FROM CATEGORIES WHERE ID = ?"
             .let { jdbc.update(it, category.id.value) }
 }
+
+private val logger = LoggerFactory.getLogger(CategoriesRepositoryJdbcAdapter::class.java)
 
 private data class CategorySetEntryEntity(
     val id: Long?,
@@ -143,4 +149,4 @@ private fun Long.toOwnerId() = ownerIdOf(this)
 
 private fun Int.toVersion() = versionOf(this)
 
-private fun Categories.isFirstVersion() = version.value == 1L
+private fun Categories.isFirstVersion() = version.value == 1

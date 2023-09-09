@@ -15,6 +15,9 @@ ext {
     ASSERTJ_VERSION = '3.24.2'
     CUCUMBER_VERSION = '7.12.1'
     MONETA_VERSION = '1.1'
+    SPRING_VERSION = '6.0.9'
+    SPRING_BOOT_VERSION = '3.1.0'
+    TEST_CONTAINERS_VERSION = '1.19.0'
 }
 
 subprojects {

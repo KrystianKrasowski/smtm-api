@@ -7,8 +7,9 @@ import com.smtm.application.api.PlansQueries
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.spi.CategoriesRepository
-import com.smtm.application.spring.infrastructure.persistence.CategoriesRepositoryJdbcAdapter
 import com.smtm.application.spring.infrastructure.persistence.PlansRepositoryJdbcAdapter
+import com.smtm.infrastructure.persistence.CategoriesRepositoryJdbcAdapter
+import javax.sql.DataSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcOperations
@@ -17,7 +18,6 @@ import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionOperations
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.Clock
-import javax.sql.DataSource
 
 @Configuration
 class ApplicationBeansConfiguration {
@@ -51,8 +51,8 @@ class ApplicationBeansConfiguration {
     }
 
     @Bean
-    fun categoriesRepository(jdbc: JdbcOperations, transactions: TransactionOperations): CategoriesRepository {
-        return CategoriesRepositoryJdbcAdapter(jdbc, transactions)
+    fun categoriesRepository(dataSource: DataSource): CategoriesRepository {
+        return CategoriesRepositoryJdbcAdapter(dataSource)
     }
 
     @Bean

@@ -95,7 +95,7 @@ internal class PlansJdbcRepository(
         connection
             .prepareStatement("""INSERT INTO plans (owner_id, version, name, start, "end") VALUES (?, ?, ?, ?, ?)""", Statement.RETURN_GENERATED_KEYS)
             .apply { setLong(1, plan.ownerId.value) }
-            .apply { setLong(2, plan.version.value) }
+            .apply { setInt(2, plan.version.value) }
             .apply { setString(3, plan.name) }
             .apply { setTimestamp(4, Timestamp.valueOf(plan.start)) }
             .apply { setTimestamp(5, Timestamp.valueOf(plan.end)) }
