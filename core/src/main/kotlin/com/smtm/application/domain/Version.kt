@@ -1,11 +1,11 @@
 package com.smtm.application.domain
 
 @JvmInline
-value class Version(val value: Long) {
+value class Version(val value: Int) {
 
     fun increment(): Version = Version(value + 1)
 
-    fun isFirst(): Boolean = value == 1L
+    fun isFirst(): Boolean = value == 1
 
     companion object {
 
@@ -13,5 +13,5 @@ value class Version(val value: Long) {
     }
 }
 
-fun versionOf(number: Long) = Version(number)
+fun versionOf(number: Long) = Version(number.toInt())
 fun versionOf(number: Int) = versionOf(number.toLong())

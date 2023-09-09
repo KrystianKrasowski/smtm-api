@@ -1,4 +1,4 @@
-package com.smtm.application.spring.infrastructure.persistence.categories
+package com.smtm.infrastructure.persistence.categories
 
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.NumericId

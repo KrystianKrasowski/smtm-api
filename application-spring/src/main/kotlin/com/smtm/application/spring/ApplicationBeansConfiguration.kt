@@ -7,17 +7,14 @@ import com.smtm.application.api.PlansQueries
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.spi.CategoriesRepository
-import com.smtm.application.spring.infrastructure.persistence.CategoriesRepositoryJdbcAdapter
-import com.smtm.application.spring.infrastructure.persistence.PlansRepositoryJdbcAdapter
+import com.smtm.infrastructure.persistence.CategoriesRepositoryJdbcAdapter
+import com.smtm.infrastructure.persistence.PlansRepositoryJdbcAdapter
+import javax.sql.DataSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcOperations
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionOperations
-import org.springframework.transaction.support.TransactionTemplate
 import java.time.Clock
-import javax.sql.DataSource
 
 @Configuration
 class ApplicationBeansConfiguration {
@@ -26,47 +23,35 @@ class ApplicationBeansConfiguration {
     fun ownerIdProvider(): () -> OwnerId = { ownerIdOf(1) }
 
     @Bean
-    fun linkFactory(): LinkFactory {
-        return LinkFactory("http", "localhost", 8080)
-    }
+    fun linkFactory(): LinkFactory =
+        LinkFactory("http", "localhost", 8080)
 
     @Bean
-    fun clock(): Clock {
-        return Clock.systemUTC()
-    }
+    fun clock(): Clock =
+        Clock.systemUTC()
 
     @Bean
-    fun categoriesApi(repository: CategoriesRepository): CategoriesApi {
-        return CategoriesApi.create(repository)
-    }
+    fun categoriesApi(repository: CategoriesRepository): CategoriesApi =
+        CategoriesApi.create(repository)
 
     @Bean
-    fun plansApi(categoriesRepository: CategoriesRepository, plansRepository: PlansRepositoryJdbcAdapter): PlansApi {
-        return PlansApi.create(categoriesRepository, plansRepository)
-    }
+    fun plansApi(categoriesRepository: CategoriesRepository, plansRepository: PlansRepositoryJdbcAdapter): PlansApi =
+        PlansApi.create(categoriesRepository, plansRepository)
 
     @Bean
-    fun plansQueries(repository: PlansRepositoryJdbcAdapter): PlansQueries {
-        return repository
-    }
+    fun plansQueries(repository: PlansRepositoryJdbcAdapter): PlansQueries =
+        repository
 
     @Bean
-    fun categoriesRepository(jdbc: JdbcOperations, transactions: TransactionOperations): CategoriesRepository {
-        return CategoriesRepositoryJdbcAdapter(jdbc, transactions)
-    }
+    fun categoriesRepository(dataSource: DataSource): CategoriesRepository =
+        CategoriesRepositoryJdbcAdapter(dataSource)
 
     @Bean
-    fun plansRepositoryJdbcAdapter(clock: Clock, jdbc: JdbcOperations, transactions: TransactionOperations): PlansRepositoryJdbcAdapter {
-        return PlansRepositoryJdbcAdapter(clock, jdbc, transactions)
-    }
-
-    @Bean
-    fun jdbc(dataSource: DataSource): JdbcOperations {
-        return JdbcTemplate(dataSource)
-    }
-
-    @Bean
-    fun transactions(transactionManager: PlatformTransactionManager): TransactionOperations {
-        return TransactionTemplate(transactionManager)
-    }
+    fun plansRepositoryJdbcAdapter(
+        dataSource: DataSource,
+        clock: Clock,
+        jdbc: JdbcOperations,
+        transactions: TransactionOperations
+    ): PlansRepositoryJdbcAdapter =
+        PlansRepositoryJdbcAdapter(dataSource, clock)
 }

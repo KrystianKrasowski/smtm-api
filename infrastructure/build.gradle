@@ -1,0 +1,24 @@
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'java-library'
+apply plugin: 'org.flywaydb.flyway'
+
+dependencies {
+    implementation project(':core')
+
+    implementation "io.arrow-kt:arrow-core:$ARROW_VERSION"
+    implementation "io.arrow-kt:arrow-fx-coroutines:$ARROW_VERSION"
+    implementation "org.javamoney:moneta:$MONETA_VERSION"
+    implementation "org.springframework:spring-jdbc:$SPRING_VERSION"
+    implementation "org.postgresql:postgresql:42.6.0"
+    implementation "org.flywaydb:flyway-core:9.19.3"
+    implementation "org.slf4j:slf4j-api:2.0.7"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:$JUNIT5_VERSION"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$JUNIT5_VERSION"
+    testImplementation "org.assertj:assertj-core:$ASSERTJ_VERSION"
+    testImplementation "org.testcontainers:postgresql:$TEST_CONTAINERS_VERSION"
+}
+
+test {
+    useJUnitPlatform()
+}

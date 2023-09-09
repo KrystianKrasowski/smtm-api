@@ -1,4 +1,4 @@
-package com.smtm.application.spring.infrastructure.persistence.plans
+package com.smtm.infrastructure.persistence.plans
 
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.NumericId
@@ -8,7 +8,7 @@ import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.versionOf
-import com.smtm.application.spring.infrastructure.persistence.categories.CategoriesResultSet
+import com.smtm.infrastructure.persistence.categories.CategoriesResultSet
 import org.javamoney.moneta.Money
 import org.springframework.jdbc.core.JdbcOperations
 import java.math.BigDecimal

@@ -1,4 +1,4 @@
-package com.smtm.application.spring.infrastructure.persistence
+package com.smtm.infrastructure.persistence
 
 import arrow.core.Either
 import arrow.core.left
@@ -11,23 +11,27 @@ import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.plans.PlansProblem
 import com.smtm.application.spi.PlansRepository
-import com.smtm.application.spring.infrastructure.persistence.categories.CategoriesResultSet
-import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntity
-import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntriesJoinedResultSet
-import com.smtm.application.spring.infrastructure.persistence.plans.PlanEntryEntity
-import com.smtm.application.spring.infrastructure.persistence.plans.PlansJdbcRepository
-import com.smtm.application.spring.infrastructure.persistence.plans.PlansResultSet
+import com.smtm.infrastructure.persistence.categories.CategoriesResultSet
+import com.smtm.infrastructure.persistence.plans.PlanEntity
+import com.smtm.infrastructure.persistence.plans.PlanEntriesJoinedResultSet
+import com.smtm.infrastructure.persistence.plans.PlanEntryEntity
+import com.smtm.infrastructure.persistence.plans.PlansJdbcRepository
+import com.smtm.infrastructure.persistence.plans.PlansResultSet
+import javax.sql.DataSource
 import org.slf4j.LoggerFactory
-import org.springframework.jdbc.core.JdbcOperations
-import org.springframework.transaction.support.TransactionOperations
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.Clock
 import java.time.LocalDateTime
 
 class PlansRepositoryJdbcAdapter(
-    private val clock: Clock,
-    private val jdbc: JdbcOperations,
-    private val transactions: TransactionOperations
+    dataSource: DataSource,
+    private val clock: Clock
 ) : PlansQueries, PlansRepository {
+
+    private val jdbc = JdbcTemplate(dataSource)
+    private val transactions = TransactionTemplate(DataSourceTransactionManager(dataSource))
 
     private val plansRepository = PlansJdbcRepository(clock, jdbc)
 

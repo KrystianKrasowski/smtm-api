@@ -1,4 +1,4 @@
-package com.smtm.application.spring.infrastructure.persistence.plans
+package com.smtm.infrastructure.persistence.plans
 
 import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId

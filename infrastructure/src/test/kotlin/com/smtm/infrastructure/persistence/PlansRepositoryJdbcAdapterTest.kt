@@ -1,4 +1,4 @@
-package com.smtm.application.spring.infrastructure.persistence
+package com.smtm.infrastructure.persistence
 
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.NumericId
@@ -9,32 +9,24 @@ import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.plans.PlansProblem
 import com.smtm.application.domain.versionOf
+import javax.sql.DataSource
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.jdbc.core.JdbcOperations
-import org.springframework.transaction.support.TransactionOperations
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-@SpringBootTest
 class PlansRepositoryJdbcAdapterTest {
 
-    @Autowired
-    private lateinit var jdbc: JdbcOperations
-
-    @Autowired
-    private lateinit var transactions: TransactionOperations
+    private lateinit var dataSource: DataSource
 
     private val clock = Clock.fixed(Instant.parse("2023-07-15T12:30:00.00Z"), ZoneId.of("UTC"))
 
-    private val adapter get() = PlansRepositoryJdbcAdapter(clock, jdbc, transactions)
+    private val adapter get() = PlansRepositoryJdbcAdapter(dataSource, clock)
 
     private val initialSqlQueries = listOf(
         "insert into category_sets (owner_id, version) values (1, 1)",
@@ -49,17 +41,18 @@ class PlansRepositoryJdbcAdapterTest {
 
     @BeforeEach
     fun setUp() {
-        initialSqlQueries.forEach(jdbc::update)
+        dataSource = TestDatabase.setup()
+        initialSqlQueries.forEach(dataSource::runSql)
     }
 
     @AfterEach
     fun tearDown() {
-        jdbc.execute("delete from plan_entries")
-        jdbc.execute("delete from plans")
-        jdbc.execute("alter table plans alter column id restart with 1")
-        jdbc.execute("delete from categories")
-        jdbc.execute("delete from category_sets")
-        jdbc.execute("alter table categories alter column id restart with 1")
+        dataSource.runSql("delete from plan_entries")
+        dataSource.runSql("delete from plans")
+        dataSource.runSql("alter table plans alter column id restart with 1")
+        dataSource.runSql("delete from categories")
+        dataSource.runSql("delete from category_sets")
+        dataSource.runSql("alter table categories alter column id restart with 1")
     }
 
     @Test
