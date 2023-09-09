@@ -1,5 +1,6 @@
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'java-library'
+apply plugin: 'org.flywaydb.flyway'
 
 dependencies {
     implementation project(':core')

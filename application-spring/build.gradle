@@ -2,7 +2,6 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.spring'
-apply plugin: 'org.flywaydb.flyway'
 
 dependencies {
     implementation project(':dto')
@@ -16,13 +15,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
-    implementation "org.flywaydb:flyway-core:9.19.3"
-    implementation "org.postgresql:postgresql:42.6.0"
     implementation "org.javamoney:moneta:$MONETA_VERSION"
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.testcontainers:postgresql:1.18.3'
-    testImplementation "org.junit.jupiter:junit-jupiter:$JUNIT5_VERSION"
 }
 
 test {
