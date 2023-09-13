@@ -5,8 +5,6 @@ value class Version(val value: Int) {
 
     fun increment(): Version = Version(value + 1)
 
-    fun isFirst(): Boolean = value == 1
-
     companion object {
 
         val ZERO = Version(0)
@@ -15,3 +13,5 @@ value class Version(val value: Int) {
 
 fun versionOf(number: Long) = Version(number.toInt())
 fun versionOf(number: Int) = versionOf(number.toLong())
+
+fun Int.toVersion() = Version(this)

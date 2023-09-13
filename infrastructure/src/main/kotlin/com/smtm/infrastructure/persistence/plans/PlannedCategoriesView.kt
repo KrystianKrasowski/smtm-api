@@ -8,21 +8,21 @@ import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.versionOf
-import com.smtm.infrastructure.persistence.categories.CategoriesResultSet
-import org.javamoney.moneta.Money
+import com.smtm.infrastructure.persistence.categories.CategoryRecord
+import com.smtm.infrastructure.persistence.categories.Conversions.toCategory
+import com.smtm.infrastructure.persistence.toMonetaryAmount
+import javax.money.MonetaryAmount
 import org.springframework.jdbc.core.JdbcOperations
-import java.math.BigDecimal
 import java.sql.ResultSet
 import java.time.LocalDateTime
-import javax.money.Monetary
 
-internal data class PlanEntriesJoinedResultSet(private val entries: Collection<Row>) {
+internal data class PlannedCategoriesView(private val entries: Collection<Row>) {
 
     val empty: Boolean = entries.isEmpty()
     val ownerId: Long get() = first.ownerId
     private val first: Row get() = entries.first()
 
-    fun toPlan(categories: CategoriesResultSet): Plan =
+    fun toPlan(categories: List<CategoryRecord>): Plan =
         Plan(
             version = versionOf(first.version),
             ownerId = ownerIdOf(first.ownerId),
@@ -38,11 +38,11 @@ internal data class PlanEntriesJoinedResultSet(private val entries: Collection<R
                         name = it.categoryName,
                         icon = Icon.valueOfOrNull(it.categoryIcon) ?: Icon.FOLDER
                     ),
-                    value = Money.of(it.extractAmount(), it.currency)
+                    value = it.value
                 )
             },
             newEntries = emptyList(),
-            availableCategories = categories.toCategoryList()
+            availableCategories = categories.map { it.toCategory() }
         )
 
     companion object {
@@ -82,9 +82,9 @@ internal data class PlanEntriesJoinedResultSet(private val entries: Collection<R
             )
         }
 
-        fun selectByPlanId(id: Long, jdbc: JdbcOperations): PlanEntriesJoinedResultSet =
+        fun selectByPlanId(id: Long, jdbc: JdbcOperations): PlannedCategoriesView =
             jdbc.query(selectByPlanId, MAPPER, id)
-                .let { PlanEntriesJoinedResultSet(it) }
+                .let { PlannedCategoriesView(it) }
     }
 
     data class Row(
@@ -101,14 +101,8 @@ internal data class PlanEntriesJoinedResultSet(private val entries: Collection<R
         val currency: String
     ) {
 
-        private val currencyFractionDigits: Int =
-            Monetary.getCurrency(currency).defaultFractionDigits
-
-        fun extractAmount(): BigDecimal =
-            BigDecimal.valueOf(amount.toLong())
-                .setScale(currencyFractionDigits)
-                .divide(BigDecimal.TEN.pow(currencyFractionDigits))
-                .setScale(currencyFractionDigits)
+        val value: MonetaryAmount =
+            amount.toMonetaryAmount(currency)
     }
 }
 

@@ -64,6 +64,14 @@ data class Categories(
             toSave = emptyList(),
             toDelete = emptyList()
         )
+
+        fun empty(id: OwnerId) = Categories(
+            id = id,
+            version = Version.ZERO,
+            current = emptyList(),
+            toSave = emptyList(),
+            toDelete = emptyList()
+        )
     }
 }
 
