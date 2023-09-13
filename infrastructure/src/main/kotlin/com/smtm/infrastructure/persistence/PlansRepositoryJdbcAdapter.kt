@@ -8,15 +8,12 @@ import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.plans.PlansProblem
 import com.smtm.application.spi.PlansRepository
 import com.smtm.infrastructure.persistence.categories.CategoriesResultSet
-import com.smtm.infrastructure.persistence.plans.PlanEntity
-import com.smtm.infrastructure.persistence.plans.PlanEntriesJoinedResultSet
-import com.smtm.infrastructure.persistence.plans.PlanEntryEntity
-import com.smtm.infrastructure.persistence.plans.PlansJdbcRepository
-import com.smtm.infrastructure.persistence.plans.PlansResultSet
+import com.smtm.infrastructure.persistence.plans.PlannedCategoriesView
+import com.smtm.infrastructure.persistence.plans.PlanEntryRecord
+import com.smtm.infrastructure.persistence.plans.PlanRecord
 import javax.sql.DataSource
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
@@ -33,22 +30,20 @@ class PlansRepositoryJdbcAdapter(
     private val jdbc = JdbcTemplate(dataSource)
     private val transactions = TransactionTemplate(DataSourceTransactionManager(dataSource))
 
-    private val plansRepository = PlansJdbcRepository(clock, jdbc)
-
     override fun getCurrentPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>> =
-        jdbc.runCatching { PlansResultSet.getByOwnerIdAndPeriodAround(ownerId.value, LocalDateTime.now(clock), this) }
+        jdbc.runCatching { PlanRecord.getByOwnerIdAndPeriodAround(ownerId.value, LocalDateTime.now(clock), this) }
             .toQueryResult()
 
     override fun getUpcomingPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>> =
-        jdbc.runCatching { PlansResultSet.getByOwnerIdAndPeriodAfter(ownerId.value, LocalDateTime.now(clock), this) }
+        jdbc.runCatching { PlanRecord.getByOwnerIdAndPeriodAfter(ownerId.value, LocalDateTime.now(clock), this) }
             .toQueryResult()
 
     override fun getArchivedPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>> =
-        jdbc.runCatching { PlansResultSet.getByOwnerIdAndPeriodBefore(ownerId.value, LocalDateTime.now(clock), this) }
+        jdbc.runCatching { PlanRecord.getByOwnerIdAndPeriodBefore(ownerId.value, LocalDateTime.now(clock), this) }
             .toQueryResult()
 
     override fun find(id: NumericId): Either<PlansProblem, Plan> =
-        PlanEntriesJoinedResultSet.selectByPlanId(id.value, jdbc)
+        PlannedCategoriesView.selectByPlanId(id.value, jdbc)
             .takeUnless { it.empty }
             ?.let { it.toPlan(CategoriesResultSet.selectByOwnerId(it.ownerId, jdbc)) }
             ?.right()
@@ -59,30 +54,36 @@ class PlansRepositoryJdbcAdapter(
             ?.applyChanges()
             ?: plan.right()
 
-    private fun Result<PlansResultSet>.toQueryResult() =
+    private fun Result<List<PlanRecord>>.toQueryResult() =
         this.map { it.toPlanDefinitionList() }
             .map { it.right() }
             .onFailure { logger.error("Cannot fetch plan definitions", it) }
             .getOrElse { it.left() }
+
+    private fun List<PlanRecord>.toPlanDefinitionList() =
+        this.map { it.toPlanDefinition() }
 
     private fun Plan.applyChanges(): Either<PlansProblem, Plan> =
         transactions.execute { trn ->
             runCatching { upsertPlanDefinition(this) }
                 .mapCatching { addNewEntries(it) }
                 .map { getPlan(it.id) }
-                .onFailure { trn.setRollbackOnly() }
                 .onFailure { logger.error(it.message, it) }
+                .onFailure { trn.setRollbackOnly() }
                 .getOrElse { PlansProblem.RepositoryProblem(it).left() }
         }!!
 
-    private fun upsertPlanDefinition(plan: Plan): Plan = PlanEntity.of(plan)
-        .runCatching { plansRepository.upsert(this) }
-        .map { plan.definition.copy(id = NumericId.of(it.id)) }
-        .map { plan.copy(definition = it) }
-        .getOrThrow()
+    private fun upsertPlanDefinition(plan: Plan): Plan =
+        PlanRecord.from(plan, jdbc)
+            .upsert()
+            .toPlanDefinition()
+            .let { plan.copy(definition = it) }
 
     private fun addNewEntries(plan: Plan): Plan =
-        plan.onEachNewEntry { plansRepository.insert(PlanEntryEntity.of(plan.id.value, it)) }
+        plan.newEntries
+            .map { PlanEntryRecord.from(it, plan, jdbc) }
+            .map { it.insert() }
+            .let { plan.copy(entries = plan.entries + plan.newEntries, newEntries = emptyList()) }
 
     private fun getPlan(id: NumericId): Either<PlansProblem, Plan> =
         find(id)
@@ -91,7 +92,5 @@ class PlansRepositoryJdbcAdapter(
 }
 
 private val logger = LoggerFactory.getLogger(PlansRepositoryJdbcAdapter::class.java)
-
-private fun Plan.onEachNewEntry(block: (PlannedCategory) -> Unit) = apply { newEntries.onEach(block) }
 
 private fun Plan.isModificationNeeded(): Boolean = newEntries.isNotEmpty()

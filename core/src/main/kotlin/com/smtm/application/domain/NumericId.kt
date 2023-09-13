@@ -3,6 +3,9 @@ package com.smtm.application.domain
 @JvmInline
 value class NumericId private constructor(val value: Long) {
 
+    val valueOrNull: Long?
+        get() = value.takeIf { isSettled() }
+
     fun isUnsettled(): Boolean =
         this == UNSETTLED
 
