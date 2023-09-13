@@ -10,7 +10,7 @@ import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlansProblem
 import com.smtm.application.spi.PlansRepository
-import com.smtm.infrastructure.persistence.categories.CategoriesResultSet
+import com.smtm.infrastructure.persistence.categories.CategoryRecord
 import com.smtm.infrastructure.persistence.plans.PlannedCategoriesView
 import com.smtm.infrastructure.persistence.plans.PlanEntryRecord
 import com.smtm.infrastructure.persistence.plans.PlanRecord
@@ -45,7 +45,7 @@ class PlansRepositoryJdbcAdapter(
     override fun find(id: NumericId): Either<PlansProblem, Plan> =
         PlannedCategoriesView.selectByPlanId(id.value, jdbc)
             .takeUnless { it.empty }
-            ?.let { it.toPlan(CategoriesResultSet.selectByOwnerId(it.ownerId, jdbc)) }
+            ?.let { it.toPlan(CategoryRecord.selectByOwnerId(it.ownerId, jdbc)) }
             ?.right()
             ?: PlansProblem.UnknownPlan(id).left()
 

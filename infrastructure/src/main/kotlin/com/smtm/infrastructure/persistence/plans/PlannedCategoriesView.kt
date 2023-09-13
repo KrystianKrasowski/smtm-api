@@ -8,7 +8,8 @@ import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.versionOf
-import com.smtm.infrastructure.persistence.categories.CategoriesResultSet
+import com.smtm.infrastructure.persistence.categories.CategoryRecord
+import com.smtm.infrastructure.persistence.categories.Conversions.toCategory
 import com.smtm.infrastructure.persistence.toMonetaryAmount
 import javax.money.MonetaryAmount
 import org.springframework.jdbc.core.JdbcOperations
@@ -21,7 +22,7 @@ internal data class PlannedCategoriesView(private val entries: Collection<Row>) 
     val ownerId: Long get() = first.ownerId
     private val first: Row get() = entries.first()
 
-    fun toPlan(categories: CategoriesResultSet): Plan =
+    fun toPlan(categories: List<CategoryRecord>): Plan =
         Plan(
             version = versionOf(first.version),
             ownerId = ownerIdOf(first.ownerId),
@@ -41,7 +42,7 @@ internal data class PlannedCategoriesView(private val entries: Collection<Row>) 
                 )
             },
             newEntries = emptyList(),
-            availableCategories = categories.toCategoryList()
+            availableCategories = categories.map { it.toCategory() }
         )
 
     companion object {
