@@ -6,12 +6,7 @@ import com.smtm.application.Link
 
 data class CategoryDto(
     @JsonProperty("_links") override val links: Map<String, Link> = emptyMap(),
-    @JsonProperty("id") val id: Long,
+    @JsonProperty("id") val id: Long? = null,
     @JsonProperty("name") val name: String,
     @JsonProperty("icon") val icon: String
 ) : HalResource(links)
-
-data class NewCategoryDto(
-    @JsonProperty("name") val name: String = "",
-    @JsonProperty("icon") val icon: String = "FOLDER"
-)
