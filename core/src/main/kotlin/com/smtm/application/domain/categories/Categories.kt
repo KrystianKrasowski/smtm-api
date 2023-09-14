@@ -5,7 +5,6 @@ import arrow.core.Nel
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
-import com.smtm.application.domain.Aggregate
 import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Version
@@ -18,12 +17,12 @@ import com.smtm.application.domain.violationPathOf
 typealias CategoriesActionResult = Either<CategoriesProblem, Categories>
 
 data class Categories(
-    override val id: OwnerId,
-    override val version: Version,
+    val id: OwnerId,
+    val version: Version,
     val current: List<Category>,
     val toSave: List<Category>,
     val toDelete: List<Category>
-) : Aggregate<OwnerId> {
+) {
 
     fun store(category: Category): CategoriesActionResult = category
         .takeUnless { contains(category) }

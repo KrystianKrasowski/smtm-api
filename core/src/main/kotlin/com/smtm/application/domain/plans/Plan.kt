@@ -5,7 +5,6 @@ import arrow.core.Nel
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
-import com.smtm.application.domain.Aggregate
 import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.Version
@@ -16,15 +15,15 @@ import com.smtm.application.domain.violationPathOf
 import java.time.LocalDateTime
 
 data class Plan(
-    override val version: Version,
+    val version: Version,
     val ownerId: OwnerId,
     val definition: PlanDefinition,
     val entries: List<PlannedCategory>,
     val newEntries: List<PlannedCategory>,
     private val availableCategories: List<Category>
-) : Aggregate<NumericId> {
+) {
 
-    override val id: NumericId
+    val id: NumericId
         get() = definition.id
 
     val name: String
