@@ -1,6 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:tc:postgresql:15.3://localhost:5432/smtm_test
-    username: test
-    password: test
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

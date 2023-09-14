@@ -1,5 +1,6 @@
 package com.smtm.application.v1
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.javamoney.moneta.Money
 import java.math.BigDecimal
@@ -12,6 +13,7 @@ data class MoneyDto(
     @JsonProperty("currency") val currency: String
 ) {
 
+    @JsonIgnore
     val monetaryAmount: MonetaryAmount =
         Monetary.getCurrency(currency)
             .createAmount(amount)
