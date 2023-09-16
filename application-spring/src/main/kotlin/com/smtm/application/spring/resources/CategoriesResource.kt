@@ -5,13 +5,14 @@ import com.smtm.application.HalCollection
 import com.smtm.application.LinkFactory
 import com.smtm.application.MediaType
 import com.smtm.application.api.CategoriesApi
-import com.smtm.application.domain.Icon
 import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
+import com.smtm.application.spring.conversions.Categories.toDomain
+import com.smtm.application.spring.conversions.Categories.toDto
+import com.smtm.application.spring.conversions.Violations.toDto
 import com.smtm.application.v1.ApiProblemDto
 import com.smtm.application.v1.CategoryDto
-import com.smtm.application.v1.NewCategoryDto
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -50,7 +51,7 @@ class CategoriesResource(
         consumes = [MediaType.VERSION_1_JSON],
         produces = [MediaType.VERSION_1_JSON]
     )
-    fun save(@RequestBody category: NewCategoryDto): ResponseEntity<*> {
+    fun save(@RequestBody category: CategoryDto): ResponseEntity<*> {
         return category
             .toDomain()
             .let { categoriesService.save(it, ownerIdProvider()) }
@@ -82,30 +83,16 @@ class CategoriesResource(
     }
 
     private fun create200Response(categories: List<Category>) = categories
-        .map { it.toDto() }
+        .map { it.toDto(linkFactory) }
         .let { HalCollection(collectionLinks, it.size, it.size, mapOf("categories" to it)) }
         .let { ResponseEntity.ok(it) }
 
     private fun create201Response(category: Category) = category
-        .toDto()
+        .toDto(linkFactory)
         .toResponse201()
 
     private fun create204Response() = ResponseEntity.status(204)
         .build<Nothing>()
-
-    private fun NewCategoryDto.toDomain() = Category.newOf(
-        name = name,
-        icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
-    )
-
-    private fun CategoryDto.toDomain() = Category.of(
-        id = id,
-        name = name,
-        icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
-    )
-
-    private fun Category.toDto() =
-        DtoFactory(linkFactory).create(this)
 
     private fun CategoryDto.toResponse201() = ResponseEntity.status(201)
         .header("Location", links["self"]?.href)
@@ -122,7 +109,7 @@ private object CategoriesProblemHandler {
     fun handle(problem: CategoriesProblem): ResponseEntity<*> {
         return when (problem) {
             is CategoriesProblem.Violations -> problem.violations
-                .map { DtoFactory.create(it) }
+                .map { it.toDto() }
                 .let { ApiProblemDto.ConstraintViolations(it) }
                 .let { ResponseEntity.status(422).body(it) }
 

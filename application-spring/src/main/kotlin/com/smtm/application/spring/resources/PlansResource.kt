@@ -6,17 +6,12 @@ import com.smtm.application.MediaType
 import com.smtm.application.api.PlansApi
 import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId
-import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.plans.NewPlan
-import com.smtm.application.domain.plans.Plan
-import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.plans.PlansProblem
+import com.smtm.application.spring.conversions.Plans.toDto
+import com.smtm.application.spring.conversions.Plans.toPlanDefinition
+import com.smtm.application.spring.conversions.Plans.toPlannedCategories
+import com.smtm.application.spring.conversions.Violations.toDto
 import com.smtm.application.v1.ApiProblemDto
-import com.smtm.application.v1.CategoryDto
-import com.smtm.application.v1.MoneyDto
-import com.smtm.application.v1.NewPlanDto
-import com.smtm.application.v1.PeriodDto
 import com.smtm.application.v1.PlanDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -41,61 +36,20 @@ class PlansResource(
     fun find(@PathVariable("id") id: Long): ResponseEntity<*> =
         plansApi
             .find(NumericId.of(id))
-            .map { it.toResponse() }
+            .map { it.toDto(linksFactory) }
+            .map { ResponseEntity.ok(it) }
             .getOrElse(PlansProblemHandler::handle)
 
     @PostMapping(
         consumes = [MediaType.VERSION_1_JSON],
         produces = [MediaType.VERSION_1_JSON]
     )
-    fun create(@RequestBody newPlanDto: NewPlanDto): ResponseEntity<*> =
+    fun create(@RequestBody plan: PlanDto): ResponseEntity<*> =
         plansApi
-            .create(newPlanDto.toNewPlan(), ownerIdProvider())
-            .map { it.toResponse() }
+            .create(plan.toPlanDefinition(), plan.toPlannedCategories(), ownerIdProvider())
+            .map { it.toDto(linksFactory) }
+            .map { ResponseEntity.status(201).body(it) }
             .getOrElse(PlansProblemHandler::handle)
-
-    private fun NewPlanDto.toNewPlan() =
-        NewPlan(
-            definition = PlanDefinition(
-                id = NumericId.UNSETTLED,
-                name = name,
-                period = period.start..period.end
-            ),
-            entries = entries.map { it.toNewPlanEntry() }
-        )
-
-    private fun NewPlanDto.Entry.toNewPlanEntry() =
-        NewPlan.Entry(
-            categoryId = NumericId.of(categoryId),
-            value = value.monetaryAmount
-        )
-
-    private fun Plan.toResponse(): ResponseEntity<PlanDto> =
-        toDto()
-            .let { ResponseEntity.status(201).body(it) }
-
-    private fun Plan.toDto() =
-        PlanDto(
-            links = mapOf(
-                "self" to linksFactory.create("$PATH/${id.value}"),
-            ),
-            id = id.value,
-            name = name,
-            period = PeriodDto(
-                start = start,
-                end = end
-            ),
-            entries = entries.map { it.toDto() }
-        )
-
-    private fun PlannedCategory.toDto() =
-        PlanDto.Entry(
-            category = category.toDto(),
-            value = MoneyDto.of(value)
-        )
-
-    private fun Category.toDto(): CategoryDto =
-        DtoFactory(linksFactory).create(this)
 
     companion object {
 
@@ -108,7 +62,7 @@ private object PlansProblemHandler {
     fun handle(problem: PlansProblem): ResponseEntity<*> =
         when (problem) {
             is PlansProblem.Violations -> problem.violations
-                .map { DtoFactory.create(it) }
+                .map { it.toDto() }
                 .let { ApiProblemDto.ConstraintViolations(it) }
                 .let { ResponseEntity.status(422).body(it) }
 

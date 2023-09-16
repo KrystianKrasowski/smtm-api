@@ -2,8 +2,8 @@ package com.smtm.application.service
 
 import com.smtm.application.World
 import com.smtm.application.domain.Violation
-import com.smtm.application.domain.plans.NewPlan
 import com.smtm.application.domain.plans.Plan
+import com.smtm.application.domain.plans.PlanRequest
 import com.smtm.application.domain.plans.PlansProblem
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -15,9 +15,9 @@ class PlansServiceStepdefs(private val world: World) {
     private var problem: PlansProblem? = null
 
     @When("user saves a new plan")
-    fun `users saves a new plan`(plan: NewPlan) {
+    fun `users saves a new plan`(plan: PlanRequest) {
         val service = PlansService(world.categoriesRepository, world.plansRepository)
-        service.create(plan, world.ownerId)
+        service.create(plan.definition, plan.categories, world.ownerId)
             .onRight { this.plan = it }
             .onLeft { this.problem = it }
     }

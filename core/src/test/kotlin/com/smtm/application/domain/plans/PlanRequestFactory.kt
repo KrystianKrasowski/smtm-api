@@ -1,16 +1,18 @@
 package com.smtm.application.domain.plans
 
 import com.smtm.application.World
+import com.smtm.application.domain.Icon
 import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.categories.Categories
+import com.smtm.application.domain.categories.Category
 import io.cucumber.java.DataTableType
+import javax.money.MonetaryAmount
 import org.javamoney.moneta.Money
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import javax.money.MonetaryAmount
 
-class NewPlanFactory(world: World) {
+class PlanRequestFactory(world: World) {
 
     private val categories: Categories =
         world.categoriesRepository
@@ -19,14 +21,14 @@ class NewPlanFactory(world: World) {
             ?: error("Cannot get categories aggregate")
 
     @DataTableType
-    fun create(entry: Map<String, String>): NewPlan =
-        NewPlan(
+    fun create(entry: Map<String, String>): PlanRequest =
+        PlanRequest(
             definition = PlanDefinition(
                 id = NumericId.UNSETTLED,
                 name = entry.getValue("name"),
                 period = entry.getPeriod()
             ),
-            entries = entry.getEntries()
+            categories = entry.getEntries()
         )
 
     private fun Map<String, String>.getPeriod(): ClosedRange<LocalDateTime> =
@@ -35,19 +37,19 @@ class NewPlanFactory(world: World) {
     private fun Map<String, String>.getLocalDateTime(key: String, time: LocalTime): LocalDateTime =
         LocalDate.parse(getValue(key)).atTime(time)
 
-    private fun Map<String, String>.getEntries(): List<NewPlan.Entry> =
+    private fun Map<String, String>.getEntries(): List<PlannedCategory> =
         getValue("entries")
             .split(',')
             .map { it.trim() }
-            .map { it.toEntry() }
+            .map { it.toPlannedCategory() }
 
-    private fun String.toEntry(): NewPlan.Entry =
+    private fun String.toPlannedCategory(): PlannedCategory =
         split('=', limit = 2)
             .map { it.trim() }
-            .let { NewPlan.Entry(it[0].toCategoryId(), it[1].toMoney()) }
+            .let { PlannedCategory(it[0].toCategory(), it[1].toMoney()) }
 
-    private fun String.toCategoryId(): NumericId =
-        categories.findByName(this)?.id ?: NumericId.UNSETTLED
+    private fun String.toCategory(): Category =
+        categories.findByName(this) ?: Category(NumericId.UNSETTLED, this, Icon.FOLDER)
 
     private fun String.toMoney(): MonetaryAmount =
         Money.parse(this)

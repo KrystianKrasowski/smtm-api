@@ -6,7 +6,7 @@ import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.versionOf
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 
 class CategoriesRepositoryStepdefs(private val world: World) {
 
