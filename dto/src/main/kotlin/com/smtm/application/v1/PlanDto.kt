@@ -6,7 +6,7 @@ import com.smtm.application.Link
 
 data class PlanDto(
     @JsonProperty("_links") override val links: Map<String, Link> = emptyMap(),
-    @JsonProperty("id") val id: Long,
+    @JsonProperty("id") val id: Long? = null,
     @JsonProperty("name") val name: String,
     @JsonProperty("period") val period: PeriodDto,
     @JsonProperty("entries") val entries: List<Entry>
@@ -14,18 +14,6 @@ data class PlanDto(
 
     data class Entry(
         @JsonProperty("category") val category: CategoryDto,
-        @JsonProperty("value") val value: MoneyDto
-    )
-}
-
-data class NewPlanDto(
-    @JsonProperty("name") val name: String,
-    @JsonProperty("period") val period: PeriodDto,
-    @JsonProperty("entries") val entries: List<Entry>
-) {
-
-    data class Entry(
-        @JsonProperty("categoryId") val categoryId: Long,
         @JsonProperty("value") val value: MoneyDto
     )
 }

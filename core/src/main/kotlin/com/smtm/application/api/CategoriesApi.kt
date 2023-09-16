@@ -5,8 +5,8 @@ import com.smtm.application.domain.OwnerId
 import com.smtm.application.domain.categories.Categories
 import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
-import com.smtm.application.spi.CategoriesRepository
 import com.smtm.application.service.CategoriesService
+import com.smtm.application.spi.CategoriesRepository
 
 interface CategoriesApi {
 

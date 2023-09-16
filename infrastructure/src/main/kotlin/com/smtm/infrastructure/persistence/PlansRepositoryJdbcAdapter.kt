@@ -75,6 +75,7 @@ class PlansRepositoryJdbcAdapter(
 
     private fun upsertPlanDefinition(plan: Plan): Plan =
         PlanRecord.from(plan, jdbc)
+            .copy(version = plan.version.increment().value)
             .upsert()
             .toPlanDefinition()
             .let { plan.copy(definition = it) }

@@ -1,5 +1,7 @@
 package com.smtm.application.domain.plans
 
+import arrow.core.Either
+import arrow.core.right
 import com.smtm.application.domain.NumericId
 import java.time.LocalDateTime
 
@@ -8,6 +10,9 @@ data class PlanDefinition(
     val name: String,
     val period: ClosedRange<LocalDateTime>
 ) {
+
+    fun validate(): Either<PlansProblem.Violations, PlanDefinition> =
+        right()
 
     companion object {
 

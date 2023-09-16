@@ -8,7 +8,7 @@ import com.smtm.application.domain.categories.CategoriesProblem
 import com.smtm.application.domain.categories.Category
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 
 class CategoriesServiceStepdefs(private val world: World) {
 
