@@ -32,6 +32,9 @@ internal object Conversions {
             jdbc = jdbc
         )
 
+    fun List<CategoryRecord>.toCategoryList(): List<Category> =
+        map { it.toCategory() }
+
     fun CategoryRecord.toCategory(): Category =
         Category(
             id = NumericId.of(id),

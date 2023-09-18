@@ -41,7 +41,6 @@ internal data class PlannedCategoriesView(private val entries: Collection<Row>) 
                     value = it.value
                 )
             },
-            newEntries = emptyList(),
             availableCategories = categories.map { it.toCategory() }
         )
 

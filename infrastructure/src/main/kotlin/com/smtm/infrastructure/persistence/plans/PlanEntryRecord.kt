@@ -44,18 +44,9 @@ internal data class PlanEntryRecord(
                 jdbc = jdbc
             )
 
-        fun from(plan: Plan, jdbc: JdbcOperations): List<PlanEntryRecord> =
-            plan.entries
-                .map { it.toRecord(plan, jdbc) }
-
-        private fun PlannedCategory.toRecord(plan: Plan, jdbc: JdbcOperations): PlanEntryRecord =
-            PlanEntryRecord(
-                id = null, // TODO: verify this behaviour after edition implementation
-                planId = plan.id.value,
-                categoryId = category.id.value,
-                amount = value.toCents(),
-                currency = value.currency.currencyCode,
-                jdbc = jdbc
-            )
+        fun deleteByPlanId(id: Long, jdbc: JdbcOperations) {
+            "DELETE FROM plan_entries WHERE plan_id = ?"
+                .let { jdbc.update(it, id) }
+        }
     }
 }

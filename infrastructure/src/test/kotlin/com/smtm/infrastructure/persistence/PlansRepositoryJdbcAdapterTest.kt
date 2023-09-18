@@ -1,14 +1,17 @@
 package com.smtm.infrastructure.persistence
 
+import com.smtm.application.assert.SmtmAssertions
 import com.smtm.application.domain.Icon
 import com.smtm.application.domain.NumericId
+import com.smtm.application.domain.Version
 import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.ownerIdOf
 import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.plans.PlansProblem
-import com.smtm.application.domain.versionOf
+import com.smtm.application.domain.toOwnerId
+import com.smtm.application.domain.toVersion
 import javax.sql.DataSource
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
@@ -106,18 +109,60 @@ class PlansRepositoryJdbcAdapterTest {
     @Test
     fun `should find plan by id`() {
         // when
-        val result = adapter.find(NumericId.of(1L)).getOrNull()
+        val plan = adapter.find(NumericId.of(1L)).getOrNull()
 
         // then
-        assertThat(result?.name).isEqualTo("June 2023")
-        assertThat(result?.start).isEqualTo(LocalDateTime.parse("2023-06-01T00:00:00"))
-        assertThat(result?.end).isEqualTo(LocalDateTime.parse("2023-06-30T23:59:59"))
-        assertThat(result?.entries).contains(
-            PlannedCategory(
-                category = Category.of(1, "Rent", Icon.HOUSE),
-                value = Money.of(315.99, "PLN")
-            )
+        SmtmAssertions.assertThat(plan)
+            .hasVersion(1)
+            .hasOwner(1)
+            .hasName("June 2023")
+            .hasStart("2023-06-01T00:00:00")
+            .hasEnd("2023-06-30T23:59:59")
+            .hasPlannedCategory("Rent", "PLN 315.99")
+            .hasAvailableCategory(Category.of(1, "Rent", Icon.HOUSE))
+    }
+
+    @Test
+    fun `should fetch existing plan on known id`() {
+        // when
+        val definition = PlanDefinition.existing(
+            id = NumericId.of(1L),
+            name = "June 2023",
+            start = LocalDateTime.parse("2023-06-01T00:00:00"),
+            end = LocalDateTime.parse("2023-06-30T23:59:59")
         )
+        val plan = adapter.findOrPrepare(definition, 1L.toOwnerId()).getOrNull()
+
+        // then
+        SmtmAssertions.assertThat(plan)
+            .hasVersion(1)
+            .hasOwner(1)
+            .hasName("June 2023")
+            .hasStart("2023-06-01T00:00:00")
+            .hasEnd("2023-06-30T23:59:59")
+            .hasPlannedCategory("Rent", "PLN 315.99")
+            .hasAvailableCategory(Category.of(1, "Rent", Icon.HOUSE))
+    }
+
+    @Test
+    fun `should define the new plan on unsettled id`() {
+        // when
+        val definition = PlanDefinition.unsettled(
+            name = "September 2023",
+            start = LocalDateTime.parse("2023-09-01T00:00:00"),
+            end = LocalDateTime.parse("2023-09-30T23:59:59")
+        )
+        val plan = adapter.findOrPrepare(definition, 1L.toOwnerId()).getOrNull()
+
+        // then
+        SmtmAssertions.assertThat(plan)
+            .hasVersion(Version.ZERO)
+            .hasOwner(1)
+            .hasName("September 2023")
+            .hasStart("2023-09-01T00:00:00")
+            .hasEnd("2023-09-30T23:59:59")
+            .hasNoPlannedCategories()
+            .hasAvailableCategory(Category.of(1, "Rent", Icon.HOUSE))
     }
 
     @Test
@@ -135,16 +180,14 @@ class PlansRepositoryJdbcAdapterTest {
     fun `should save the new plan`() {
         // given
         val plan = Plan(
-            version = versionOf(1),
+            version = Version.ZERO,
             ownerId = ownerIdOf(1),
-            definition = PlanDefinition.existing(
-                id = NumericId.UNSETTLED,
+            definition = PlanDefinition.unsettled(
                 name = "September 2023",
                 start = LocalDateTime.parse("2023-09-01T00:00:00"),
                 end = LocalDateTime.parse("2023-09-30T23:59:59")
             ),
-            entries = emptyList(),
-            newEntries = listOf(
+            entries = listOf(
                 PlannedCategory(
                     category = Category.of(1, "Rent", Icon.HOUSE),
                     value = Money.of(317.98, "PLN")
@@ -157,15 +200,48 @@ class PlansRepositoryJdbcAdapterTest {
         val result = adapter.save(plan).getOrNull()
 
         // then
-        assertThat(result?.id).isEqualTo(NumericId.of(4L))
-        assertThat(result?.name).isEqualTo("September 2023")
-        assertThat(result?.start).isEqualTo(LocalDateTime.parse("2023-09-01T00:00:00"))
-        assertThat(result?.end).isEqualTo(LocalDateTime.parse("2023-09-30T23:59:59"))
-        assertThat(result?.entries).contains(
-            PlannedCategory(
-                category = Category.of(1, "Rent", Icon.HOUSE),
-                value = Money.of(317.98, "PLN")
-            )
+        SmtmAssertions.assertThat(result)
+            .hasVersion(1)
+            .hasOwner(1)
+            .hasName("September 2023")
+            .hasStart("2023-09-01T00:00:00")
+            .hasEnd("2023-09-30T23:59:59")
+            .hasPlannedCategory("Rent", "PLN 317.98")
+            .hasAvailableCategory(Category.of(1, "Rent", Icon.HOUSE))
+    }
+
+    @Test
+    fun `should update existing plan`() {
+        // given
+        val plan = Plan(
+            version = 1.toVersion(),
+            ownerId = 1.toOwnerId(),
+            definition = PlanDefinition.existing(
+                id = NumericId.of(3L),
+                name = "Supreme August 2023",
+                start = LocalDateTime.parse("2023-08-10T00:00:00"),
+                end = LocalDateTime.parse("2023-08-30T23:59:59")
+            ),
+            entries = listOf(
+                PlannedCategory(
+                    category = Category.of(1, "Rent", Icon.HOUSE),
+                    value = Money.of(517.98, "PLN")
+                )
+            ),
+            availableCategories = emptyList()
         )
+
+        // when
+        val result = adapter.save(plan).getOrNull()
+
+        // then
+        SmtmAssertions.assertThat(result)
+            .hasVersion(1)
+            .hasOwner(1)
+            .hasName("Supreme August 2023")
+            .hasStart("2023-08-10T00:00:00")
+            .hasEnd("2023-08-30T23:59:59")
+            .hasOnlyPlannedCategory("Rent", "PLN 517.98")
+            .hasAvailableCategory(Category.of(1, "Rent", Icon.HOUSE))
     }
 }

@@ -12,6 +12,7 @@ import com.smtm.application.domain.Violation
 import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.unknownViolationOf
 import com.smtm.application.domain.violationPathOf
+import javax.money.MonetaryAmount
 import java.time.LocalDateTime
 
 data class Plan(
@@ -19,8 +20,7 @@ data class Plan(
     val ownerId: OwnerId,
     val definition: PlanDefinition,
     val entries: List<PlannedCategory>,
-    val newEntries: List<PlannedCategory>,
-    private val availableCategories: List<Category>
+    val availableCategories: List<Category>
 ) {
 
     val id: NumericId
@@ -35,27 +35,49 @@ data class Plan(
     val end: LocalDateTime
         get() = definition.period.endInclusive
 
+    val settled: Boolean =
+        definition.settled
+
+    val notEmpty: Boolean =
+        entries.isNotEmpty()
+
     fun define(definition: PlanDefinition): Either<PlansProblem, Plan> =
         definition
             .validate()
             .map { copy(definition = it) }
 
-    fun add(categories: List<PlannedCategory>): Either<PlansProblem, Plan> =
-        PlannedCategoriesValidator(categories, availableCategories)
+    fun replace(categories: List<PlannedCategory>): Either<PlansProblem, Plan> =
+        categories
+            .squashDuplicates()
+            .let { PlannedCategoriesValidator(it, availableCategories) }
             .validate()
             .mapLeft { PlansProblem.Violations(it) }
-            .map { copy(newEntries = it) }
+            .map { copy(entries = it) }
+
+    fun getValueOf(category: String): MonetaryAmount? =
+        entries
+            .find { it.category.name == category }
+            ?.value
+
+    private fun List<PlannedCategory>.squashDuplicates(): List<PlannedCategory> =
+        groupBy { it.category }
+            .map { (category, plannedCategories) ->
+                plannedCategories
+                    .map { it.value }
+                    .reduce { acc, monetaryAmount -> acc.add(monetaryAmount) }
+                    .let { PlannedCategory(category, it) }
+            }
 
     companion object {
 
-        fun prepared(availableCategories: List<Category>, ownerId: OwnerId) = Plan(
-            version = Version.ZERO,
-            ownerId = ownerId,
-            definition = PlanDefinition.EMPTY,
-            entries = emptyList(),
-            newEntries = emptyList(),
-            availableCategories = availableCategories
-        )
+        fun prepare(ownerId: OwnerId, definition: PlanDefinition, availableCategories: List<Category>): Plan =
+            Plan(
+                version = Version.ZERO,
+                ownerId = ownerId,
+                definition = definition,
+                entries = emptyList(),
+                availableCategories = availableCategories
+            )
     }
 }
 

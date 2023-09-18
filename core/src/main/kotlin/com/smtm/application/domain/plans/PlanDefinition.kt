@@ -11,6 +11,9 @@ data class PlanDefinition(
     val period: ClosedRange<LocalDateTime>
 ) {
 
+    val settled: Boolean =
+        id.isSettled()
+
     fun validate(): Either<PlansProblem.Violations, PlanDefinition> =
         right()
 
@@ -27,5 +30,12 @@ data class PlanDefinition(
             name = name,
             period = start..end
         )
+
+        fun unsettled(name: String, start: LocalDateTime, end: LocalDateTime): PlanDefinition =
+            PlanDefinition(
+                id = NumericId.UNSETTLED,
+                name = name,
+                period = start..end
+            )
     }
 }

@@ -3,4 +3,5 @@ include 'dto'
 include 'core'
 include 'application-spring'
 include 'infrastructure'
+include 'core-assert'
 

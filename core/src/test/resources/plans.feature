@@ -10,7 +10,7 @@ Feature: Plans
 
 
   Scenario: The one where planned category does not exist
-    When user saves a new plan
+    When user saves a plan
       | name      | start      | end        | entries                                                 |
       | July 2023 | 2023-07-01 | 2023-07-31 | Rent = PLN 300, Savings = PLN 5000, Groceries = PLN 750 |
     Then plan is not saved due to constraint violation
@@ -18,8 +18,16 @@ Feature: Plans
       | /entries/2/category | UNKNOWN |
 
 
+  Scenario: The one where planned category is not unique
+    When user saves a plan
+      | name      | start      | end        | entries                                            |
+      | July 2023 | 2023-07-01 | 2023-07-31 | Rent = PLN 300, Savings = PLN 5000, Rent = PLN 800 |
+    Then plan is saved
+    And plan has category "Rent" valued for PLN 1100
+
+
   Scenario: The one where plan is created successfully
-    When user saves a new plan
+    When user saves a plan
       | name      | start      | end        | entries                            |
       | July 2023 | 2023-07-01 | 2023-07-31 | Rent = PLN 300, Savings = PLN 5000 |
     Then plan is saved

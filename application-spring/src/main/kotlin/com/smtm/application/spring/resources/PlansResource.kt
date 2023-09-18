@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -46,9 +47,21 @@ class PlansResource(
     )
     fun create(@RequestBody plan: PlanDto): ResponseEntity<*> =
         plansApi
-            .create(plan.toPlanDefinition(), plan.toPlannedCategories(), ownerIdProvider())
+            .save(plan.toPlanDefinition(), plan.toPlannedCategories(), ownerIdProvider())
             .map { it.toDto(linksFactory) }
             .map { ResponseEntity.status(201).body(it) }
+            .getOrElse(PlansProblemHandler::handle)
+
+    @PutMapping(
+        path = ["/{id}"],
+        consumes = [MediaType.VERSION_1_JSON],
+        produces = [MediaType.VERSION_1_JSON]
+    )
+    fun update(@RequestBody plan: PlanDto): ResponseEntity<*> =
+        plansApi
+            .save(plan.toPlanDefinition(), plan.toPlannedCategories(), ownerIdProvider())
+            .map { it.toDto(linksFactory) }
+            .map { ResponseEntity.ok(it) }
             .getOrElse(PlansProblemHandler::handle)
 
     companion object {

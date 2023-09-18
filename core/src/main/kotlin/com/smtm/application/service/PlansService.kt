@@ -9,28 +9,21 @@ import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlannedCategory
 import com.smtm.application.domain.plans.PlansProblem
-import com.smtm.application.spi.CategoriesRepository
 import com.smtm.application.spi.PlansRepository
 
-internal class PlansService(
-    private val categoriesRepository: CategoriesRepository,
-    private val plansRepository: PlansRepository
-) : PlansApi {
+internal class PlansService(private val plansRepository: PlansRepository) : PlansApi {
 
     override fun find(id: NumericId): Either<PlansProblem, Plan> =
         plansRepository.find(id)
 
-    override fun create(
+    override fun save(
         definition: PlanDefinition,
         categories: List<PlannedCategory>,
         ownerId: OwnerId
     ): Either<PlansProblem, Plan> =
-        categoriesRepository
-            .getCategories(ownerId)
-            .mapLeft { PlansProblem.RepositoryProblem() }
-            .map { it.current }
-            .map { Plan.prepared(it, ownerId) }
+        plansRepository
+            .findOrPrepare(definition, ownerId)
             .flatMap { it.define(definition) }
-            .flatMap { it.add(categories) }
+            .flatMap { it.replace(categories) }
             .flatMap { plansRepository.save(it) }
 }

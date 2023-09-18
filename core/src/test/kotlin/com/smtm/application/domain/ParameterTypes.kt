@@ -1,6 +1,9 @@
 package com.smtm.application.domain
 
 import io.cucumber.java.DataTableType
+import io.cucumber.java.ParameterType
+import javax.money.MonetaryAmount
+import org.javamoney.moneta.Money
 
 class ParameterTypes {
 
@@ -11,6 +14,11 @@ class ParameterTypes {
             code = Violation.Code.valueOf(entry.getValue("code")),
             parameters = entry.extractParameters().toMap()
         )
+    }
+
+    @ParameterType("([A-Z]{3} \\d+(\\.\\d{1,2})*)")
+    fun money(input: String?): MonetaryAmount {
+        return Money.parse(input)
     }
 
     private fun Map<String, String>.extractParameters() = listOfNotNull(
