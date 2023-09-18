@@ -6,14 +6,16 @@ import arrow.core.right
 import com.smtm.application.api.PlansQueries
 import com.smtm.application.domain.NumericId
 import com.smtm.application.domain.OwnerId
+import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.plans.Plan
 import com.smtm.application.domain.plans.PlanDefinition
 import com.smtm.application.domain.plans.PlansProblem
 import com.smtm.application.spi.PlansRepository
 import com.smtm.infrastructure.persistence.categories.CategoryRecord
-import com.smtm.infrastructure.persistence.plans.PlannedCategoriesView
+import com.smtm.infrastructure.persistence.categories.Conversions.toCategoryList
 import com.smtm.infrastructure.persistence.plans.PlanEntryRecord
 import com.smtm.infrastructure.persistence.plans.PlanRecord
+import com.smtm.infrastructure.persistence.plans.PlannedCategoriesView
 import javax.sql.DataSource
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
@@ -43,15 +45,27 @@ class PlansRepositoryJdbcAdapter(
             .toQueryResult()
 
     override fun find(id: NumericId): Either<PlansProblem, Plan> =
-        PlannedCategoriesView.selectByPlanId(id.value, jdbc)
-            .takeUnless { it.empty }
+        id.takeIf { it.isSettled() }
+            ?.let { PlannedCategoriesView.selectByPlanId(it.value, jdbc) }
+            ?.takeUnless { it.empty }
             ?.let { it.toPlan(CategoryRecord.selectByOwnerId(it.ownerId, jdbc)) }
             ?.right()
             ?: PlansProblem.UnknownPlan(id).left()
 
+    override fun findOrPrepare(definition: PlanDefinition, ownerId: OwnerId): Either<PlansProblem, Plan> =
+        definition
+            .takeIf { it.settled }
+            ?.let { PlannedCategoriesView.selectByPlanId(it.id.value, jdbc) }
+            ?.takeUnless { it.empty }
+            ?.let { it.toPlan(CategoryRecord.selectByOwnerId(it.ownerId, jdbc)) }
+            ?.right()
+            ?: getAvailableCategories(ownerId)
+                .map { Plan.prepare(ownerId, definition, it) }
+
     override fun save(plan: Plan): Either<PlansProblem, Plan> =
         transactions.execute { trn ->
             plan.runCatching { upsertPlanDefinition(plan) }
+                .mapCatching { removeExistingEntries(it) }
                 .mapCatching { addNewEntries(it) }
                 .map { getPlan(it.id) }
                 .onFailure { logger.error(it.message, it) }
@@ -75,6 +89,11 @@ class PlansRepositoryJdbcAdapter(
             .toPlanDefinition()
             .let { plan.copy(definition = it) }
 
+    private fun removeExistingEntries(plan: Plan): Plan =
+        plan.takeIf { it.settled && it.notEmpty }
+            ?.also { PlanEntryRecord.deleteByPlanId(plan.id.value, jdbc) }
+            ?: plan
+
     private fun addNewEntries(plan: Plan): Plan =
         plan.entries
             .map { PlanEntryRecord.from(it, plan, jdbc) }
@@ -85,6 +104,12 @@ class PlansRepositoryJdbcAdapter(
         find(id)
             .mapLeft { IllegalStateException("Cannot find plan by id ${id.value}") }
             .mapLeft { PlansProblem.RepositoryProblem(it) }
+
+    private fun getAvailableCategories(ownerId: OwnerId): Either<PlansProblem, List<Category>> =
+        jdbc.runCatching { CategoryRecord.selectByOwnerId(ownerId.value, this) }
+            .map { it.toCategoryList() }
+            .map { it.right() }
+            .getOrElse { PlansProblem.RepositoryProblem().left() }
 }
 
 private val logger = LoggerFactory.getLogger(PlansRepositoryJdbcAdapter::class.java)

@@ -8,5 +8,5 @@ class World {
 
     var ownerId = ownerIdOf(1)
     var categoriesRepository = FakeCategoriesRepository()
-    var plansRepository = FakePlansRepository()
+    var plansRepository = FakePlansRepository(categoriesRepository)
 }

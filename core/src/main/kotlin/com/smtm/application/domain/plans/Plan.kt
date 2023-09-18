@@ -20,7 +20,7 @@ data class Plan(
     val ownerId: OwnerId,
     val definition: PlanDefinition,
     val entries: List<PlannedCategory>,
-    private val availableCategories: List<Category>
+    val availableCategories: List<Category>
 ) {
 
     val id: NumericId
@@ -34,6 +34,12 @@ data class Plan(
 
     val end: LocalDateTime
         get() = definition.period.endInclusive
+
+    val settled: Boolean =
+        definition.settled
+
+    val notEmpty: Boolean =
+        entries.isNotEmpty()
 
     fun define(definition: PlanDefinition): Either<PlansProblem, Plan> =
         definition
@@ -64,13 +70,14 @@ data class Plan(
 
     companion object {
 
-        fun prepared(availableCategories: List<Category>, ownerId: OwnerId) = Plan(
-            version = Version.ZERO,
-            ownerId = ownerId,
-            definition = PlanDefinition.EMPTY,
-            entries = emptyList(),
-            availableCategories = availableCategories
-        )
+        fun prepare(ownerId: OwnerId, definition: PlanDefinition, availableCategories: List<Category>): Plan =
+            Plan(
+                version = Version.ZERO,
+                ownerId = ownerId,
+                definition = definition,
+                entries = emptyList(),
+                availableCategories = availableCategories
+            )
     }
 }
 

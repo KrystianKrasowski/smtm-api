@@ -17,7 +17,7 @@ class PlansServiceStepdefs(private val world: World) {
 
     @When("user saves a plan")
     fun `users saves a plan`(plan: PlanRequest) {
-        val service = PlansService(world.categoriesRepository, world.plansRepository)
+        val service = PlansService(world.plansRepository)
         service.save(plan.definition, plan.categories, world.ownerId)
             .onRight { this.plan = it }
             .onLeft { this.problem = it }

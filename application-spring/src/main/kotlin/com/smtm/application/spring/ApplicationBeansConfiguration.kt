@@ -36,7 +36,7 @@ class ApplicationBeansConfiguration {
 
     @Bean
     fun plansApi(categoriesRepository: CategoriesRepository, plansRepository: PlansRepositoryJdbcAdapter): PlansApi =
-        PlansApi.create(categoriesRepository, plansRepository)
+        PlansApi.create(plansRepository)
 
     @Bean
     fun plansQueries(repository: PlansRepositoryJdbcAdapter): PlansQueries =
