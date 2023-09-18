@@ -12,6 +12,7 @@ import com.smtm.application.domain.Violation
 import com.smtm.application.domain.categories.Category
 import com.smtm.application.domain.unknownViolationOf
 import com.smtm.application.domain.violationPathOf
+import javax.money.MonetaryAmount
 import java.time.LocalDateTime
 
 data class Plan(
@@ -19,7 +20,6 @@ data class Plan(
     val ownerId: OwnerId,
     val definition: PlanDefinition,
     val entries: List<PlannedCategory>,
-    val newEntries: List<PlannedCategory>,
     private val availableCategories: List<Category>
 ) {
 
@@ -40,11 +40,27 @@ data class Plan(
             .validate()
             .map { copy(definition = it) }
 
-    fun add(categories: List<PlannedCategory>): Either<PlansProblem, Plan> =
-        PlannedCategoriesValidator(categories, availableCategories)
+    fun replace(categories: List<PlannedCategory>): Either<PlansProblem, Plan> =
+        categories
+            .squashDuplicates()
+            .let { PlannedCategoriesValidator(it, availableCategories) }
             .validate()
             .mapLeft { PlansProblem.Violations(it) }
-            .map { copy(newEntries = it) }
+            .map { copy(entries = it) }
+
+    fun getValueOf(category: String): MonetaryAmount? =
+        entries
+            .find { it.category.name == category }
+            ?.value
+
+    private fun List<PlannedCategory>.squashDuplicates(): List<PlannedCategory> =
+        groupBy { it.category }
+            .map { (category, plannedCategories) ->
+                plannedCategories
+                    .map { it.value }
+                    .reduce { acc, monetaryAmount -> acc.add(monetaryAmount) }
+                    .let { PlannedCategory(category, it) }
+            }
 
     companion object {
 
@@ -53,7 +69,6 @@ data class Plan(
             ownerId = ownerId,
             definition = PlanDefinition.EMPTY,
             entries = emptyList(),
-            newEntries = emptyList(),
             availableCategories = availableCategories
         )
     }

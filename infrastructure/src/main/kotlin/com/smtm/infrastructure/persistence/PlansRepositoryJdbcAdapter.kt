@@ -50,9 +50,14 @@ class PlansRepositoryJdbcAdapter(
             ?: PlansProblem.UnknownPlan(id).left()
 
     override fun save(plan: Plan): Either<PlansProblem, Plan> =
-        plan.takeIf { it.isModificationNeeded() }
-            ?.applyChanges()
-            ?: plan.right()
+        transactions.execute { trn ->
+            plan.runCatching { upsertPlanDefinition(plan) }
+                .mapCatching { addNewEntries(it) }
+                .map { getPlan(it.id) }
+                .onFailure { logger.error(it.message, it) }
+                .onFailure { trn.setRollbackOnly() }
+                .getOrElse { PlansProblem.RepositoryProblem(it).left() }
+        }!!
 
     private fun Result<List<PlanRecord>>.toQueryResult() =
         this.map { it.toPlanDefinitionList() }
@@ -63,16 +68,6 @@ class PlansRepositoryJdbcAdapter(
     private fun List<PlanRecord>.toPlanDefinitionList() =
         this.map { it.toPlanDefinition() }
 
-    private fun Plan.applyChanges(): Either<PlansProblem, Plan> =
-        transactions.execute { trn ->
-            runCatching { upsertPlanDefinition(this) }
-                .mapCatching { addNewEntries(it) }
-                .map { getPlan(it.id) }
-                .onFailure { logger.error(it.message, it) }
-                .onFailure { trn.setRollbackOnly() }
-                .getOrElse { PlansProblem.RepositoryProblem(it).left() }
-        }!!
-
     private fun upsertPlanDefinition(plan: Plan): Plan =
         PlanRecord.from(plan, jdbc)
             .copy(version = plan.version.increment().value)
@@ -81,10 +76,10 @@ class PlansRepositoryJdbcAdapter(
             .let { plan.copy(definition = it) }
 
     private fun addNewEntries(plan: Plan): Plan =
-        plan.newEntries
+        plan.entries
             .map { PlanEntryRecord.from(it, plan, jdbc) }
             .map { it.insert() }
-            .let { plan.copy(entries = plan.entries + plan.newEntries, newEntries = emptyList()) }
+            .let { plan }
 
     private fun getPlan(id: NumericId): Either<PlansProblem, Plan> =
         find(id)
@@ -93,5 +88,3 @@ class PlansRepositoryJdbcAdapter(
 }
 
 private val logger = LoggerFactory.getLogger(PlansRepositoryJdbcAdapter::class.java)
-
-private fun Plan.isModificationNeeded(): Boolean = newEntries.isNotEmpty()

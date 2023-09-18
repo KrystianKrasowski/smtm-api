@@ -20,7 +20,7 @@ internal class PlansService(
     override fun find(id: NumericId): Either<PlansProblem, Plan> =
         plansRepository.find(id)
 
-    override fun create(
+    override fun save(
         definition: PlanDefinition,
         categories: List<PlannedCategory>,
         ownerId: OwnerId
@@ -31,6 +31,6 @@ internal class PlansService(
             .map { it.current }
             .map { Plan.prepared(it, ownerId) }
             .flatMap { it.define(definition) }
-            .flatMap { it.add(categories) }
+            .flatMap { it.replace(categories) }
             .flatMap { plansRepository.save(it) }
 }

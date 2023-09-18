@@ -46,7 +46,7 @@ class PlansResource(
     )
     fun create(@RequestBody plan: PlanDto): ResponseEntity<*> =
         plansApi
-            .create(plan.toPlanDefinition(), plan.toPlannedCategories(), ownerIdProvider())
+            .save(plan.toPlanDefinition(), plan.toPlannedCategories(), ownerIdProvider())
             .map { it.toDto(linksFactory) }
             .map { ResponseEntity.status(201).body(it) }
             .getOrElse(PlansProblemHandler::handle)

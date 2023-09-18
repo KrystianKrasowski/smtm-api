@@ -143,8 +143,7 @@ class PlansRepositoryJdbcAdapterTest {
                 start = LocalDateTime.parse("2023-09-01T00:00:00"),
                 end = LocalDateTime.parse("2023-09-30T23:59:59")
             ),
-            entries = emptyList(),
-            newEntries = listOf(
+            entries = listOf(
                 PlannedCategory(
                     category = Category.of(1, "Rent", Icon.HOUSE),
                     value = Money.of(317.98, "PLN")

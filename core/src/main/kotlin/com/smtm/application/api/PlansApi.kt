@@ -15,7 +15,7 @@ interface PlansApi {
 
     fun find(id: NumericId): Either<PlansProblem, Plan>
 
-    fun create(
+    fun save(
         definition: PlanDefinition,
         categories: List<PlannedCategory>,
         ownerId: OwnerId
