@@ -17,12 +17,11 @@ ext {
     MONETA_VERSION = '1.1'
     SPRING_VERSION = '6.0.9'
     SPRING_BOOT_VERSION = '3.1.0'
-    TEST_CONTAINERS_VERSION = '1.19.0'
+    TEST_CONTAINERS_VERSION = '1.20.0'
+    POSTGRES_VERSION = '42.6.0'
 }
 
 subprojects {
-    version = '1.0.0-SNAPSHOT'
-
     repositories {
         mavenCentral()
     }

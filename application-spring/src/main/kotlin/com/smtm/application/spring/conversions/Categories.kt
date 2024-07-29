@@ -8,9 +8,9 @@ import com.smtm.application.v1.CategoryDto
 
 object Categories {
 
-    fun CategoryDto.toDomain(): Category =
+    fun CategoryDto.toDomain(id: Long? = null): Category =
         Category.of(
-            id = id,
+            id = this.id ?: id,
             name = name,
             icon = Icon.valueOfOrNull(icon) ?: Icon.FOLDER
         )
