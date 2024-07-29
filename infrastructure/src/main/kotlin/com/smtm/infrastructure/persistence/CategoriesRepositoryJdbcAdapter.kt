@@ -3,10 +3,10 @@ package com.smtm.infrastructure.persistence
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import com.smtm.application.domain.OwnerId
-import com.smtm.application.domain.categories.Categories
-import com.smtm.application.domain.categories.CategoriesProblem
-import com.smtm.application.spi.CategoriesRepository
+import com.smtm.core.domain.OwnerId
+import com.smtm.core.domain.categories.Categories
+import com.smtm.core.domain.categories.CategoriesProblem
+import com.smtm.core.spi.CategoriesRepository
 import com.smtm.infrastructure.persistence.categories.CategoryInSetRecord
 import com.smtm.infrastructure.persistence.categories.Conversions.toCategoryRecord
 import com.smtm.infrastructure.persistence.categories.Conversions.toCategorySetRecord

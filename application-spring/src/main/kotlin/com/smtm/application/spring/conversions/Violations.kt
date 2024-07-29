@@ -1,7 +1,7 @@
 package com.smtm.application.spring.conversions
 
-import com.smtm.application.domain.Violation
-import com.smtm.application.v1.ApiProblemDto
+import com.smtm.core.domain.Violation
+import com.smtm.api.v1.ApiProblemDto
 
 object Violations {
 

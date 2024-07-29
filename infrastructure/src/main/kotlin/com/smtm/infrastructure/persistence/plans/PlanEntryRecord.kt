@@ -1,7 +1,7 @@
 package com.smtm.infrastructure.persistence.plans
 
-import com.smtm.application.domain.plans.Plan
-import com.smtm.application.domain.plans.PlannedCategory
+import com.smtm.core.domain.plans.Plan
+import com.smtm.core.domain.plans.PlannedCategory
 import com.smtm.infrastructure.persistence.insertAndGetId
 import com.smtm.infrastructure.persistence.toCents
 import org.springframework.jdbc.core.JdbcOperations

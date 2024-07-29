@@ -1,13 +1,13 @@
 package com.smtm.infrastructure.persistence.categories
 
-import com.smtm.application.domain.Icon
-import com.smtm.application.domain.NumericId
-import com.smtm.application.domain.OwnerId
-import com.smtm.application.domain.Version
-import com.smtm.application.domain.categories.Categories
-import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.toOwnerId
-import com.smtm.application.domain.toVersion
+import com.smtm.core.domain.Icon
+import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.OwnerId
+import com.smtm.core.domain.Version
+import com.smtm.core.domain.categories.Categories
+import com.smtm.core.domain.categories.Category
+import com.smtm.core.domain.toOwnerId
+import com.smtm.core.domain.toVersion
 import org.springframework.jdbc.core.JdbcOperations
 
 internal object Conversions {

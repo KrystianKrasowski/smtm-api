@@ -1,8 +1,8 @@
 package com.smtm.application.spring.resources
 
-import com.smtm.application.LinkFactory
-import com.smtm.application.MediaType
-import com.smtm.application.v1.RootDto
+import com.smtm.api.LinkFactory
+import com.smtm.api.MediaType
+import com.smtm.api.v1.RootDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController

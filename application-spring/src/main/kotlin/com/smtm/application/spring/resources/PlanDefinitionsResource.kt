@@ -1,15 +1,15 @@
 package com.smtm.application.spring.resources
 
 import arrow.core.getOrElse
-import com.smtm.application.LinkFactory
-import com.smtm.application.MediaType
-import com.smtm.application.api.PlansQueries
-import com.smtm.application.domain.OwnerId
-import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.toHalCollection
-import com.smtm.application.v1.ApiProblemDto
-import com.smtm.application.v1.PeriodDto
-import com.smtm.application.v1.PlanDefinitionDto
+import com.smtm.api.LinkFactory
+import com.smtm.api.MediaType
+import com.smtm.core.api.PlansQueries
+import com.smtm.core.domain.OwnerId
+import com.smtm.core.domain.plans.PlanDefinition
+import com.smtm.api.toHalCollection
+import com.smtm.api.v1.ApiProblemDto
+import com.smtm.api.v1.PeriodDto
+import com.smtm.api.v1.PlanDefinitionDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController

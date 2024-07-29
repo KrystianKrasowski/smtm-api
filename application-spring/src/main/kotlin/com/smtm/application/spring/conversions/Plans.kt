@@ -1,16 +1,16 @@
 package com.smtm.application.spring.conversions
 
-import com.smtm.application.LinkFactory
-import com.smtm.application.domain.NumericId
-import com.smtm.application.domain.plans.Plan
-import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.domain.plans.PlannedCategory
+import com.smtm.api.LinkFactory
+import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.plans.Plan
+import com.smtm.core.domain.plans.PlanDefinition
+import com.smtm.core.domain.plans.PlannedCategory
 import com.smtm.application.spring.conversions.Categories.toDomain
 import com.smtm.application.spring.conversions.Categories.toDto
 import com.smtm.application.spring.resources.PlansResource
-import com.smtm.application.v1.MoneyDto
-import com.smtm.application.v1.PeriodDto
-import com.smtm.application.v1.PlanDto
+import com.smtm.api.v1.MoneyDto
+import com.smtm.api.v1.PeriodDto
+import com.smtm.api.v1.PlanDto
 
 object Plans {
 

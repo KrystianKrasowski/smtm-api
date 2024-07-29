@@ -4,7 +4,7 @@ apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.spring'
 
 dependencies {
-    implementation project(':dto')
+    implementation project(':api')
     implementation project(':core')
     implementation project(':infrastructure')
 

@@ -1,10 +1,10 @@
 package com.smtm.application.spring.conversions
 
-import com.smtm.application.LinkFactory
-import com.smtm.application.domain.Icon
-import com.smtm.application.domain.categories.Category
+import com.smtm.api.LinkFactory
+import com.smtm.core.domain.Icon
+import com.smtm.core.domain.categories.Category
 import com.smtm.application.spring.resources.CategoriesResource
-import com.smtm.application.v1.CategoryDto
+import com.smtm.api.v1.CategoryDto
 
 object Categories {
 

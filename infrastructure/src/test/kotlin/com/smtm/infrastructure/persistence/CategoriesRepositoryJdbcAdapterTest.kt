@@ -1,12 +1,12 @@
 package com.smtm.infrastructure.persistence
 
-import com.smtm.application.domain.Icon
-import com.smtm.application.domain.NumericId
-import com.smtm.application.domain.categories.Categories
-import com.smtm.application.domain.categories.CategoriesProblem
-import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.ownerIdOf
-import com.smtm.application.domain.versionOf
+import com.smtm.core.domain.Icon
+import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.categories.Categories
+import com.smtm.core.domain.categories.CategoriesProblem
+import com.smtm.core.domain.categories.Category
+import com.smtm.core.domain.ownerIdOf
+import com.smtm.core.domain.versionOf
 import javax.sql.DataSource
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach

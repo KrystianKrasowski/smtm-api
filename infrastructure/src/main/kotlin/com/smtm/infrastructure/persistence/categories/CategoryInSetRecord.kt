@@ -1,6 +1,6 @@
 package com.smtm.infrastructure.persistence.categories
 
-import com.smtm.application.domain.OwnerId
+import com.smtm.core.domain.OwnerId
 import org.springframework.jdbc.core.JdbcOperations
 import java.sql.ResultSet
 

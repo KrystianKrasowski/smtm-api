@@ -1,8 +1,8 @@
 package com.smtm.infrastructure.persistence.plans
 
-import com.smtm.application.domain.NumericId
-import com.smtm.application.domain.plans.Plan
-import com.smtm.application.domain.plans.PlanDefinition
+import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.plans.Plan
+import com.smtm.core.domain.plans.PlanDefinition
 import com.smtm.infrastructure.persistence.insertAndGetId
 import org.springframework.jdbc.core.JdbcOperations
 import org.springframework.jdbc.core.RowMapper

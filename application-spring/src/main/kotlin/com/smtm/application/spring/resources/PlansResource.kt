@@ -1,18 +1,18 @@
 package com.smtm.application.spring.resources
 
 import arrow.core.getOrElse
-import com.smtm.application.LinkFactory
-import com.smtm.application.MediaType
-import com.smtm.application.api.PlansApi
-import com.smtm.application.domain.NumericId
-import com.smtm.application.domain.OwnerId
-import com.smtm.application.domain.plans.PlansProblem
+import com.smtm.api.LinkFactory
+import com.smtm.api.MediaType
+import com.smtm.core.api.PlansApi
+import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.OwnerId
+import com.smtm.core.domain.plans.PlansProblem
 import com.smtm.application.spring.conversions.Plans.toDto
 import com.smtm.application.spring.conversions.Plans.toPlanDefinition
 import com.smtm.application.spring.conversions.Plans.toPlannedCategories
 import com.smtm.application.spring.conversions.Violations.toDto
-import com.smtm.application.v1.ApiProblemDto
-import com.smtm.application.v1.PlanDto
+import com.smtm.api.v1.ApiProblemDto
+import com.smtm.api.v1.PlanDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

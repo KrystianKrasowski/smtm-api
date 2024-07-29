@@ -1,13 +1,13 @@
 package com.smtm.infrastructure.persistence.plans
 
-import com.smtm.application.domain.Icon
-import com.smtm.application.domain.NumericId
-import com.smtm.application.domain.categories.Category
-import com.smtm.application.domain.ownerIdOf
-import com.smtm.application.domain.plans.Plan
-import com.smtm.application.domain.plans.PlanDefinition
-import com.smtm.application.domain.plans.PlannedCategory
-import com.smtm.application.domain.versionOf
+import com.smtm.core.domain.Icon
+import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.categories.Category
+import com.smtm.core.domain.ownerIdOf
+import com.smtm.core.domain.plans.Plan
+import com.smtm.core.domain.plans.PlanDefinition
+import com.smtm.core.domain.plans.PlannedCategory
+import com.smtm.core.domain.versionOf
 import com.smtm.infrastructure.persistence.categories.CategoryRecord
 import com.smtm.infrastructure.persistence.categories.Conversions.toCategory
 import com.smtm.infrastructure.persistence.toMonetaryAmount
