@@ -10,48 +10,36 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.testcontainers.containers.DockerComposeContainer
-import org.testcontainers.containers.wait.strategy.Wait
-import java.io.File
 
 class CategoriesResourceTest {
 
     companion object {
-        private lateinit var compose: DockerComposeContainer<*>
-        private lateinit var database: Database
 
         @BeforeAll
         @JvmStatic
         fun beforeAll() {
-            compose = DockerComposeContainer(File("../docker-compose.yml"))
-                .withExposedService("application_1", 8080, Wait.forListeningPort())
-                .withExposedService("db_1", 5432, Wait.forListeningPort())
-                .withEnv(ENVIRONMENT)
-                .apply { start() }
-
-            database = Database.connect()
+            Environment.setUp()
         }
 
         @AfterAll
         @JvmStatic
         fun afterAll() {
-            compose.stop()
-            database.disconnect()
+            Environment.tearDown()
         }
     }
 
     @BeforeEach
     fun beforeEach() {
-        database.runSql("INSERT INTO category_sets (owner_id, version) VALUES (1, 1)")
-        database.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Rent', 'HOUSE')")
-        database.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Savings', 'PIGGY_BANK')")
-        database.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Groceries', 'SHOPPING_CART')")
+        Environment.runSql("INSERT INTO category_sets (owner_id, version) VALUES (1, 1)")
+        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Rent', 'HOUSE')")
+        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Savings', 'PIGGY_BANK')")
+        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Groceries', 'SHOPPING_CART')")
     }
 
     @AfterEach
     fun afterEach() {
-        database.runSql("DELETE FROM category_sets CASCADE")
-        database.runSql("ALTER TABLE categories ALTER COLUMN id RESTART WITH 1")
+        Environment.runSql("DELETE FROM category_sets CASCADE")
+        Environment.runSql("ALTER TABLE categories ALTER COLUMN id RESTART WITH 1")
     }
 
     @Test

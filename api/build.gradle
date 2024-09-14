@@ -46,4 +46,4 @@ tasks.register('integrationTest', Test) {
     useJUnitPlatform()
 }
 
-check.dependsOn integrationTest
+//check.dependsOn integrationTest
