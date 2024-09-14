@@ -1,4 +1,4 @@
-package com.smtm.application.spring.resources
+package com.smtm.application.spring.endpoints
 
 import arrow.core.getOrElse
 import com.smtm.api.HalCollection
@@ -14,6 +14,7 @@ import com.smtm.application.spring.conversions.Categories.toDto
 import com.smtm.application.spring.conversions.Violations.toDto
 import com.smtm.api.v1.ApiProblemDto
 import com.smtm.api.v1.CategoryDto
+import com.smtm.api.v1.CategoryResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -27,8 +28,8 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping(CategoriesResource.PATH)
-class CategoriesResource(
+@RequestMapping(CategoriesEndpoint.PATH)
+class CategoriesEndpoint(
     private val linkFactory: LinkFactory,
     private val categoriesService: CategoriesApi,
     private val ownerIdProvider: () -> OwnerId
@@ -102,7 +103,7 @@ class CategoriesResource(
     private fun create204Response() = ResponseEntity.status(204)
         .build<Nothing>()
 
-    private fun CategoryDto.toResponse2xx(status: Int) = ResponseEntity.status(status)
+    private fun CategoryResource.toResponse2xx(status: Int) = ResponseEntity.status(status)
         .header("Location", links["self"]?.href)
         .body(this)
 

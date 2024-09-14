@@ -14,7 +14,6 @@ object Environment {
             .withExposedService("application_1", 8080, Wait.forListeningPort())
             .withExposedService("db_1", 5432, Wait.forListeningPort())
             .withEnv(ENVIRONMENT)
-            .withLogConsumer("application_1") { frame -> println(frame.utf8String) }
             .apply { start() }
 
         try {

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled("Not implemented yet with this approach")
 class PlansResourceTest {
 
     companion object {
@@ -63,49 +62,7 @@ class PlansResourceTest {
     }
 
     @Test
-    fun `should return plans by date`() {
-        Given {
-            port(8080)
-            header("Content-Type", "application/vnd.smtm.v1+json")
-            header("Accept", "application/vnd.smtm.v1+json")
-        } When {
-            get("/plans?date=2024-09-14")
-        } Then {
-            statusCode(200)
-            header("Content-Type", "application/vnd.smtm.v1+json")
-            body("_links.self.href", equalTo("http://localhost:8080/plans"))
-            body("count", equalTo(3))
-            body("total", equalTo(3))
-            body("_embedded.plans[0]._links.self.href", equalTo("http://localhost:8080/plans/1"))
-            body("_embedded.plans[0].id", equalTo(1))
-            body("_embedded.plans[0].name", equalTo("September 2024"))
-            body("_embedded.plans[0].period.start", equalTo("2024-09-01"))
-            body("_embedded.plans[0].period.end", equalTo("2024-09-30"))
-            body("_embedded.plans[0].entries[0].category-id", equalTo(1))
-            body("_embedded.plans[0].entries[0].value.amount", equalTo(37959))
-            body("_embedded.plans[0].entries[0].value.currency", equalTo("PLN"))
-            body("_embedded.plans[0].entries[1].category-id", equalTo(2))
-            body("_embedded.plans[0].entries[1].value.amount", equalTo(500000))
-            body("_embedded.plans[0].entries[1].value.currency", equalTo("PLN"))
-            body("_embedded.plans[0].entries[2].category-id", equalTo(3))
-            body("_embedded.plans[0].entries[2].value.amount", equalTo(100000))
-            body("_embedded.plans[0].entries[2].value.currency", equalTo("PLN"))
-            body("_embedded.categories[0]._links.self.href", equalTo("http://localhost:8080/categories/1"))
-            body("_embedded.categories[0].id", equalTo(1))
-            body("_embedded.categories[0].name", equalTo("Rent"))
-            body("_embedded.categories[0].icon", equalTo("HOUSE"))
-            body("_embedded.categories[1]._links.self.href", equalTo("http://localhost:8080/categories/2"))
-            body("_embedded.categories[1].id", equalTo(2))
-            body("_embedded.categories[1].name", equalTo("Savings"))
-            body("_embedded.categories[1].icon", equalTo("PIGGY_BANK"))
-            body("_embedded.categories[2]._links.self.href", equalTo("http://localhost:8080/categories/3"))
-            body("_embedded.categories[2].id", equalTo(3))
-            body("_embedded.categories[2].name", equalTo("Groceries"))
-            body("_embedded.categories[2].icon", equalTo("SHOPPING_CART"))
-        }
-    }
-
-    @Test
+    @Disabled("Not implemented yet with this approach")
     fun `should return plan by id`() {
         Given {
             port(8080)
@@ -146,6 +103,7 @@ class PlansResourceTest {
     }
 
     @Test
+    @Disabled("Not implemented yet with this approach")
     fun `should return 404 while getting unknown plan`() {
         Given {
             port(8080)
@@ -162,6 +120,7 @@ class PlansResourceTest {
     }
 
     @Test
+    @Disabled("Not implemented yet with this approach")
     fun `should create new plan`() {
         Given {
             port(8080)
@@ -207,6 +166,7 @@ class PlansResourceTest {
     }
 
     @Test
+    @Disabled("Not implemented yet with this approach")
     fun `should return 422 while creating invalid plan`() {
         Given {
             port(8080)
@@ -265,6 +225,7 @@ class PlansResourceTest {
     }
 
     @Test
+    @Disabled("Not implemented yet with this approach")
     fun `should update plan by id`() {
         Given {
             port(8080)
@@ -312,6 +273,7 @@ class PlansResourceTest {
     }
 
     @Test
+    @Disabled("Not implemented yet with this approach")
     fun `should return 404 while updating unknown plan`() {
         Given {
             port(8080)
@@ -361,6 +323,7 @@ class PlansResourceTest {
     }
 
     @Test
+    @Disabled("Not implemented yet with this approach")
     fun `should return 422 while updating invalid plan`() {
         Given {
             port(8080)

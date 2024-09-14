@@ -6,4 +6,4 @@ import com.smtm.api.Link
 
 data class RootDto(
     @JsonProperty("_links") override val links: Map<String, Link>
-) : HalResource(links)
+) : HalResource<Long>(links, 1)

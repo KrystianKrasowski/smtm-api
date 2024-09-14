@@ -2,13 +2,28 @@ package com.smtm.core.api
 
 import arrow.core.Either
 import com.smtm.core.domain.OwnerId
-import com.smtm.core.domain.plans.PlanDefinition
+import com.smtm.core.domain.plans.PlanHeader
+import com.smtm.core.domain.plans.PlansQueriesCriteria
+import java.time.LocalDate
+
+typealias PlanHeaders = List<PlanHeader>
 
 interface PlansQueries {
 
-    fun getCurrentPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>>
+    fun getPlanHeadersBy(criteria: Criteria): Either<Throwable, PlanHeaders>
 
-    fun getUpcomingPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>>
+    interface Criteria {
+        val byOwner: OwnerId
+        val byDateWithinPeriod: LocalDate?
 
-    fun getArchivedPlans(ownerId: OwnerId): Either<Throwable, List<PlanDefinition>>
+        companion object {
+
+            fun by(
+                owner: OwnerId,
+                dateWithinPeriod: LocalDate? = null
+            ): Criteria {
+                return PlansQueriesCriteria(owner, dateWithinPeriod)
+            }
+        }
+    }
 }

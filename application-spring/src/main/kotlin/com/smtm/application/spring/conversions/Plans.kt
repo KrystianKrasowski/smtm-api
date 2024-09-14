@@ -1,47 +1,41 @@
 package com.smtm.application.spring.conversions
 
+import com.smtm.api.HalCollection
 import com.smtm.api.LinkFactory
-import com.smtm.core.domain.NumericId
-import com.smtm.core.domain.plans.Plan
-import com.smtm.core.domain.plans.PlanDefinition
-import com.smtm.core.domain.plans.PlannedCategory
-import com.smtm.application.spring.conversions.Categories.toDomain
-import com.smtm.application.spring.conversions.Categories.toDto
-import com.smtm.application.spring.resources.PlansResource
-import com.smtm.api.v1.MoneyDto
-import com.smtm.api.v1.PeriodDto
-import com.smtm.api.v1.PlanDto
+import com.smtm.api.v1.DatePeriodDto
+import com.smtm.api.v1.PlanHeaderDto
+import com.smtm.api.v1.PlanHeaderResource
+import com.smtm.application.spring.endpoints.PlanHeadersEndpoint
+import com.smtm.application.spring.endpoints.PlansEndpoint
+import com.smtm.core.api.PlanHeaders
+import com.smtm.core.domain.plans.PlanHeader
 
 object Plans {
 
-    fun PlanDto.toPlanDefinition(): PlanDefinition =
-        PlanDefinition(
-            id = NumericId.of(id),
-            name = name,
-            period = period.start..period.end
+    fun PlanHeaders.toHalCollection(linkFactory: LinkFactory): HalCollection =
+        HalCollection(
+            links = mapOf(
+                "self" to linkFactory.create(PlanHeadersEndpoint.PATH)
+            ),
+            count = size,
+            total = size,
+            embedded = mapOf(
+                "plan-headers" to map { it.toResource(linkFactory) }
+            )
         )
 
-    fun PlanDto.toPlannedCategories(): List<PlannedCategory> =
-        entries
-            .map { PlannedCategory(it.category.toDomain(), it.value.monetaryAmount) }
-
-    fun Plan.toDto(linksFactory: LinkFactory): PlanDto =
-        PlanDto(
+    private fun PlanHeader.toResource(linkFactory: LinkFactory): PlanHeaderResource =
+        PlanHeaderResource(
             links = mapOf(
-                "self" to linksFactory.create("${PlansResource.PATH}/${id.value}"),
+                "self" to linkFactory.create("${PlansEndpoint.PATH}/$id")
             ),
             id = id.value,
-            name = name,
-            period = PeriodDto(
-                start = start,
-                end = end
+            header = PlanHeaderDto(
+                name = name,
+                period = DatePeriodDto(
+                    start = period.start,
+                    end = period.endInclusive
+                )
             ),
-            entries = entries.map { it.toDto(linksFactory) }
-        )
-
-    private fun PlannedCategory.toDto(linksFactory: LinkFactory) =
-        PlanDto.Entry(
-            category = category.toDto(linksFactory),
-            value = MoneyDto.of(value)
         )
 }
