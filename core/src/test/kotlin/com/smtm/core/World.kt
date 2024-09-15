@@ -1,10 +1,10 @@
 package com.smtm.core
 
-import com.smtm.core.domain.ownerIdOf
+import com.smtm.core.domain.OwnerId
 import com.smtm.core.spi.FakeCategoriesRepository
 
 class World {
 
-    var ownerId = ownerIdOf(1)
+    var ownerId = OwnerId.of(1)
     var categoriesRepository = FakeCategoriesRepository()
 }

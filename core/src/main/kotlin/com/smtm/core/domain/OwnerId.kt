@@ -1,10 +1,11 @@
 package com.smtm.core.domain
 
 @JvmInline
-value class OwnerId(val value: Long)
+value class OwnerId(val value: Long) {
 
-fun ownerIdOf(id: Long) = OwnerId(id)
+    companion object {
 
-fun Long.toOwnerId() = OwnerId(this)
-
-fun Int.toOwnerId() = OwnerId(this.toLong())
+        fun of(id: Long): OwnerId =
+            OwnerId(id)
+    }
+}

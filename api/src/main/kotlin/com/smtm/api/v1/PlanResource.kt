@@ -7,8 +7,9 @@ import com.smtm.api.Link
 data class PlanResource(
     @JsonProperty("_links") override val links: Map<String, Link>,
     @JsonProperty("id") override val id: Long,
+    @JsonProperty("_embedded") override val embedded: Map<String, Collection<CategoryResource>>,
     private val plan: PlanDto
-) : HalResource<Long>(links, id) {
+) : HalResource<Long>(links, id, embedded) {
 
     @JsonProperty("name") val name: String = plan.name
     @JsonProperty("period") val period: DatePeriodDto = plan.period

@@ -6,7 +6,6 @@ import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.Version
 import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.categories.Category
-import com.smtm.core.domain.toOwnerId
 import com.smtm.core.domain.toVersion
 import org.springframework.jdbc.core.JdbcOperations
 
@@ -45,7 +44,7 @@ internal object Conversions {
     private fun List<CategoryInSetRecord>.extractId(): OwnerId =
         first()
             .ownerId
-            .toOwnerId()
+            .let { OwnerId.of(it) }
 
     private fun List<CategoryInSetRecord>.extractVersion(): Version =
         first()

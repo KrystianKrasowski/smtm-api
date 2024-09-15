@@ -2,10 +2,10 @@ package com.smtm.infrastructure.persistence
 
 import com.smtm.core.domain.Icon
 import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.categories.CategoriesProblem
 import com.smtm.core.domain.categories.Category
-import com.smtm.core.domain.ownerIdOf
 import com.smtm.core.domain.versionOf
 import javax.sql.DataSource
 import org.assertj.core.api.Assertions.assertThat
@@ -27,7 +27,7 @@ class CategoriesRepositoryJdbcAdapterTest {
     )
 
     private val categoriesPrototype = Categories.fetched(
-        id = ownerIdOf(1),
+        id = OwnerId.of(1),
         version = versionOf(2),
         list = listOf(
             Category.of(
@@ -58,7 +58,7 @@ class CategoriesRepositoryJdbcAdapterTest {
     @Test
     fun `should get categories`() {
         // when
-        val categories = adapter.getCategories(ownerIdOf(1)).getOrNull()
+        val categories = adapter.getCategories(OwnerId.of(1)).getOrNull()
 
         // then
         assertThat(categories?.current).containsOnly(
@@ -84,7 +84,7 @@ class CategoriesRepositoryJdbcAdapterTest {
         dataSource.runSql("UPDATE CATEGORY_SETS SET VERSION = 2 WHERE OWNER_ID = 1")
 
         // when
-        val result = adapter.getCategories(ownerIdOf(1)).getOrNull()
+        val result = adapter.getCategories(OwnerId.of(1)).getOrNull()
 
         // then
         assertThat(result?.version).isEqualTo(versionOf(2))
@@ -94,10 +94,10 @@ class CategoriesRepositoryJdbcAdapterTest {
     @Test
     fun `should get empty categories for new owner`() {
         // when
-        val categories = adapter.getCategories(ownerIdOf(99)).getOrNull()
+        val categories = adapter.getCategories(OwnerId.of(99)).getOrNull()
 
         // then
-        assertThat(categories?.id).isEqualTo(ownerIdOf(99))
+        assertThat(categories?.id).isEqualTo(OwnerId.of(99))
         assertThat(categories?.current).isEmpty()
         assertThat(categories?.version).isEqualTo(versionOf(0))
     }
@@ -142,7 +142,7 @@ class CategoriesRepositoryJdbcAdapterTest {
             .leftOrNull()
 
         val version = adapter
-            .getCategories(ownerIdOf(1))
+            .getCategories(OwnerId.of(1))
             .map { it.version }
             .getOrNull()
 

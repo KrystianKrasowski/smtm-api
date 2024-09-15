@@ -62,7 +62,6 @@ class PlansResourceTest {
     }
 
     @Test
-    @Disabled("Not implemented yet with this approach")
     fun `should return plan by id`() {
         Given {
             port(8080)
@@ -103,7 +102,6 @@ class PlansResourceTest {
     }
 
     @Test
-    @Disabled("Not implemented yet with this approach")
     fun `should return 404 while getting unknown plan`() {
         Given {
             port(8080)
