@@ -38,12 +38,10 @@ object Plans {
             ),
             id = id.value,
             plan = PlanDto(
-                header = PlanHeaderDto(
-                    name = name,
-                    period = DatePeriodDto(
-                        start = start,
-                        end = end
-                    )
+                name = name,
+                period = DatePeriodDto(
+                    start = start,
+                    end = end
                 ),
                 entries = entries.map { it.toEntryDto() },
             ),

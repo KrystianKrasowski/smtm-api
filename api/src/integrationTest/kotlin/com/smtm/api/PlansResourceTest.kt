@@ -35,21 +35,25 @@ class PlansResourceTest {
         Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Savings', 'PIGGY_BANK')")
         Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Groceries', 'SHOPPING_CART')")
 
-        Environment.runSql("""
+        Environment.runSql(
+            """
             INSERT INTO plans
             (owner_id, version, name, start, "end") 
             VALUES 
             (1, 1, 'September 2024', '2024-09-01', '2024-09-30')
-        """.trimIndent())
+        """.trimIndent()
+        )
 
-        Environment.runSql("""
+        Environment.runSql(
+            """
             INSERT INTO plan_entries 
             (plan_id, category_id, amount, currency)
             VALUES
             (1, 1, 37959, 'PLN'),
             (1, 2, 500000, 'PLN'),
             (1, 3, 100000, 'PLN')
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     @AfterEach
@@ -118,19 +122,18 @@ class PlansResourceTest {
     }
 
     @Test
-    @Disabled("Not implemented yet with this approach")
     fun `should create new plan`() {
         Given {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
-        } When {
-            post("/plans", """
+            body(
+                """
                 {
                     "name": "October 2024",
                     "period": {
                         "start": "2024-10-01",
-                        "end": "2024-10-31",
+                        "end": "2024-10-31"
                     },
                     "entries": [
                         {
@@ -156,7 +159,10 @@ class PlansResourceTest {
                         }
                     ]
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
+        } When {
+            post("/plans")
         } Then {
             statusCode(201)
             header("Location", "http://localhost:8080/plans/2")
@@ -171,7 +177,8 @@ class PlansResourceTest {
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
         } When {
-            body("""
+            body(
+                """
                 {
                     "name": "October <2024>",
                     "period": {
@@ -202,7 +209,8 @@ class PlansResourceTest {
                         }
                     ]
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
             post("/plans")
         } Then {
             statusCode(422)
@@ -230,7 +238,8 @@ class PlansResourceTest {
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
         } When {
-            body("""
+            body(
+                """
                 {
                     "id": 1,
                     "name": "Super September 2024",
@@ -262,7 +271,8 @@ class PlansResourceTest {
                         }
                     ]
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
             put("/plans/1")
         } Then {
             statusCode(204)
@@ -278,7 +288,8 @@ class PlansResourceTest {
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
         } When {
-            body("""
+            body(
+                """
                 {
                     "id": 1,
                     "name": "Super September 2024",
@@ -310,7 +321,8 @@ class PlansResourceTest {
                         }
                     ]
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
             put("/plans/99")
         } Then {
             statusCode(404)
@@ -328,7 +340,8 @@ class PlansResourceTest {
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
         } When {
-            body("""
+            body(
+                """
                 {
                     "name": "September <2024>",
                     "period": {
@@ -359,7 +372,8 @@ class PlansResourceTest {
                         }
                     ]
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
             put("/plans/1")
         } Then {
             statusCode(422)
