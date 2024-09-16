@@ -34,9 +34,9 @@ object Plans {
     fun Plan.toHalResource(linkFactory: LinkFactory): PlanResource =
         PlanResource(
             links = mapOf(
-                "self" to linkFactory.create("${PlansEndpoint.PATH}/${id.value}")
+                "self" to linkFactory.create("${PlansEndpoint.PATH}/$id")
             ),
-            id = id.value,
+            id = id.toString(),
             plan = PlanDto(
                 name = name,
                 period = DatePeriodDto(
@@ -55,7 +55,7 @@ object Plans {
             links = mapOf(
                 "self" to linkFactory.create("${PlansEndpoint.PATH}/$id")
             ),
-            id = id.value,
+            id = id.toString(),
             header = PlanHeaderDto(
                 name = name,
                 period = DatePeriodDto(

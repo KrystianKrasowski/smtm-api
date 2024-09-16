@@ -5,6 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import com.smtm.core.api.PlanHeaders
 import com.smtm.core.api.PlansQueries
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Icon
 import com.smtm.core.domain.NumericId
 import com.smtm.core.domain.OwnerId
@@ -28,8 +29,8 @@ class PlansAdapter(dataSource: DataSource) : PlansQueries {
             ?.let { getOwnerPlanHeadersByMatchingDate(criteria.byOwner.value, it) }
             ?: getAllOwnerPlanHeaders(criteria.byOwner.value)
 
-    override fun getPlan(id: NumericId, owner: OwnerId): Either<PlansProblem, Plan> =
-        FullPlanViewRecord.runCatching { selectByIdAndOwner(id.value, owner.value, jdbc) }
+    override fun getPlan(id: EntityId, owner: OwnerId): Either<PlansProblem, Plan> =
+        FullPlanViewRecord.runCatching { selectByIdAndOwner(id.toString(), owner.value, jdbc) }
             .map { it.toPlanOrNotFound(id) }
             .getOrElse { PlansProblem.Failure(it).left() }
 
@@ -51,7 +52,7 @@ class PlansAdapter(dataSource: DataSource) : PlansQueries {
 
 private fun List<PlanRecord>.toPlanDefinitions() = map { it.toPlanDefinition() }
 
-private fun List<FullPlanViewRecord>.toPlanOrNotFound(id: NumericId): Either<PlansProblem.NotFound, Plan> {
+private fun List<FullPlanViewRecord>.toPlanOrNotFound(id: EntityId): Either<PlansProblem.NotFound, Plan> {
     if (isEmpty()) {
         return PlansProblem.NotFound(id).left()
     }
@@ -60,7 +61,7 @@ private fun List<FullPlanViewRecord>.toPlanOrNotFound(id: NumericId): Either<Pla
 
     return Plan(
         header = PlanHeader(
-            id = NumericId.of(first.planId),
+            id = EntityId.of(first.planId),
             name = first.name,
             period = first.start..first.end
         ),

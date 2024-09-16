@@ -6,6 +6,7 @@ import assertk.assertions.contains
 import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import com.smtm.core.api.PlansQueries
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Icon
 import com.smtm.core.domain.NumericId
 import com.smtm.core.domain.OwnerId
@@ -40,18 +41,18 @@ class PlansAdapterTest {
             (1, 'Groceries', 'SHOPPING_CART')
         """.trimIndent())
         dataSource.runSql("""
-            INSERT INTO plans (owner_id, version, name, start, "end") 
+            INSERT INTO plans (id, owner_id, version, name, start, "end") 
             VALUES 
-            (1, 1, 'August 2024', '2024-08-01', '2024-08-31'),
-            (1, 1, 'September 2024', '2024-09-01', '2024-09-30'),
-            (1, 1, 'October 2024', '2024-10-01', '2024-10-31')
+            ('smtm-plan-1', 1, 1, 'August 2024', '2024-08-01', '2024-08-31'),
+            ('smtm-plan-2', 1, 1, 'September 2024', '2024-09-01', '2024-09-30'),
+            ('smtm-plan-3', 1, 1, 'October 2024', '2024-10-01', '2024-10-31')
         """.trimIndent())
         dataSource.runSql("""
             INSERT INTO plan_entries (plan_id, category_id, amount, currency)
             VALUES
-            (2, 1, 37959, 'PLN'),
-            (2, 2, 500000, 'PLN'),
-            (2, 3, 100000, 'PLN')
+            ('smtm-plan-2', 1, 37959, 'PLN'),
+            ('smtm-plan-2', 2, 500000, 'PLN'),
+            ('smtm-plan-2', 3, 100000, 'PLN')
         """.trimIndent())
     }
 
@@ -59,7 +60,6 @@ class PlansAdapterTest {
     fun tearDown() {
         dataSource.runSql("DELETE FROM plans CASCADE")
         dataSource.runSql("DELETE FROM category_sets CASCADE")
-        dataSource.runSql("ALTER TABLE plans ALTER COLUMN id RESTART WITH 1")
         dataSource.runSql("ALTER TABLE plan_entries ALTER COLUMN id RESTART WITH 1")
         dataSource.runSql("ALTER TABLE categories ALTER COLUMN id RESTART WITH 1")
     }
@@ -84,7 +84,9 @@ class PlansAdapterTest {
             .getPlanHeadersBy(criteria)
             .getOrElse { throw IllegalStateException("Expected to return success here", it) }
 
-        assertThat(result).contains(planDefinitionOf(2, "September 2024", "2024-09-01", "2024-09-30"))
+        assertThat(result).contains(
+            planDefinitionOf("smtm-plan-2", "September 2024", "2024-09-01", "2024-09-30")
+        )
     }
 
     @Test
@@ -98,9 +100,9 @@ class PlansAdapterTest {
             .getOrElse { throw IllegalStateException("Expected to return success here", it) }
 
         assertThat(result).containsExactly(
-            planDefinitionOf(3, "October 2024", "2024-10-01", "2024-10-31"),
-            planDefinitionOf(2, "September 2024", "2024-09-01", "2024-09-30"),
-            planDefinitionOf(1, "August 2024", "2024-08-01", "2024-08-31")
+            planDefinitionOf("smtm-plan-3", "October 2024", "2024-10-01", "2024-10-31"),
+            planDefinitionOf("smtm-plan-2", "September 2024", "2024-09-01", "2024-09-30"),
+            planDefinitionOf("smtm-plan-1", "August 2024", "2024-08-01", "2024-08-31")
         )
     }
 
@@ -108,11 +110,11 @@ class PlansAdapterTest {
     fun `should return owner's plan by id`() {
         // when
         val result = plansAdapter
-            .getPlan(NumericId.of(2L), OwnerId.of(1L))
+            .getPlan(EntityId.of("smtm-plan-2"), OwnerId.of(1L))
             .getOrElse { error("Expected to return success here: $it") }
 
         // then
-        assertThat(result.id).isEqualTo(NumericId.of(2L))
+        assertThat(result.id).isEqualTo(EntityId.of("smtm-plan-2"))
         assertThat(result.start).isEqualTo(LocalDate.parse("2024-09-01"))
         assertThat(result.end).isEqualTo(LocalDate.parse("2024-09-30"))
         assertThat(result.entries).containsExactly(
@@ -123,9 +125,9 @@ class PlansAdapterTest {
     }
 }
 
-private fun planDefinitionOf(id: Long, name: String, start: String, end: String): PlanHeader =
+private fun planDefinitionOf(id: String, name: String, start: String, end: String): PlanHeader =
     PlanHeader(
-        id = NumericId.of(id),
+        id = EntityId.of(id),
         name = name,
         period = LocalDate.parse(start)..LocalDate.parse(end),
     )

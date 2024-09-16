@@ -38,9 +38,9 @@ class PlansResourceTest {
         Environment.runSql(
             """
             INSERT INTO plans
-            (owner_id, version, name, start, "end") 
+            (id, owner_id, version, name, start, "end") 
             VALUES 
-            (1, 1, 'September 2024', '2024-09-01', '2024-09-30')
+            ('smtm-plan-1', 1, 1, 'September 2024', '2024-09-01', '2024-09-30')
         """.trimIndent()
         )
 
@@ -49,9 +49,9 @@ class PlansResourceTest {
             INSERT INTO plan_entries 
             (plan_id, category_id, amount, currency)
             VALUES
-            (1, 1, 37959, 'PLN'),
-            (1, 2, 500000, 'PLN'),
-            (1, 3, 100000, 'PLN')
+            ('smtm-plan-1', 1, 37959, 'PLN'),
+            ('smtm-plan-1', 2, 500000, 'PLN'),
+            ('smtm-plan-1', 3, 100000, 'PLN')
         """.trimIndent()
         )
     }
@@ -60,7 +60,6 @@ class PlansResourceTest {
     fun afterEach() {
         Environment.runSql("DELETE FROM plans CASCADE")
         Environment.runSql("DELETE FROM category_sets CASCADE")
-        Environment.runSql("ALTER TABLE plans ALTER COLUMN id RESTART WITH 1")
         Environment.runSql("ALTER TABLE plan_entries ALTER COLUMN id RESTART WITH 1")
         Environment.runSql("ALTER TABLE categories ALTER COLUMN id RESTART WITH 1")
     }
@@ -72,12 +71,11 @@ class PlansResourceTest {
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
         } When {
-            get("/plans/1")
+            get("/plans/smtm-plan-1")
         } Then {
             statusCode(200)
             header("Content-Type", "application/vnd.smtm.v1+json")
-            body("_links.self.href", equalTo("http://localhost:8080/plans/1"))
-            body("id", equalTo(1))
+            body("_links.self.href", equalTo("http://localhost:8080/plans/smtm-plan-1"))
             body("name", equalTo("September 2024"))
             body("period.start", equalTo("2024-09-01"))
             body("period.end", equalTo("2024-09-30"))

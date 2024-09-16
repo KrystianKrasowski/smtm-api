@@ -1,6 +1,6 @@
 create table plan_entries (
     id bigint generated always as identity primary key,
-    plan_id bigint not null,
+    plan_id varchar not null,
     category_id bigint not null,
     amount integer not null,
     currency varchar(3) not null

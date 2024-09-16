@@ -1,6 +1,6 @@
 package com.smtm.infrastructure.persistence.plans
 
-import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.plans.PlanHeader
 import org.springframework.jdbc.core.JdbcOperations
 import org.springframework.jdbc.core.RowMapper
@@ -8,7 +8,7 @@ import java.sql.ResultSet
 import java.time.LocalDate
 
 internal data class PlanRecord(
-    val id: Long,
+    val id: String,
     val ownerId: Long,
     val version: Int,
     val name: String,
@@ -19,7 +19,7 @@ internal data class PlanRecord(
 
     fun toPlanDefinition(): PlanHeader =
         PlanHeader(
-            id = NumericId.of(id),
+            id = EntityId.of(id),
             name = name,
             period = start..end
         )
@@ -50,7 +50,7 @@ private class PlanRecordMapper(private val jdbc: JdbcOperations) : RowMapper<Pla
 
     override fun mapRow(rs: ResultSet, rowNum: Int): PlanRecord =
         PlanRecord(
-            id = rs.getLong("id"),
+            id = rs.getString("id"),
             ownerId = rs.getLong("owner_id"),
             version = rs.getInt("version"),
             name = rs.getString("name"),

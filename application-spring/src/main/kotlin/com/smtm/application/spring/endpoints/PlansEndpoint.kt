@@ -7,7 +7,7 @@ import com.smtm.api.v1.ApiProblemDto
 import com.smtm.api.v1.PlanDto
 import com.smtm.application.spring.conversions.Plans.toHalResource
 import com.smtm.core.api.PlansQueries
-import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.plans.PlansProblem
 import org.springframework.http.ResponseEntity
@@ -31,8 +31,8 @@ class PlansEndpoint(
         consumes = [MediaType.VERSION_1_JSON],
         produces = [MediaType.VERSION_1_JSON]
     )
-    fun getPlan(@PathVariable("id") id: Long): ResponseEntity<*> =
-        plansQueries.getPlan(NumericId.of(id), ownerIdProvider())
+    fun getPlan(@PathVariable("id") id: String): ResponseEntity<*> =
+        plansQueries.getPlan(EntityId.of(id), ownerIdProvider())
             .map { it.toHalResource(linksFactory) }
             .map { ResponseEntity.ok(it) }
             .getOrElse { it.toResponseEntity() }

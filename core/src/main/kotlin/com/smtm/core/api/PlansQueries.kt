@@ -1,7 +1,7 @@
 package com.smtm.core.api
 
 import arrow.core.Either
-import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
@@ -15,7 +15,7 @@ interface PlansQueries {
 
     fun getPlanHeadersBy(criteria: Criteria): Either<Throwable, PlanHeaders>
 
-    fun getPlan(id: NumericId, owner: OwnerId): Either<PlansProblem, Plan>
+    fun getPlan(id: EntityId, owner: OwnerId): Either<PlansProblem, Plan>
 
     interface Criteria {
         val byOwner: OwnerId

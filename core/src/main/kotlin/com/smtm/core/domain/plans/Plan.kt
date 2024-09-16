@@ -1,6 +1,6 @@
 package com.smtm.core.domain.plans
 
-import com.smtm.core.domain.NumericId
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.categories.Category
 import javax.money.MonetaryAmount
 import java.time.LocalDate
@@ -10,7 +10,7 @@ data class Plan(
     private val header: PlanHeader
 ) {
 
-    val id: NumericId = header.id
+    val id: EntityId = header.id
     val name: String = header.name
     val start: LocalDate = header.period.start
     val end: LocalDate = header.period.endInclusive
