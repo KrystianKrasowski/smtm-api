@@ -10,7 +10,6 @@ import com.smtm.api.v1.PlanDto
 import com.smtm.api.v1.PlanHeaderDto
 import com.smtm.api.v1.PlanHeaderResource
 import com.smtm.api.v1.PlanResource
-import com.smtm.application.spring.endpoints.CategoriesEndpoint
 import com.smtm.application.spring.endpoints.PlanHeadersEndpoint
 import com.smtm.application.spring.endpoints.PlansEndpoint
 import com.smtm.core.api.PlanHeaders
@@ -74,7 +73,7 @@ object Plans {
     private fun Plan.Entry.toCategoryResource(linkFactory: LinkFactory): CategoryResource =
         CategoryResource(
             links = mapOf(
-                "self" to linkFactory.create("${CategoriesEndpoint.PATH}/${category.id.value}")
+                "self" to linkFactory.create("/categories/${category.id.value}")
             ),
             id = category.id.value,
             category = CategoryDto(
