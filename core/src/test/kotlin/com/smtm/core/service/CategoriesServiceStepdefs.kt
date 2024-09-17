@@ -24,8 +24,8 @@ class CategoriesServiceStepdefs(private val world: World) {
 
     }
 
-    @When("used deletes category of id {long}")
-    fun `used deletes category of id N`(id: Long) {
+    @When("used deletes category of id {string}")
+    fun `used deletes category of id N`(id: String) {
 
     }
 

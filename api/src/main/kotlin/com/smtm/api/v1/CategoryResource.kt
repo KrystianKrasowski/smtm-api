@@ -6,9 +6,9 @@ import com.smtm.api.Link
 
 data class CategoryResource(
     @JsonProperty("_links") override val links: Map<String, Link>,
-    @JsonProperty("id") override val id: Long,
+    @JsonProperty("id") override val id: String,
     private val category: CategoryDto
-) : HalResource<Long>(links, id) {
+) : HalResource<String>(links, id) {
 
     @JsonProperty("name") val name: String = category.name
     @JsonProperty("icon") val icon: String = category.icon

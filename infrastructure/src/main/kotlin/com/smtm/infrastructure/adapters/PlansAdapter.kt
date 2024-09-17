@@ -68,7 +68,7 @@ private fun List<FullPlanViewRecord>.toPlanOrNotFound(id: EntityId): Either<Plan
         entries = map {
             Plan.Entry(
                 category = Category(
-                    id = NumericId.of(it.categoryId),
+                    id = EntityId.of(it.categoryId),
                     name = it.categoryName,
                     icon = Icon.valueOfOrNull(it.categoryIcon) ?: Icon.FOLDER
                 ),

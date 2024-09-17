@@ -66,16 +66,16 @@ object Plans {
 
     private fun Plan.Entry.toEntryDto(): PlanDto.Entry =
         PlanDto.Entry(
-            categoryId = category.id.value,
+            categoryId = category.id.toString(),
             value = MoneyDto.of(value)
         )
 
     private fun Plan.Entry.toCategoryResource(linkFactory: LinkFactory): CategoryResource =
         CategoryResource(
             links = mapOf(
-                "self" to linkFactory.create("/categories/${category.id.value}")
+                "self" to linkFactory.create("/categories/${category.id}")
             ),
-            id = category.id.value,
+            id = category.id.toString(),
             category = CategoryDto(
                 name = category.name,
                 icon = category.icon.name

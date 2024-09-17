@@ -1,19 +1,21 @@
-CREATE TABLE CATEGORY_SETS (
-    OWNER_ID BIGINT PRIMARY KEY,
-    VERSION INTEGER NOT NULL DEFAULT 1
+CREATE TABLE category_sets
+(
+    owner_id bigint primary key,
+    version  integer not null default 1
 );
 
-CREATE TABLE CATEGORIES (
-    ID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    OWNER_ID BIGINT NOT NULL,
-    NAME VARCHAR(255) NOT NULL,
-    ICON VARCHAR(32) NOT NULL
+CREATE TABLE categories
+(
+    id       varchar primary key,
+    owner_id bigint       not null,
+    name     varchar(255) not null,
+    icon     varchar(32)  not null
 );
 
-CREATE UNIQUE INDEX UQ_CATEGORIES_OWNER_ID_NAME ON CATEGORIES (NAME);
+CREATE UNIQUE INDEX uq_categories_owner_id_name ON categories (name);
 
-ALTER TABLE CATEGORIES
-    ADD CONSTRAINT FK_CATEGORIES_CATEGORY_SETS
-    FOREIGN KEY (OWNER_ID)
-    REFERENCES CATEGORY_SETS (OWNER_ID)
-    ON DELETE CASCADE;
+ALTER TABLE categories
+    ADD CONSTRAINT fk_categories_category_sets
+        FOREIGN KEY (owner_id)
+            REFERENCES category_sets (owner_id)
+            ON DELETE CASCADE;

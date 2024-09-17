@@ -8,7 +8,6 @@ import assertk.assertions.isEqualTo
 import com.smtm.core.api.PlansQueries
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Icon
-import com.smtm.core.domain.NumericId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.categories.Category
 import com.smtm.core.domain.plans.Plan
@@ -20,6 +19,7 @@ import javax.sql.DataSource
 import org.javamoney.moneta.Money
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -34,25 +34,25 @@ class PlansAdapterTest {
     fun setUp() {
         dataSource.runSql("INSERT INTO category_sets (owner_id, version) VALUES (1, 1)")
         dataSource.runSql("""
-            INSERT INTO categories (owner_id, name, icon)
+            INSERT INTO categories (id, owner_id, name, icon)
             VALUES
-            (1, 'Rent', 'HOUSE'),
-            (1, 'Savings', 'PIGGY_BANK'),
-            (1, 'Groceries', 'SHOPPING_CART')
+            ('category-1', 1, 'Rent', 'HOUSE'),
+            ('category-2', 1, 'Savings', 'PIGGY_BANK'),
+            ('category-3', 1, 'Groceries', 'SHOPPING_CART')
         """.trimIndent())
         dataSource.runSql("""
             INSERT INTO plans (id, owner_id, version, name, start, "end") 
             VALUES 
-            ('smtm-plan-1', 1, 1, 'August 2024', '2024-08-01', '2024-08-31'),
-            ('smtm-plan-2', 1, 1, 'September 2024', '2024-09-01', '2024-09-30'),
-            ('smtm-plan-3', 1, 1, 'October 2024', '2024-10-01', '2024-10-31')
+            ('plan-1', 1, 1, 'August 2024', '2024-08-01', '2024-08-31'),
+            ('plan-2', 1, 1, 'September 2024', '2024-09-01', '2024-09-30'),
+            ('plan-3', 1, 1, 'October 2024', '2024-10-01', '2024-10-31')
         """.trimIndent())
         dataSource.runSql("""
             INSERT INTO plan_entries (plan_id, category_id, amount, currency)
             VALUES
-            ('smtm-plan-2', 1, 37959, 'PLN'),
-            ('smtm-plan-2', 2, 500000, 'PLN'),
-            ('smtm-plan-2', 3, 100000, 'PLN')
+            ('plan-2', 'category-1', 37959, 'PLN'),
+            ('plan-2', 'category-2', 500000, 'PLN'),
+            ('plan-2', 'category-3', 100000, 'PLN')
         """.trimIndent())
     }
 
@@ -60,8 +60,6 @@ class PlansAdapterTest {
     fun tearDown() {
         dataSource.runSql("DELETE FROM plans CASCADE")
         dataSource.runSql("DELETE FROM category_sets CASCADE")
-        dataSource.runSql("ALTER TABLE plan_entries ALTER COLUMN id RESTART WITH 1")
-        dataSource.runSql("ALTER TABLE categories ALTER COLUMN id RESTART WITH 1")
     }
 
     @ParameterizedTest
@@ -85,7 +83,7 @@ class PlansAdapterTest {
             .getOrElse { throw IllegalStateException("Expected to return success here", it) }
 
         assertThat(result).contains(
-            planDefinitionOf("smtm-plan-2", "September 2024", "2024-09-01", "2024-09-30")
+            planDefinitionOf("plan-2", "September 2024", "2024-09-01", "2024-09-30")
         )
     }
 
@@ -100,9 +98,9 @@ class PlansAdapterTest {
             .getOrElse { throw IllegalStateException("Expected to return success here", it) }
 
         assertThat(result).containsExactly(
-            planDefinitionOf("smtm-plan-3", "October 2024", "2024-10-01", "2024-10-31"),
-            planDefinitionOf("smtm-plan-2", "September 2024", "2024-09-01", "2024-09-30"),
-            planDefinitionOf("smtm-plan-1", "August 2024", "2024-08-01", "2024-08-31")
+            planDefinitionOf("plan-3", "October 2024", "2024-10-01", "2024-10-31"),
+            planDefinitionOf("plan-2", "September 2024", "2024-09-01", "2024-09-30"),
+            planDefinitionOf("plan-1", "August 2024", "2024-08-01", "2024-08-31")
         )
     }
 
@@ -110,17 +108,17 @@ class PlansAdapterTest {
     fun `should return owner's plan by id`() {
         // when
         val result = plansAdapter
-            .getPlan(EntityId.of("smtm-plan-2"), OwnerId.of(1L))
+            .getPlan(EntityId.of("plan-2"), OwnerId.of(1L))
             .getOrElse { error("Expected to return success here: $it") }
 
         // then
-        assertThat(result.id).isEqualTo(EntityId.of("smtm-plan-2"))
+        assertThat(result.id).isEqualTo(EntityId.of("plan-2"))
         assertThat(result.start).isEqualTo(LocalDate.parse("2024-09-01"))
         assertThat(result.end).isEqualTo(LocalDate.parse("2024-09-30"))
         assertThat(result.entries).containsExactly(
-            planEntryOf(categoryOf(1, "Rent", Icon.HOUSE), Money.of(379.59, "PLN")),
-            planEntryOf(categoryOf(2, "Savings", Icon.PIGGY_BANK), Money.of(5000, "PLN")),
-            planEntryOf(categoryOf(3, "Groceries", Icon.SHOPPING_CART), Money.of(1000, "PLN"))
+            planEntryOf(categoryOf("category-1", "Rent", Icon.HOUSE), Money.of(379.59, "PLN")),
+            planEntryOf(categoryOf("category-2", "Savings", Icon.PIGGY_BANK), Money.of(5000, "PLN")),
+            planEntryOf(categoryOf("category-3", "Groceries", Icon.SHOPPING_CART), Money.of(1000, "PLN"))
         )
     }
 }
@@ -138,9 +136,9 @@ private fun planEntryOf(category: Category, value: MonetaryAmount): Plan.Entry =
         value = value
     )
 
-private fun categoryOf(id: Long, name: String, icon: Icon): Category =
+private fun categoryOf(id: String, name: String, icon: Icon): Category =
     Category(
-        id = NumericId.of(id),
+        id = EntityId.of(id),
         name = name,
         icon = icon
     )

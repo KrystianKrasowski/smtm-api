@@ -9,7 +9,7 @@ data class PlanDto(
 ) {
 
     data class Entry(
-        @JsonProperty("category-id") val categoryId: Long,
+        @JsonProperty("category-id") val categoryId: String,
         @JsonProperty("value") val value: MoneyDto
     )
 }

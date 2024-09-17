@@ -1,8 +1,6 @@
 create table plans
 (
-    id       varchar           not null
-        constraint plans_pk
-            primary key,
+    id       varchar primary key,
     owner_id bigint            not null,
     version  integer default 1 not null,
     name     varchar           not null,
