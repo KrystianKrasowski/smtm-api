@@ -3,6 +3,7 @@ package com.smtm.application.spring.endpoints
 import arrow.core.getOrElse
 import com.smtm.api.LinkFactory
 import com.smtm.api.MediaType
+import com.smtm.api.ResourcePaths
 import com.smtm.api.v1.ApiProblemDto
 import com.smtm.api.v1.PlanDto
 import com.smtm.application.spring.conversions.Plans.toHalResource
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping(PlansEndpoint.PATH)
+@RequestMapping(ResourcePaths.PLANS)
 class PlansEndpoint(
     private val plansQueries: PlansQueries,
     private val ownerIdProvider: () -> OwnerId,
@@ -46,11 +47,6 @@ class PlansEndpoint(
             .status(201)
             .header("Location", "http://localhost:8080/plans/2")
             .build<Nothing>()
-
-    companion object {
-
-        const val PATH = "/plans"
-    }
 }
 
 private fun PlansProblem.toResponseEntity(): ResponseEntity<ApiProblemDto> =

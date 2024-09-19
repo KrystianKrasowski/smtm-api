@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled
 class CategoriesResourceTest {
 
     companion object {
@@ -33,15 +32,14 @@ class CategoriesResourceTest {
     @BeforeEach
     fun beforeEach() {
         Environment.runSql("INSERT INTO category_sets (owner_id, version) VALUES (1, 1)")
-        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Rent', 'HOUSE')")
-        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Savings', 'PIGGY_BANK')")
-        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Groceries', 'SHOPPING_CART')")
+        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('1', 1, 'Rent', 'HOUSE')")
+        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('2', 1, 'Savings', 'PIGGY_BANK')")
+        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('3', 1, 'Groceries', 'SHOPPING_CART')")
     }
 
     @AfterEach
     fun afterEach() {
         Environment.runSql("DELETE FROM category_sets CASCADE")
-        Environment.runSql("ALTER TABLE categories ALTER COLUMN id RESTART WITH 1")
     }
 
     @Test
@@ -60,21 +58,22 @@ class CategoriesResourceTest {
             body("total", equalTo(3))
             body("_embedded.categories", hasSize<Any>(3))
             body("_embedded.categories[0]._links.self.href", equalTo("http://localhost:8080/categories/1"))
-            body("_embedded.categories[0].id", equalTo(1))
+            body("_embedded.categories[0].id", equalTo("1"))
             body("_embedded.categories[0].name", equalTo("Rent"))
             body("_embedded.categories[0].icon", equalTo("HOUSE"))
             body("_embedded.categories[1]._links.self.href", equalTo("http://localhost:8080/categories/2"))
-            body("_embedded.categories[1].id", equalTo(2))
+            body("_embedded.categories[1].id", equalTo("2"))
             body("_embedded.categories[1].name", equalTo("Savings"))
             body("_embedded.categories[1].icon", equalTo("PIGGY_BANK"))
             body("_embedded.categories[2]._links.self.href", equalTo("http://localhost:8080/categories/3"))
-            body("_embedded.categories[2].id", equalTo(3))
+            body("_embedded.categories[2].id", equalTo("3"))
             body("_embedded.categories[2].name", equalTo("Groceries"))
             body("_embedded.categories[2].icon", equalTo("SHOPPING_CART"))
         }
     }
 
     @Test
+    @Disabled
     fun `should create new category`() {
         Given {
             port(8080)
@@ -94,6 +93,7 @@ class CategoriesResourceTest {
     }
 
     @Test
+    @Disabled
     fun `should return non unique constraint violation`() {
         Given {
             port(8080)
@@ -114,6 +114,7 @@ class CategoriesResourceTest {
     }
 
     @Test
+    @Disabled
     fun `should return invalid characters constraint violation for POST request`() {
         Given {
             port(8080)
@@ -135,6 +136,7 @@ class CategoriesResourceTest {
     }
 
     @Test
+    @Disabled
     fun `should update existing category`() {
         Given {
             port(8080)
@@ -154,6 +156,7 @@ class CategoriesResourceTest {
     }
 
     @Test
+    @Disabled
     fun `should return invalid characters constraint violation for PUT request`() {
         Given {
             port(8080)
