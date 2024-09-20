@@ -31,20 +31,20 @@ class PlansAdapterTest {
 
     @BeforeEach
     fun setUp() {
-        dataSource.runSql("INSERT INTO category_sets (owner_id, version) VALUES (1, 1)")
+        dataSource.runSql("INSERT INTO category_sets (owner_id, version) VALUES ('owner-1', 1)")
         dataSource.runSql("""
             INSERT INTO categories (id, owner_id, name, icon)
             VALUES
-            ('category-1', 1, 'Rent', 'HOUSE'),
-            ('category-2', 1, 'Savings', 'PIGGY_BANK'),
-            ('category-3', 1, 'Groceries', 'SHOPPING_CART')
+            ('category-1', 'owner-1', 'Rent', 'HOUSE'),
+            ('category-2', 'owner-1', 'Savings', 'PIGGY_BANK'),
+            ('category-3', 'owner-1', 'Groceries', 'SHOPPING_CART')
         """.trimIndent())
         dataSource.runSql("""
             INSERT INTO plans (id, owner_id, version, name, start, "end") 
             VALUES 
-            ('plan-1', 1, 1, 'August 2024', '2024-08-01', '2024-08-31'),
-            ('plan-2', 1, 1, 'September 2024', '2024-09-01', '2024-09-30'),
-            ('plan-3', 1, 1, 'October 2024', '2024-10-01', '2024-10-31')
+            ('plan-1', 'owner-1', 1, 'August 2024', '2024-08-01', '2024-08-31'),
+            ('plan-2', 'owner-1', 1, 'September 2024', '2024-09-01', '2024-09-30'),
+            ('plan-3', 'owner-1', 1, 'October 2024', '2024-10-01', '2024-10-31')
         """.trimIndent())
         dataSource.runSql("""
             INSERT INTO plan_entries (plan_id, category_id, amount, currency)
@@ -74,7 +74,7 @@ class PlansAdapterTest {
     fun `should return plans by matching date`(dateWithinPeriod: String) {
         // when
         val criteria = PlansQueries.Criteria.by(
-            owner = OwnerId(1),
+            owner = OwnerId.of("owner-1"),
             dateWithinPeriod = LocalDate.parse(dateWithinPeriod)
         )
         val result = plansAdapter
@@ -90,7 +90,7 @@ class PlansAdapterTest {
     fun `should return all owner's plans`() {
         // when
         val criteria = PlansQueries.Criteria.by(
-            owner = OwnerId(1)
+            owner = OwnerId.of("owner-1")
         )
         val result = plansAdapter
             .getPlanHeadersBy(criteria)
@@ -107,7 +107,7 @@ class PlansAdapterTest {
     fun `should return owner's plan by id`() {
         // when
         val result = plansAdapter
-            .getPlan(EntityId.of("plan-2"), OwnerId.of(1L))
+            .getPlan(EntityId.of("plan-2"), OwnerId.of("owner-1"))
             .getOrElse { error("Expected to return success here: $it") }
 
         // then

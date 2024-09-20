@@ -4,7 +4,6 @@ import com.smtm.api.LinkFactory
 import com.smtm.core.api.CategoriesApi
 import com.smtm.core.api.PlansQueries
 import com.smtm.core.domain.OwnerId
-import com.smtm.core.spi.CategoriesRepository
 import com.smtm.infrastructure.adapters.CategoriesRepositoryAdapter
 import com.smtm.infrastructure.adapters.PlansAdapter
 import javax.sql.DataSource
@@ -16,7 +15,7 @@ import java.time.Clock
 class ApplicationBeansConfiguration {
 
     @Bean
-    fun ownerIdProvider(): () -> OwnerId = { OwnerId.of(1) }
+    fun ownerIdProvider(): () -> OwnerId = { OwnerId.of("owner-1") }
 
     @Bean
     fun linkFactory(): LinkFactory =

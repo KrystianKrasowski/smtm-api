@@ -9,7 +9,7 @@ import java.time.LocalDate
 
 internal data class PlanRecord(
     val id: String,
-    val ownerId: Long,
+    val ownerId: String,
     val version: Int,
     val name: String,
     val start: LocalDate,
@@ -27,7 +27,7 @@ internal data class PlanRecord(
     companion object {
 
         fun selectByOwnerAndMatchingDate(
-            ownerId: Long,
+            ownerId: String,
             matchingDate: LocalDate,
             jdbc: JdbcOperations
         ): List<PlanRecord> =
@@ -37,7 +37,7 @@ internal data class PlanRecord(
                 ownerId, matchingDate
             )
 
-        fun selectByOwnerId(ownerId: Long, jdbc: JdbcOperations): List<PlanRecord> =
+        fun selectByOwnerId(ownerId: String, jdbc: JdbcOperations): List<PlanRecord> =
             jdbc.query(
                 """SELECT * FROM plans WHERE owner_id = ? ORDER BY "end" DESC""",
                 PlanRecordMapper(jdbc),
@@ -51,7 +51,7 @@ private class PlanRecordMapper(private val jdbc: JdbcOperations) : RowMapper<Pla
     override fun mapRow(rs: ResultSet, rowNum: Int): PlanRecord =
         PlanRecord(
             id = rs.getString("id"),
-            ownerId = rs.getLong("owner_id"),
+            ownerId = rs.getString("owner_id"),
             version = rs.getInt("version"),
             name = rs.getString("name"),
             start = rs.getTimestamp("start").toLocalDateTime().toLocalDate(),

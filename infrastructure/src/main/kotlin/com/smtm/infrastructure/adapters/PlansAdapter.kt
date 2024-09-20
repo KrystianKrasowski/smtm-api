@@ -35,7 +35,7 @@ class PlansAdapter(dataSource: DataSource) : PlansQueries {
             .getOrElse { PlansProblem.Failure(it).left() }
 
     private fun getOwnerPlanHeadersByMatchingDate(
-        ownerId: Long,
+        ownerId: String,
         matchingDate: LocalDate
     ): Either<Throwable, PlanHeaders> =
         PlanRecord.runCatching { selectByOwnerAndMatchingDate(ownerId, matchingDate, jdbc) }
@@ -43,7 +43,7 @@ class PlansAdapter(dataSource: DataSource) : PlansQueries {
             .map { it.right() }
             .getOrElse { it.left() }
 
-    private fun getAllOwnerPlanHeaders(ownerId: Long): Either<Throwable, PlanHeaders> =
+    private fun getAllOwnerPlanHeaders(ownerId: String): Either<Throwable, PlanHeaders> =
         PlanRecord.runCatching { selectByOwnerId(ownerId, jdbc) }
             .map { it.toPlanDefinitions() }
             .map { it.right() }

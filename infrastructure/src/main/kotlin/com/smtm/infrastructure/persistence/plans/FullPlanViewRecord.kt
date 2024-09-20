@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 internal data class FullPlanViewRecord(
     val planId: String,
-    val ownerId: Long,
+    val ownerId: String,
     val version: Int,
     val name: String,
     val start: LocalDate,
@@ -22,7 +22,7 @@ internal data class FullPlanViewRecord(
 
     companion object {
 
-        fun selectByIdAndOwner(id: String, ownerId: Long, jdbc: JdbcOperations): List<FullPlanViewRecord> =
+        fun selectByIdAndOwner(id: String, ownerId: String, jdbc: JdbcOperations): List<FullPlanViewRecord> =
             jdbc.query(
                 """
                     SELECT
@@ -54,7 +54,7 @@ private class RecordMapper(private val jdbc: JdbcOperations) : RowMapper<FullPla
     override fun mapRow(rs: ResultSet, rowNum: Int): FullPlanViewRecord =
         FullPlanViewRecord(
             planId = rs.getString("plan_id"),
-            ownerId = rs.getLong("owner_id"),
+            ownerId = rs.getString("owner_id"),
             version = rs.getInt("version"),
             name = rs.getString("name"),
             start = rs.getTimestamp("start").toLocalDateTime().toLocalDate(),

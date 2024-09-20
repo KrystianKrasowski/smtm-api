@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.RowMapper
 import java.sql.ResultSet
 
 internal data class CategorySetViewRecord(
-    val ownerId: Long,
+    val ownerId: String,
     val version: Int,
     val id: String?,
     val name: String?,
@@ -15,7 +15,7 @@ internal data class CategorySetViewRecord(
 
     companion object {
 
-        fun selectByOwnerId(ownerId: Long, jdbc: JdbcOperations): List<CategorySetViewRecord> =
+        fun selectByOwnerId(ownerId: String, jdbc: JdbcOperations): List<CategorySetViewRecord> =
             jdbc.query(
                 """
                 SELECT
@@ -38,7 +38,7 @@ private class CategorySetViewRecordMapper(private val jdbc: JdbcOperations) : Ro
 
     override fun mapRow(rs: ResultSet, rowNum: Int): CategorySetViewRecord =
         CategorySetViewRecord(
-            ownerId = rs.getLong("owner_id"),
+            ownerId = rs.getString("owner_id"),
             version = rs.getInt("version"),
             id = rs.getString("id"),
             name = rs.getString("name"),
