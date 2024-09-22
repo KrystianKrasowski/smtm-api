@@ -2,7 +2,7 @@ package com.smtm.core.domain.categories
 
 import com.smtm.core.domain.Violation
 
-interface CategoriesProblem {
+sealed interface CategoriesProblem {
 
     data class Failure(val throwable: Throwable) : CategoriesProblem
 

@@ -1,4 +1,5 @@
 apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.jpa'
 apply plugin: 'java-library'
 apply plugin: 'org.flywaydb.flyway'
 
@@ -9,6 +10,8 @@ dependencies {
     implementation "io.arrow-kt:arrow-fx-coroutines:$ARROW_VERSION"
     implementation "org.javamoney:moneta:$MONETA_VERSION"
     implementation "org.springframework:spring-jdbc:$SPRING_VERSION"
+    implementation "org.springframework.data:spring-data-jpa:$SPRING_DATA_VERSION"
+    implementation "jakarta.persistence:jakarta.persistence-api:$JPA_VERSION"
     implementation "org.postgresql:postgresql:$POSTGRES_VERSION"
     implementation "org.flywaydb:flyway-core:9.19.3"
     implementation "org.slf4j:slf4j-api:2.0.7"

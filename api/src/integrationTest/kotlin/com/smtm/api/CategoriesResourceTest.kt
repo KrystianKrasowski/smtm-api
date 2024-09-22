@@ -1,5 +1,6 @@
 package com.smtm.api
 
+import com.smtm.api.matchers.matchesNamedPattern
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
@@ -46,7 +47,6 @@ class CategoriesResourceTest {
     fun `should get all categories`() {
         Given {
             port(8080)
-            header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
             header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
@@ -74,32 +74,32 @@ class CategoriesResourceTest {
     }
 
     @Test
-    @Disabled
     fun `should create new category`() {
         Given {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
             body("""{"name": "Services", "icon": "LIGHTENING"}""")
             post("/categories")
         } Then {
             statusCode(201)
             header("Content-Type", "application/vnd.smtm.v1+json")
-            body("_links.self.href", equalTo("http://localhost:8080/categories/4"))
-            body("id", equalTo(4))
+            header("Location", matchesNamedPattern("^http://localhost:8080/categories/category-%uuid%$"))
+            body("_links.self.href", matchesNamedPattern("^http://localhost:8080/categories/category-%uuid%$"))
             body("name", equalTo("Services"))
             body("icon", equalTo("LIGHTENING"))
         }
     }
 
     @Test
-    @Disabled
     fun `should return non unique constraint violation`() {
         Given {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
             body("""{"name": "Rent", "icon": "HOUSE"}""")
             post("/categories")
@@ -115,12 +115,12 @@ class CategoriesResourceTest {
     }
 
     @Test
-    @Disabled
     fun `should return invalid characters constraint violation for POST request`() {
         Given {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
             body("""{"name": "Invalid <name>", "icon": "HOUSE"}""")
             post("/categories")

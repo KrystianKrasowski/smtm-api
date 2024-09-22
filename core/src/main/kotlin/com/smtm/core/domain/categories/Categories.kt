@@ -22,6 +22,9 @@ data class Categories(
         return actual.iterator()
     }
 
+    fun getByName(name: String): Category =
+        first { it.name == name }
+
     fun add(category: Category): Either<CategoriesProblem, Categories> =
         category
             .validate {
