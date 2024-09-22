@@ -29,28 +29,19 @@ class PlanHeadersResourceTest {
 
     @BeforeEach
     fun beforeEach() {
-        Environment.runSql("INSERT INTO category_sets (owner_id, version) VALUES (1, 1)")
-        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Rent', 'HOUSE')")
-        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Savings', 'PIGGY_BANK')")
-        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Groceries', 'SHOPPING_CART')")
-
         Environment.runSql("""
             INSERT INTO plans
-            (owner_id, version, name, start, "end") 
+            (id, owner_id, version, name, start, "end") 
             VALUES 
-            (1, 1, 'September 2024', '2024-09-01', '2024-09-30'),
-            (1, 1, 'October 2024', '2024-10-01', '2024-10-31'),
-            (1, 1, 'November 2024', '2024-11-01', '2024-11-30')
+            ('plan-1', 'owner-1', 1, 'September 2024', '2024-09-01', '2024-09-30'),
+            ('plan-2', 'owner-1', 1, 'October 2024', '2024-10-01', '2024-10-31'),
+            ('plan-3', 'owner-1', 1, 'November 2024', '2024-11-01', '2024-11-30')
         """.trimIndent())
     }
 
     @AfterEach
     fun afterEach() {
         Environment.runSql("DELETE FROM plans CASCADE")
-        Environment.runSql("DELETE FROM category_sets CASCADE")
-        Environment.runSql("ALTER TABLE plans ALTER COLUMN id RESTART WITH 1")
-        Environment.runSql("ALTER TABLE plan_entries ALTER COLUMN id RESTART WITH 1")
-        Environment.runSql("ALTER TABLE categories ALTER COLUMN id RESTART WITH 1")
     }
 
     @Test
@@ -59,6 +50,7 @@ class PlanHeadersResourceTest {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
             get("/plan-headers")
         } Then {
@@ -67,18 +59,18 @@ class PlanHeadersResourceTest {
             body("_links.self.href", equalTo("http://localhost:8080/plan-headers"))
             body("count", equalTo(3))
             body("total", equalTo(3))
-            body("_embedded.plan-headers[0]._links.self.href", equalTo("http://localhost:8080/plans/3"))
-            body("_embedded.plan-headers[0].id", equalTo(3))
+            body("_embedded.plan-headers[0]._links.self.href", equalTo("http://localhost:8080/plans/plan-3"))
+            body("_embedded.plan-headers[0].id", equalTo("plan-3"))
             body("_embedded.plan-headers[0].name", equalTo("November 2024"))
             body("_embedded.plan-headers[0].period.start", equalTo("2024-11-01"))
             body("_embedded.plan-headers[0].period.end", equalTo("2024-11-30"))
-            body("_embedded.plan-headers[1]._links.self.href", equalTo("http://localhost:8080/plans/2"))
-            body("_embedded.plan-headers[1].id", equalTo(2))
+            body("_embedded.plan-headers[1]._links.self.href", equalTo("http://localhost:8080/plans/plan-2"))
+            body("_embedded.plan-headers[1].id", equalTo("plan-2"))
             body("_embedded.plan-headers[1].name", equalTo("October 2024"))
             body("_embedded.plan-headers[1].period.start", equalTo("2024-10-01"))
             body("_embedded.plan-headers[1].period.end", equalTo("2024-10-31"))
-            body("_embedded.plan-headers[2]._links.self.href", equalTo("http://localhost:8080/plans/1"))
-            body("_embedded.plan-headers[2].id", equalTo(1))
+            body("_embedded.plan-headers[2]._links.self.href", equalTo("http://localhost:8080/plans/plan-1"))
+            body("_embedded.plan-headers[2].id", equalTo("plan-1"))
             body("_embedded.plan-headers[2].name", equalTo("September 2024"))
             body("_embedded.plan-headers[2].period.start", equalTo("2024-09-01"))
             body("_embedded.plan-headers[2].period.end", equalTo("2024-09-30"))
@@ -91,6 +83,7 @@ class PlanHeadersResourceTest {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
             queryParam("matching-date", "2024-09-14")
             get("/plan-headers")
@@ -100,8 +93,8 @@ class PlanHeadersResourceTest {
             body("_links.self.href", equalTo("http://localhost:8080/plan-headers"))
             body("count", equalTo(1))
             body("total", equalTo(1))
-            body("_embedded.plan-headers[0]._links.self.href", equalTo("http://localhost:8080/plans/1"))
-            body("_embedded.plan-headers[0].id", equalTo(1))
+            body("_embedded.plan-headers[0]._links.self.href", equalTo("http://localhost:8080/plans/plan-1"))
+            body("_embedded.plan-headers[0].id", equalTo("plan-1"))
             body("_embedded.plan-headers[0].name", equalTo("September 2024"))
             body("_embedded.plan-headers[0].period.start", equalTo("2024-09-01"))
             body("_embedded.plan-headers[0].period.end", equalTo("2024-09-30"))
