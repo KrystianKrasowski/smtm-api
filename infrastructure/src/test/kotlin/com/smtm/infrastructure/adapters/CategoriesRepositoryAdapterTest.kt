@@ -20,18 +20,20 @@ import org.junit.jupiter.api.Test
 class CategoriesRepositoryAdapterTest {
 
     private val dataSource: DataSource = TestDatabase.setup()
-    private val adapter get() = CategoriesRepositoryAdapter(dataSource)
+    private var ownerIdProvider: () -> OwnerId = { OwnerId.of("owner-1") }
+
+    private val adapter get() = CategoriesRepositoryAdapter(dataSource, ownerIdProvider)
 
     @BeforeEach
     fun setUp() {
-        dataSource.runSql("INSERT INTO category_sets (owner_id, version) VALUES (1, 23)")
+        dataSource.runSql("INSERT INTO category_sets (owner_id, version) VALUES ('owner-1', 23)")
         dataSource.runSql(
             """
             INSERT INTO categories (id, owner_id, name, icon)
             VALUES
-            ('category-1', 1, 'Rent', 'HOUSE'),
-            ('category-2', 1, 'Savings', 'PIGGY_BANK'),
-            ('category-3', 1, 'Groceries', 'SHOPPING_CART')
+            ('category-1', 'owner-1', 'Rent', 'HOUSE'),
+            ('category-2', 'owner-1', 'Savings', 'PIGGY_BANK'),
+            ('category-3', 'owner-1', 'Groceries', 'SHOPPING_CART')
         """.trimIndent()
         )
     }
@@ -45,11 +47,11 @@ class CategoriesRepositoryAdapterTest {
     @Test
     fun `should return categories for owner`() {
         // when
-        val categories = adapter.getCategories(OwnerId.of(1))
+        val categories = adapter.getCategories()
             .getOrElse { error("Should return categories in this case") }
 
         // then
-        assertThat(categories.id).isEqualTo(OwnerId.of(1))
+        assertThat(categories.id).isEqualTo(OwnerId.of("owner-1"))
         assertThat(categories.version).isEqualTo(Version.of(23))
         assertThat(categories).containsExactlyInAnyOrder(
             categoryOf("category-1", "Rent", "HOUSE"),
@@ -60,12 +62,15 @@ class CategoriesRepositoryAdapterTest {
 
     @Test
     fun `should return empty categories`() {
+        // given
+        ownerIdProvider = { OwnerId.of("owner-99") }
+
         // when
-        val categories = adapter.getCategories(OwnerId.of(99))
+        val categories = adapter.getCategories()
             .getOrElse { error("Should return categories in this case") }
 
         // then
-        assertThat(categories.id).isEqualTo(OwnerId.of(99))
+        assertThat(categories.id).isEqualTo(OwnerId.of("owner-99"))
         assertThat(categories.version).isEqualTo(Version.of(0))
         assertThat(categories).isEmpty()
     }

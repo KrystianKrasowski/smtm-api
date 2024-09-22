@@ -29,6 +29,7 @@ dependencies {
     integrationTestImplementation "org.testcontainers:testcontainers:$TEST_CONTAINERS_VERSION"
     integrationTestImplementation "org.testcontainers:junit-jupiter:$TEST_CONTAINERS_VERSION"
     integrationTestImplementation "org.testcontainers:postgresql:$TEST_CONTAINERS_VERSION"
+    integrationTestImplementation "com.tngtech.keycloakmock:mock:0.16.0"
 
     integrationTestRuntimeOnly "org.postgresql:postgresql:$POSTGRES_VERSION"
 }

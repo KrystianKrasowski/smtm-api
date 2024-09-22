@@ -31,10 +31,10 @@ class CategoriesResourceTest {
 
     @BeforeEach
     fun beforeEach() {
-        Environment.runSql("INSERT INTO category_sets (owner_id, version) VALUES (1, 1)")
-        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('1', 1, 'Rent', 'HOUSE')")
-        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('2', 1, 'Savings', 'PIGGY_BANK')")
-        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('3', 1, 'Groceries', 'SHOPPING_CART')")
+        Environment.runSql("INSERT INTO category_sets (owner_id, version) VALUES ('owner-1', 1)")
+        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('1', 'owner-1', 'Rent', 'HOUSE')")
+        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('2', 'owner-1', 'Savings', 'PIGGY_BANK')")
+        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('3', 'owner-1', 'Groceries', 'SHOPPING_CART')")
     }
 
     @AfterEach
@@ -48,6 +48,7 @@ class CategoriesResourceTest {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
             get("/categories")
         } Then {

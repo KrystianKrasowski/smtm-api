@@ -1,5 +1,3 @@
-version: '3.1'
-
 services:
   db:
     image: postgres:15.3
@@ -30,5 +28,6 @@ services:
       DB_PASSWORD: "${DB_PASSWORD}"
       CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS}"
       CORS_ALLOWED_METHODS: "${CORS_ALLOWED_METHODS}"
+      OAUTH_ISSUER_URI: "${OAUTH_ISSUER_URI}"
 volumes:
   storage:

@@ -4,5 +4,5 @@ import com.smtm.core.domain.OwnerId
 
 class World {
 
-    var ownerId = OwnerId.of(1)
+    var ownerId = OwnerId.of("1")
 }

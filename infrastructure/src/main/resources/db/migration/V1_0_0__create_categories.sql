@@ -1,13 +1,13 @@
 CREATE TABLE category_sets
 (
-    owner_id bigint primary key,
+    owner_id varchar primary key,
     version  integer not null default 1
 );
 
 CREATE TABLE categories
 (
     id       varchar primary key,
-    owner_id bigint       not null,
+    owner_id varchar       not null,
     name     varchar(255) not null,
     icon     varchar(32)  not null
 );

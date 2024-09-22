@@ -16,15 +16,16 @@ import javax.sql.DataSource
 import org.springframework.jdbc.core.JdbcTemplate
 
 class CategoriesRepositoryAdapter(
-    dataSource: DataSource
+    dataSource: DataSource,
+    private val ownerIdProvider: () -> OwnerId,
 ) : CategoriesRepository {
 
     private val jdbc = JdbcTemplate(dataSource)
 
-    override fun getCategories(ownerId: OwnerId): Either<CategoriesProblem, Categories> {
+    override fun getCategories(): Either<CategoriesProblem, Categories> {
         return CategorySetViewRecord
-            .runCatching { selectByOwnerId(ownerId.value, jdbc) }
-            .map { it.toCategories(ownerId) }
+            .runCatching { selectByOwnerId(ownerIdProvider().value, jdbc) }
+            .map { it.toCategories(ownerIdProvider()) }
             .map { it.right() }
             .getOrElse { CategoriesProblem.failure(it).left() }
     }
