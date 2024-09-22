@@ -48,6 +48,7 @@ class CategoriesResourceTest {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
             get("/categories")
         } Then {
