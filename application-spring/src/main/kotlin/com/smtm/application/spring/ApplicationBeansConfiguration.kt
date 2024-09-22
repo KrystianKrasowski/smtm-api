@@ -9,13 +9,15 @@ import com.smtm.infrastructure.adapters.PlansAdapter
 import javax.sql.DataSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.core.context.SecurityContextHolder
 import java.time.Clock
 
 @Configuration
 class ApplicationBeansConfiguration {
 
     @Bean
-    fun ownerIdProvider(): () -> OwnerId = { OwnerId.of("owner-1") }
+    fun ownerIdProvider(): () -> OwnerId =
+        { SecurityContextHolder.getContext().authentication.name.let { OwnerId.of(it) } }
 
     @Bean
     fun linkFactory(): LinkFactory =
@@ -35,8 +37,11 @@ class ApplicationBeansConfiguration {
 
     // Adapters
     @Bean
-    fun categoriesRepositoryAdapter(dataSource: DataSource): CategoriesRepositoryAdapter =
-        CategoriesRepositoryAdapter(dataSource)
+    fun categoriesRepositoryAdapter(
+        dataSource: DataSource,
+        ownerIdProvider: () -> OwnerId
+    ): CategoriesRepositoryAdapter =
+        CategoriesRepositoryAdapter(dataSource, ownerIdProvider)
 
     @Bean
     fun plansAdapter(dataSource: DataSource): PlansAdapter =

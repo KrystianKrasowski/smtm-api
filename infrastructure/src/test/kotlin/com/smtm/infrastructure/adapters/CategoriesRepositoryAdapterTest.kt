@@ -20,7 +20,9 @@ import org.junit.jupiter.api.Test
 class CategoriesRepositoryAdapterTest {
 
     private val dataSource: DataSource = TestDatabase.setup()
-    private val adapter get() = CategoriesRepositoryAdapter(dataSource)
+    private var ownerIdProvider: () -> OwnerId = { OwnerId.of("owner-1") }
+
+    private val adapter get() = CategoriesRepositoryAdapter(dataSource, ownerIdProvider)
 
     @BeforeEach
     fun setUp() {
@@ -45,7 +47,7 @@ class CategoriesRepositoryAdapterTest {
     @Test
     fun `should return categories for owner`() {
         // when
-        val categories = adapter.getCategories(OwnerId.of("owner-1"))
+        val categories = adapter.getCategories()
             .getOrElse { error("Should return categories in this case") }
 
         // then
@@ -60,8 +62,11 @@ class CategoriesRepositoryAdapterTest {
 
     @Test
     fun `should return empty categories`() {
+        // given
+        ownerIdProvider = { OwnerId.of("owner-99") }
+
         // when
-        val categories = adapter.getCategories(OwnerId.of("owner-99"))
+        val categories = adapter.getCategories()
             .getOrElse { error("Should return categories in this case") }
 
         // then

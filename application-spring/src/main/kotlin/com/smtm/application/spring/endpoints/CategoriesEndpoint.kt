@@ -6,10 +6,8 @@ import com.smtm.api.MediaType
 import com.smtm.api.ResourcePaths
 import com.smtm.api.v1.ApiProblemDto
 import com.smtm.application.spring.conversions.CategoriesConversions.toHalCollection
-import com.smtm.application.spring.conversions.Owner.toOwnerId
 import com.smtm.core.api.CategoriesApi
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -25,8 +23,8 @@ class CategoriesEndpoint(
         consumes = [MediaType.VERSION_1_JSON],
         produces = [MediaType.VERSION_1_JSON]
     )
-    fun getAll(authentication: Authentication): ResponseEntity<*> =
-        categoriesApi.getAll(authentication.toOwnerId())
+    fun getAll(): ResponseEntity<*> =
+        categoriesApi.getAll()
             .map { it.toHalCollection(linkFactory) }
             .map { ResponseEntity.ok(it) }
             .getOrElse {
