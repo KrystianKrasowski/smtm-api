@@ -1,50 +1,20 @@
-apply plugin: 'org.jetbrains.kotlin.jvm'
-apply plugin: 'java-library'
-
-sourceSets {
-    integrationTest {
-        kotlin.srcDir 'src/integrationTest/kotlin'
-        resources.srcDir 'src/integrationTest/resources'
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-    }
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.8.21'
 }
 
-configurations {
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+group = 'com.smtm.api'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-reflect'
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_VERSION"
-    implementation "org.javamoney:moneta:$MONETA_VERSION"
-
-    testImplementation "org.junit.jupiter:junit-jupiter:$JUNIT5_VERSION"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:$JUNIT5_VERSION"
-
-    integrationTestImplementation 'io.rest-assured:rest-assured:5.5.0'
-    integrationTestImplementation 'io.rest-assured:json-path:5.5.0'
-    integrationTestImplementation 'io.rest-assured:kotlin-extensions:5.5.0'
-    integrationTestImplementation "org.testcontainers:testcontainers:$TEST_CONTAINERS_VERSION"
-    integrationTestImplementation "org.testcontainers:junit-jupiter:$TEST_CONTAINERS_VERSION"
-    integrationTestImplementation "org.testcontainers:postgresql:$TEST_CONTAINERS_VERSION"
-    integrationTestImplementation "com.tngtech.keycloakmock:mock:0.16.0"
-
-    integrationTestRuntimeOnly "org.postgresql:postgresql:$POSTGRES_VERSION"
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
 }
 
 test {
     useJUnitPlatform()
 }
-
-tasks.register('integrationTest', Test) {
-    description 'Runs the integration tests.'
-    group 'verification'
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    shouldRunAfter test
-    useJUnitPlatform()
-}
-
-//check.dependsOn integrationTest
