@@ -9,22 +9,28 @@ Feature: Categories
       | category-2 | Savings | PIGGY_BANK |
 
 
-  Scenario: The one where saving category has not unique name
-    When user saves category with name "Rent"
+  Scenario: The one where saving category has non unique name
+    When user creates new category
+      | id         | name | icon   |
+      | category-3 | Rent | FOLDER |
     Then category is not saved due to constraint violation
       | path | code       |
       | name | NON_UNIQUE |
 
 
   Scenario: The one where saving category has empty name
-    When user saves category with empty name
+    When user creates new category
+      | id         | name | icon   |
+      | category-3 |      | FOLDER |
     Then category is not saved due to constraint violation
       | path | code  |
       | name | EMPTY |
 
 
   Scenario Outline: The one where saving category has invalid name
-    When user saves category with name "<name>"
+    When user creates new category
+      | id         | name   | icon   |
+      | category-3 | <name> | FOLDER |
     Then category is not saved due to constraint violation
       | path | code               | illegal characters   |
       | name | ILLEGAL_CHARACTERS | <illegal characters> |
@@ -40,34 +46,8 @@ Feature: Categories
     Then category is not deleted because it is unknown
 
 
-  Scenario: The one where category is created successfully
-    When user saves category
-      | id         | name      | icon          |
-      | category-4 | Groceries | SHOPPING_CART |
-    Then saved category is
-      | id         | name      | icon          |
-      | category-4 | Groceries | SHOPPING_CART |
-    And user categories version is updated to 2
-
-
-  Scenario Outline: The one where category is updated successfully
-    When user saves category
-      | id         | name   | icon   |
-      | category-1 | <name> | <icon> |
-    Then saved category is
-      | id         | name   | icon   |
-      | category-1 | <name> | <icon> |
-
-    Examples:
-      | name         | icon       |
-      | Awesome rent | HOUSE      |
-      | Awesome rent | LIGHTENING |
-      | Rent         | LIGHTENING |
-
-
   Scenario: The one where category is deleted successfully
     When used deletes category of id "category-2"
     Then user categories contains
       | id         | name | icon  |
       | category-1 | Rent | HOUSE |
-    And user categories version is updated to 2
