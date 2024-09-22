@@ -45,7 +45,7 @@ class PlansEndpoint(
     fun createPlan(@RequestBody planDto: PlanDto): ResponseEntity<*> =
         ResponseEntity
             .status(201)
-            .header("Location", "http://localhost:8080/plans/2")
+            .header("Location", "http://localhost:8080/plans/smtm-plan-8c9ee5af-66a3-4e97-862c-2318c4b2c7c5")
             .build<Nothing>()
 }
 

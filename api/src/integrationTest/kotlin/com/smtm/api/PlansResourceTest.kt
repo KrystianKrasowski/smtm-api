@@ -1,5 +1,6 @@
 package com.smtm.api
 
+import com.smtm.api.matchers.matchesNamedPattern
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
@@ -30,17 +31,17 @@ class PlansResourceTest {
 
     @BeforeEach
     fun beforeEach() {
-        Environment.runSql("INSERT INTO category_sets (owner_id, version) VALUES (1, 1)")
-        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Rent', 'HOUSE')")
-        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Savings', 'PIGGY_BANK')")
-        Environment.runSql("INSERT INTO categories (owner_id, name, icon) VALUES (1, 'Groceries', 'SHOPPING_CART')")
+        Environment.runSql("INSERT INTO category_sets (owner_id, version) VALUES ('owner-1', 1)")
+        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('smtm-cat-1', 'owner-1', 'Rent', 'HOUSE')")
+        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('smtm-cat-2', 'owner-1', 'Savings', 'PIGGY_BANK')")
+        Environment.runSql("INSERT INTO categories (id, owner_id, name, icon) VALUES ('smtm-cat-3', 'owner-1', 'Groceries', 'SHOPPING_CART')")
 
         Environment.runSql(
             """
             INSERT INTO plans
             (id, owner_id, version, name, start, "end") 
             VALUES 
-            ('smtm-plan-1', 1, 1, 'September 2024', '2024-09-01', '2024-09-30')
+            ('smtm-plan-1', 'owner-1', 1, 'September 2024', '2024-09-01', '2024-09-30')
         """.trimIndent()
         )
 
@@ -49,9 +50,9 @@ class PlansResourceTest {
             INSERT INTO plan_entries 
             (plan_id, category_id, amount, currency)
             VALUES
-            ('smtm-plan-1', 1, 37959, 'PLN'),
-            ('smtm-plan-1', 2, 500000, 'PLN'),
-            ('smtm-plan-1', 3, 100000, 'PLN')
+            ('smtm-plan-1', 'smtm-cat-1', 37959, 'PLN'),
+            ('smtm-plan-1', 'smtm-cat-2', 500000, 'PLN'),
+            ('smtm-plan-1', 'smtm-cat-3', 100000, 'PLN')
         """.trimIndent()
         )
     }
@@ -60,8 +61,6 @@ class PlansResourceTest {
     fun afterEach() {
         Environment.runSql("DELETE FROM plans CASCADE")
         Environment.runSql("DELETE FROM category_sets CASCADE")
-        Environment.runSql("ALTER TABLE plan_entries ALTER COLUMN id RESTART WITH 1")
-        Environment.runSql("ALTER TABLE categories ALTER COLUMN id RESTART WITH 1")
     }
 
     @Test
@@ -70,6 +69,7 @@ class PlansResourceTest {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
             get("/plans/smtm-plan-1")
         } Then {
@@ -79,25 +79,25 @@ class PlansResourceTest {
             body("name", equalTo("September 2024"))
             body("period.start", equalTo("2024-09-01"))
             body("period.end", equalTo("2024-09-30"))
-            body("entries[0].category-id", equalTo(1))
+            body("entries[0].category-id", equalTo("smtm-cat-1"))
             body("entries[0].value.amount", equalTo(37959))
             body("entries[0].value.currency", equalTo("PLN"))
-            body("entries[1].category-id", equalTo(2))
+            body("entries[1].category-id", equalTo("smtm-cat-2"))
             body("entries[1].value.amount", equalTo(500000))
             body("entries[1].value.currency", equalTo("PLN"))
-            body("entries[2].category-id", equalTo(3))
+            body("entries[2].category-id", equalTo("smtm-cat-3"))
             body("entries[2].value.amount", equalTo(100000))
             body("entries[2].value.currency", equalTo("PLN"))
-            body("_embedded.categories[0]._links.self.href", equalTo("http://localhost:8080/categories/1"))
-            body("_embedded.categories[0].id", equalTo(1))
+            body("_embedded.categories[0]._links.self.href", equalTo("http://localhost:8080/categories/smtm-cat-1"))
+            body("_embedded.categories[0].id", equalTo("smtm-cat-1"))
             body("_embedded.categories[0].name", equalTo("Rent"))
             body("_embedded.categories[0].icon", equalTo("HOUSE"))
-            body("_embedded.categories[1]._links.self.href", equalTo("http://localhost:8080/categories/2"))
-            body("_embedded.categories[1].id", equalTo(2))
+            body("_embedded.categories[1]._links.self.href", equalTo("http://localhost:8080/categories/smtm-cat-2"))
+            body("_embedded.categories[1].id", equalTo("smtm-cat-2"))
             body("_embedded.categories[1].name", equalTo("Savings"))
             body("_embedded.categories[1].icon", equalTo("PIGGY_BANK"))
-            body("_embedded.categories[2]._links.self.href", equalTo("http://localhost:8080/categories/3"))
-            body("_embedded.categories[2].id", equalTo(3))
+            body("_embedded.categories[2]._links.self.href", equalTo("http://localhost:8080/categories/smtm-cat-3"))
+            body("_embedded.categories[2].id", equalTo("smtm-cat-3"))
             body("_embedded.categories[2].name", equalTo("Groceries"))
             body("_embedded.categories[2].icon", equalTo("SHOPPING_CART"))
         }
@@ -109,6 +109,7 @@ class PlansResourceTest {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {
             get("/plans/99")
         } Then {
@@ -125,6 +126,7 @@ class PlansResourceTest {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
             body(
                 """
                 {
@@ -135,21 +137,21 @@ class PlansResourceTest {
                     },
                     "entries": [
                         {
-                            "category-id": 1,
+                            "category-id": "smtm-cat-1",
                             "value": {
                                 "amount": 37959,
                                 "currency": "PLN"
                             }
                         },
                         {
-                            "category-id": 2,
+                            "category-id": "smtm-cat-2",
                             "value": {
                                 "amount": 600000,
                                 "currency": "PLN"
                             }
                         },
                         {
-                            "category-id": 3,
+                            "category-id": "smtm-cat-3",
                             "value": {
                                 "amount": 100000,
                                 "currency": "PLN"
@@ -163,7 +165,7 @@ class PlansResourceTest {
             post("/plans")
         } Then {
             statusCode(201)
-            header("Location", "http://localhost:8080/plans/2")
+            header("Location", matchesNamedPattern("^http://localhost:8080/plans/smtm-plan-%uuid%$"))
         }
     }
 
