@@ -1,12 +1,24 @@
 package com.smtm.core.domain.categories
 
-interface CategoriesProblem {
+import com.smtm.core.domain.Violation
+
+sealed interface CategoriesProblem {
 
     data class Failure(val throwable: Throwable) : CategoriesProblem
 
+    data class ValidationErrors(val violations: Collection<Violation>): CategoriesProblem, Iterable<Violation> {
+
+        override fun iterator(): Iterator<Violation> {
+            return violations.iterator()
+        }
+    }
+
     companion object {
 
-        fun failure(throwable: Throwable): Failure =
+        fun failure(throwable: Throwable): CategoriesProblem =
             Failure(throwable)
+
+        fun validationError(violations: Collection<Violation>): CategoriesProblem =
+            ValidationErrors(violations)
     }
 }

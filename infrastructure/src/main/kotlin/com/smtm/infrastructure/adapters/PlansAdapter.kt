@@ -7,7 +7,6 @@ import com.smtm.core.api.PlanHeaders
 import com.smtm.core.api.PlansQueries
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Icon
-import com.smtm.core.domain.NumericId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.categories.Category
 import com.smtm.core.domain.plans.Plan

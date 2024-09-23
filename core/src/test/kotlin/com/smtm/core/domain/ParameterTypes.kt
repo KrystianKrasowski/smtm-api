@@ -10,7 +10,7 @@ class ParameterTypes {
     @DataTableType
     fun constraintViolation(entry: Map<String, String>): Violation {
         return Violation(
-            path = violationPathOf(entry.getValue("path")),
+            path = Violation.path(entry.getValue("path")),
             code = Violation.Code.valueOf(entry.getValue("code")),
             parameters = entry.extractParameters().toMap()
         )

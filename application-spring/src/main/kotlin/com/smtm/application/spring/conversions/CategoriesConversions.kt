@@ -22,7 +22,7 @@ object CategoriesConversions {
             )
         )
 
-    private fun Category.toResource(linkFactory: LinkFactory): CategoryResource =
+    fun Category.toResource(linkFactory: LinkFactory): CategoryResource =
         CategoryResource(
             links = mapOf(
                 "self" to linkFactory.create("${ResourcePaths.CATEGORIES}/$id")

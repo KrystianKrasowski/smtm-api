@@ -14,29 +14,31 @@ data class Violation(val path: Path, val code: Code, val parameters: Map<String,
         NON_UNIQUE,
         UNKNOWN
     }
+
+    companion object {
+
+        fun path(path: String): Path =
+            Path(path)
+
+        fun empty(path: Path): Violation =
+            Violation(path, Code.EMPTY)
+
+        fun empty(path: String): Violation =
+            Violation(path(path), Code.EMPTY)
+
+        fun nonUnique(path: String): Violation =
+            Violation(path(path), Code.NON_UNIQUE)
+
+        fun illegalCharacters(path: String, illegalCharacters: CharArray): Violation =
+            Violation(
+                path = path(path),
+                code = Code.ILLEGAL_CHARACTERS,
+                parameters = mapOf(
+                    "illegal-characters" to illegalCharacters.joinToString(", ")
+                )
+            )
+
+        fun unknown(path: Path): Violation =
+            Violation(path, Code.UNKNOWN)
+    }
 }
-
-fun violationPathOf(path: String) = Violation.Path(path)
-
-fun emptyViolationOf(path: Violation.Path) = Violation(
-    path = path,
-    code = Violation.Code.EMPTY
-)
-
-fun nonUniqueViolationOf(path: Violation.Path) = Violation(
-    path = path,
-    code = Violation.Code.NON_UNIQUE
-)
-
-fun illegalCharactersViolationOf(path: Violation.Path, illegalCharacters: CharArray) = Violation(
-    path = path,
-    code = Violation.Code.ILLEGAL_CHARACTERS,
-    parameters = mapOf(
-        "illegal-characters" to illegalCharacters.joinToString(", ")
-    )
-)
-
-fun unknownViolationOf(path: Violation.Path) = Violation(
-    path = path,
-    code = Violation.Code.UNKNOWN
-)
