@@ -2,6 +2,7 @@ package com.smtm.core.service
 
 import assertk.assertThat
 import assertk.assertions.containsAtLeast
+import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import com.smtm.core.World
@@ -26,6 +27,13 @@ class CategoriesServiceStepdefs(private val world: World) {
             .onLeft { problem = it }
     }
 
+    @When("user updates the category")
+    fun `user updates the category`(category: Category) {
+        categoriesService.update(category)
+            .onRight { categories = it }
+            .onLeft { problem = it }
+    }
+
     @When("used deletes category of id {string}")
     fun `used deletes category of id N`(id: String) {
 
@@ -39,12 +47,17 @@ class CategoriesServiceStepdefs(private val world: World) {
             .containsAtLeast(violation)
     }
 
-    @Then("category is not deleted because it is unknown")
-    fun `category is not deleted because it is unknown`() {
+    @Then("unknown category problem occurs")
+    fun `unknown category problem occurs`() {
+        assertThat(problem)
+            .isNotNull()
+            .isInstanceOf(CategoriesProblem.Unknown::class)
     }
 
     @Then("user categories contains")
-    fun `user categories contains`(categories: List<Category>) {
+    fun `user categories contains`(categoryList: List<Category>) {
+        assertThat(categories)
+            .isNotNull()
+            .containsExactlyInAnyOrder(*(categoryList.toTypedArray()))
     }
-
 }

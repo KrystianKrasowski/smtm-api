@@ -20,4 +20,10 @@ internal class CategoriesService(
             .getCategories()
             .flatMap { it.add(category) }
             .flatMap { categoriesRepository.save(it) }
+
+    override fun update(category: Category): Either<CategoriesProblem, Categories> =
+        categoriesRepository
+            .getCategories()
+            .flatMap { it.replace(category) }
+            .flatMap { categoriesRepository.save(it) }
 }

@@ -13,6 +13,8 @@ sealed interface CategoriesProblem {
         }
     }
 
+    data class Unknown(val category: Category): CategoriesProblem
+
     companion object {
 
         fun failure(throwable: Throwable): CategoriesProblem =
@@ -20,5 +22,8 @@ sealed interface CategoriesProblem {
 
         fun validationError(violations: Collection<Violation>): CategoriesProblem =
             ValidationErrors(violations)
+
+        fun unknown(category: Category): CategoriesProblem =
+            Unknown(category)
     }
 }

@@ -13,6 +13,8 @@ interface CategoriesApi {
 
     fun create(category: Category): Either<CategoriesProblem, Categories>
 
+    fun update(category: Category): Either<CategoriesProblem, Categories>
+
     companion object {
 
         fun of(repository: CategoriesRepository): CategoriesApi =

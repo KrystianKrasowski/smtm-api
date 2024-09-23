@@ -10,7 +10,6 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class CategoriesResourceTest {
@@ -80,8 +79,8 @@ class CategoriesResourceTest {
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
             header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
-        } When {
             body("""{"name": "Services", "icon": "LIGHTENING"}""")
+        } When {
             post("/categories")
         } Then {
             statusCode(201)
@@ -100,8 +99,8 @@ class CategoriesResourceTest {
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
             header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
-        } When {
             body("""{"name": "Rent", "icon": "HOUSE"}""")
+        } When {
             post("/categories")
         } Then {
             statusCode(422)
@@ -121,8 +120,8 @@ class CategoriesResourceTest {
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
             header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
-        } When {
             body("""{"name": "Invalid <name>", "icon": "HOUSE"}""")
+        } When {
             post("/categories")
         } Then {
             statusCode(422)
@@ -137,34 +136,33 @@ class CategoriesResourceTest {
     }
 
     @Test
-    @Disabled
     fun `should update existing category`() {
         Given {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
-        } When {
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
             body("""{"name": "My rent", "icon": "FOLDER"}""")
+        } When {
             put("/categories/1")
         } Then {
             statusCode(200)
             header("Content-Type", "application/vnd.smtm.v1+json")
             body("_links.self.href", equalTo("http://localhost:8080/categories/1"))
-            body("id", equalTo(1))
             body("name", equalTo("My rent"))
             body("icon", equalTo("FOLDER"))
         }
     }
 
     @Test
-    @Disabled
     fun `should return invalid characters constraint violation for PUT request`() {
         Given {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
-        } When {
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
             body("""{"name": "Invalid <name>", "icon": "HOUSE"}""")
+        } When {
             put("/categories/1")
         } Then {
             statusCode(422)
