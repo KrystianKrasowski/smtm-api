@@ -92,6 +92,13 @@ Feature: Categories
     Then unknown category problem occurs
 
 
-#  Scenario: The one where deleting category does not exist
-#    When used deletes category of id "category-3"
-#    Then unknown category problem occurs
+  Scenario: The one where category is deleted
+    When user deletes category of id "category-2"
+    Then user categories contains
+      | id         | name      | icon          |
+      | category-1 | Rent      | HOUSE         |
+
+
+  Scenario: The one where deleting category does not exist
+    When user deletes category of id "category-3"
+    Then unknown category problem occurs

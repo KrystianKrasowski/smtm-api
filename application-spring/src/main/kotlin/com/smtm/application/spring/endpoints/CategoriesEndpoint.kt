@@ -16,6 +16,7 @@ import com.smtm.core.domain.categories.CategoriesProblem
 import com.smtm.core.domain.categories.Category
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -59,6 +60,13 @@ class CategoriesEndpoint(
             .map { it.getByName(categoryDto.name) }
             .map { it.toResource(linkFactory) }
             .map { ResponseEntity.ok(it) }
+            .getOrElse { handleProblem(it) }
+
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable("id") id: String): ResponseEntity<*> =
+        categoriesApi
+            .delete(EntityId.of(id))
+            .map { ResponseEntity.status(HttpStatus.NO_CONTENT).build<Nothing>() }
             .getOrElse { handleProblem(it) }
 }
 

@@ -155,6 +155,24 @@ class CategoriesResourceTest {
     }
 
     @Test
+    fun `should return 404 while updating non existing category`() {
+        Given {
+            port(8080)
+            header("Content-Type", "application/vnd.smtm.v1+json")
+            header("Accept", "application/vnd.smtm.v1+json")
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
+            body("""{"name": "My rent", "icon": "FOLDER"}""")
+        } When {
+            put("/categories/999")
+        } Then {
+            statusCode(404)
+            header("Content-Type", "application/problem+json")
+            body("type", equalTo("https://api.smtm.com/problems/unknown-resource"))
+            body("title", equalTo("Requested resource is unknown"))
+        }
+    }
+
+    @Test
     fun `should return invalid characters constraint violation for PUT request`() {
         Given {
             port(8080)
@@ -173,6 +191,33 @@ class CategoriesResourceTest {
             body("violations[0].message", equalTo("ILLEGAL_CHARACTERS"))
             body("violations[0].code", equalTo("ILLEGAL_CHARACTERS"))
             body("violations[0].parameters['illegal-characters']", equalTo("<, >"))
+        }
+    }
+
+    @Test
+    fun `should delete existing category`() {
+        Given {
+            port(8080)
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
+        } When {
+            delete("/categories/1")
+        } Then {
+            statusCode(204)
+        }
+    }
+
+    @Test
+    fun `should return 404 while deleting non existing category`() {
+        Given {
+            port(8080)
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
+        } When {
+            delete("/categories/999")
+        } Then {
+            statusCode(404)
+            header("Content-Type", "application/problem+json")
+            body("type", equalTo("https://api.smtm.com/problems/unknown-resource"))
+            body("title", equalTo("Requested resource is unknown"))
         }
     }
 }

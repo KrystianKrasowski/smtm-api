@@ -6,6 +6,7 @@ import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import com.smtm.core.World
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Violation
 import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.categories.CategoriesProblem
@@ -34,9 +35,11 @@ class CategoriesServiceStepdefs(private val world: World) {
             .onLeft { problem = it }
     }
 
-    @When("used deletes category of id {string}")
-    fun `used deletes category of id N`(id: String) {
-
+    @When("user deletes category of id {string}")
+    fun `user deletes category of id N`(id: String) {
+        categoriesService.delete(EntityId.of(id))
+            .onRight { categories = it }
+            .onLeft { problem = it }
     }
 
     @Then("category is not saved due to constraint violation")

@@ -1,6 +1,7 @@
 package com.smtm.core.api
 
 import arrow.core.Either
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.categories.CategoriesProblem
 import com.smtm.core.domain.categories.Category
@@ -14,6 +15,8 @@ interface CategoriesApi {
     fun create(category: Category): Either<CategoriesProblem, Categories>
 
     fun update(category: Category): Either<CategoriesProblem, Categories>
+
+    fun delete(id: EntityId): Either<CategoriesProblem, Categories>
 
     companion object {
 

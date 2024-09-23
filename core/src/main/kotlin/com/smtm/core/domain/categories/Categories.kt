@@ -7,6 +7,7 @@ import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.Version
 import com.smtm.core.domain.Violation
+import com.smtm.core.domain.categories.CategoriesProblem
 
 data class Categories(
     val id: OwnerId,
@@ -41,7 +42,14 @@ data class Categories(
                 hasLegalCharacters()
             }
             ?.map { upsertCategory(it) }
-            ?: CategoriesProblem.unknown(category).left()
+            ?: CategoriesProblem.unknown(category.id).left()
+
+    fun delete(categoryId: EntityId): Either<CategoriesProblem, Categories> =
+        categoryId
+            .takeIf { hasCategoryWithId(it) }
+            ?.let { deleteCategoryById(it) }
+            ?.right()
+            ?: CategoriesProblem.unknown(categoryId).left()
 
     private fun Category.validate(block: CategoryValidator.() -> Unit): Either<CategoriesProblem, Category> =
         CategoryValidator(this@Categories, this)
@@ -57,8 +65,13 @@ data class Categories(
 
     private fun upsertCategory(category: Category): Categories =
         actual.toMutableList()
-            .apply { removeIf { it.id == category.id} }
+            .apply { removeIf { it.id == category.id } }
             .apply { add(category) }
+            .let { copy(actual = it.toList()) }
+
+    private fun deleteCategoryById(categoryId: EntityId): Categories =
+        actual.toMutableList()
+            .apply { removeIf { it.id == categoryId } }
             .let { copy(actual = it.toList()) }
 
     companion object {
