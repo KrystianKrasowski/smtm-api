@@ -10,13 +10,17 @@ import com.smtm.application.spring.conversions.CategoriesConversions.toHalCollec
 import com.smtm.application.spring.conversions.CategoriesConversions.toResource
 import com.smtm.application.spring.conversions.Violations.toDto
 import com.smtm.core.api.CategoriesApi
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Icon
 import com.smtm.core.domain.categories.CategoriesProblem
 import com.smtm.core.domain.categories.Category
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -48,10 +52,28 @@ class CategoriesEndpoint(
             .map { it.toResource(linkFactory) }
             .map { ResponseEntity.created(it.getSelfURI()).body(it) }
             .getOrElse { handleProblem(it) }
+
+    @PutMapping("/{id}")
+    fun update(@PathVariable("id") id: String, @RequestBody categoryDto: CategoryDto): ResponseEntity<*> =
+        categoriesApi
+            .update(categoryDto.toDomain(id))
+            .map { it.getByName(categoryDto.name) }
+            .map { it.toResource(linkFactory) }
+            .map { ResponseEntity.ok(it) }
+            .getOrElse { handleProblem(it) }
+
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable("id") id: String): ResponseEntity<*> =
+        categoriesApi
+            .delete(EntityId.of(id))
+            .map { ResponseEntity.status(HttpStatus.NO_CONTENT).build<Nothing>() }
+            .getOrElse { handleProblem(it) }
 }
 
-private fun CategoryDto.toDomain(): Category =
-    Category.newOf(name, Icon.valueOfOrDefault(icon))
+private fun CategoryDto.toDomain(id: String? = null): Category =
+    id?.let { EntityId.of(it) }
+        ?.let { Category.of(it, name, Icon.valueOfOrDefault(icon)) }
+        ?: Category.newOf(name, Icon.valueOfOrDefault(icon))
 
 private fun handleProblem(problem: CategoriesProblem): ResponseEntity<*> =
     when (problem) {
@@ -60,7 +82,13 @@ private fun handleProblem(problem: CategoriesProblem): ResponseEntity<*> =
             .header("Content-Type", MediaType.PROBLEM)
             .body(ApiProblemDto.ConstraintViolations(problem.violations.map { it.toDto() }))
 
+        is CategoriesProblem.Unknown -> ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .header("Content-Type", MediaType.PROBLEM)
+            .body(ApiProblemDto.UnknownResource())
+
         is CategoriesProblem.Failure -> ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .header("Content-Type", MediaType.PROBLEM)
             .body(ApiProblemDto.Undefined())
     }

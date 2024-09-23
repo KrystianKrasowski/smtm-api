@@ -3,6 +3,7 @@ package com.smtm.core.service
 import arrow.core.Either
 import arrow.core.flatMap
 import com.smtm.core.api.CategoriesApi
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.categories.CategoriesProblem
 import com.smtm.core.domain.categories.Category
@@ -19,5 +20,17 @@ internal class CategoriesService(
         categoriesRepository
             .getCategories()
             .flatMap { it.add(category) }
+            .flatMap { categoriesRepository.save(it) }
+
+    override fun update(category: Category): Either<CategoriesProblem, Categories> =
+        categoriesRepository
+            .getCategories()
+            .flatMap { it.replace(category) }
+            .flatMap { categoriesRepository.save(it) }
+
+    override fun delete(id: EntityId): Either<CategoriesProblem, Categories> =
+        categoriesRepository
+            .getCategories()
+            .flatMap { it.delete(id) }
             .flatMap { categoriesRepository.save(it) }
 }

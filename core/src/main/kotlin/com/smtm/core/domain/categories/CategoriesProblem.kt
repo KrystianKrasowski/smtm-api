@@ -1,5 +1,6 @@
 package com.smtm.core.domain.categories
 
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Violation
 
 sealed interface CategoriesProblem {
@@ -13,6 +14,8 @@ sealed interface CategoriesProblem {
         }
     }
 
+    data class Unknown(val id: EntityId): CategoriesProblem
+
     companion object {
 
         fun failure(throwable: Throwable): CategoriesProblem =
@@ -20,5 +23,8 @@ sealed interface CategoriesProblem {
 
         fun validationError(violations: Collection<Violation>): CategoriesProblem =
             ValidationErrors(violations)
+
+        fun unknown(id: EntityId): CategoriesProblem =
+            Unknown(id)
     }
 }

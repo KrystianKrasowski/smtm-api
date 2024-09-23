@@ -6,7 +6,6 @@ import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.persistence.Version
@@ -24,9 +23,8 @@ internal open class CategorySetEntity(
     @Column(name = "version")
     open val version: Int,
 
-    @OneToMany(cascade = [CascadeType.ALL])
-    @JoinColumn(name = "owner_id")
-    open val categories: List<CategoryEntity>
+    @OneToMany(mappedBy = "categorySet", cascade = [CascadeType.ALL], orphanRemoval = true)
+    open val categories: MutableList<CategoryEntity>
 ) {
 
     fun toDomain(): Categories =
@@ -38,11 +36,15 @@ internal open class CategorySetEntity(
 
     companion object {
 
-        fun from(categories: Categories): CategorySetEntity =
-            CategorySetEntity(
+        fun from(categories: Categories): CategorySetEntity {
+            val categorySetEntity = CategorySetEntity(
                 ownerId = categories.id.value,
                 version = categories.version.value,
-                categories = categories.map { CategoryEntity.from(it, categories.id) }
+                categories = mutableListOf()
             )
+            val categoryEntities = categories.map { CategoryEntity.from(it, categorySetEntity) }
+            categorySetEntity.categories.addAll(categoryEntities)
+            return categorySetEntity
+        }
     }
 }

@@ -1,13 +1,13 @@
 package com.smtm.core.domain.categories
 
 import arrow.core.Either
-import arrow.core.NonEmptySet
 import arrow.core.left
 import arrow.core.right
-import arrow.core.toNonEmptySetOrNull
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.Version
 import com.smtm.core.domain.Violation
+import com.smtm.core.domain.categories.CategoriesProblem
 
 data class Categories(
     val id: OwnerId,
@@ -32,17 +32,47 @@ data class Categories(
                 hasNotEmptyName()
                 hasLegalCharacters()
             }
-            .map { actual.toMutableList().apply { add(it) } }
-            .map { copy(actual = it.toList()) }
-            .mapLeft { CategoriesProblem.validationError(it) }
+            .map { upsertCategory(it) }
 
-    private fun Category.validate(block: CategoryValidator.() -> Unit): Either<NonEmptySet<Violation>, Category> =
+    fun replace(category: Category): Either<CategoriesProblem, Categories> =
+        category
+            .takeIf { hasCategoryWithId(it.id) }
+            ?.validate {
+                hasNotEmptyName()
+                hasLegalCharacters()
+            }
+            ?.map { upsertCategory(it) }
+            ?: CategoriesProblem.unknown(category.id).left()
+
+    fun delete(categoryId: EntityId): Either<CategoriesProblem, Categories> =
+        categoryId
+            .takeIf { hasCategoryWithId(it) }
+            ?.let { deleteCategoryById(it) }
+            ?.right()
+            ?: CategoriesProblem.unknown(categoryId).left()
+
+    private fun Category.validate(block: CategoryValidator.() -> Unit): Either<CategoriesProblem, Category> =
         CategoryValidator(this@Categories, this)
             .apply(block)
             .getViolations()
-            .toNonEmptySetOrNull()
+            .takeIf { it.isNotEmpty() }
+            ?.let { CategoriesProblem.validationError(it) }
             ?.left()
             ?: this.right()
+
+    private fun hasCategoryWithId(id: EntityId): Boolean =
+        any { it.id == id }
+
+    private fun upsertCategory(category: Category): Categories =
+        actual.toMutableList()
+            .apply { removeIf { it.id == category.id } }
+            .apply { add(category) }
+            .let { copy(actual = it.toList()) }
+
+    private fun deleteCategoryById(categoryId: EntityId): Categories =
+        actual.toMutableList()
+            .apply { removeIf { it.id == categoryId } }
+            .let { copy(actual = it.toList()) }
 
     companion object {
 
