@@ -1,21 +1,23 @@
 package com.smtm.application.spring.endpoints
 
 import arrow.core.getOrElse
+import com.smtm.api.HalCollection
 import com.smtm.api.LinkFactory
 import com.smtm.api.MediaType
 import com.smtm.api.ResourcePaths
 import com.smtm.api.v1.ApiProblemDto
 import com.smtm.api.v1.CategoryDto
+import com.smtm.api.v1.CategoryResource
 import com.smtm.application.spring.conversions.Categories.toDomain
 import com.smtm.application.spring.conversions.Categories.toHalCollection
 import com.smtm.application.spring.conversions.Categories.toResource
-import com.smtm.application.spring.conversions.Violations.toDto
+import com.smtm.application.spring.endpoints.exceptions.CategoriesProblemException
 import com.smtm.core.api.CategoriesApi
 import com.smtm.core.domain.EntityId
-import com.smtm.core.domain.categories.CategoriesProblem
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -34,55 +36,44 @@ class CategoriesEndpoint(
     @GetMapping(
         produces = [MediaType.VERSION_1_JSON]
     )
-    fun getAll(): ResponseEntity<*> =
+    fun getAll(): ResponseEntity<HalCollection> =
         categoriesApi.getAll()
             .map { it.toHalCollection(linkFactory) }
             .map { ResponseEntity.ok(it) }
-            .getOrElse { handleProblem(it) }
+            .getOrElse { throw CategoriesProblemException(it) }
 
     @PostMapping(
         consumes = [MediaType.VERSION_1_JSON],
         produces = [MediaType.VERSION_1_JSON]
     )
-    fun create(@RequestBody categoryDto: CategoryDto): ResponseEntity<*> =
+    fun create(@RequestBody categoryDto: CategoryDto): ResponseEntity<CategoryResource> =
         categoriesApi
             .create(categoryDto.toDomain())
             .map { it.getByName(categoryDto.name) }
             .map { it.toResource(linkFactory) }
             .map { ResponseEntity.created(it.getSelfURI()).body(it) }
-            .getOrElse { handleProblem(it) }
+            .getOrElse { throw CategoriesProblemException(it) }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable("id") id: String, @RequestBody categoryDto: CategoryDto): ResponseEntity<*> =
+    fun update(
+        @PathVariable("id") id: String,
+        @RequestBody categoryDto: CategoryDto
+    ): ResponseEntity<CategoryResource> =
         categoriesApi
             .update(categoryDto.toDomain(id))
             .map { it.getByName(categoryDto.name) }
             .map { it.toResource(linkFactory) }
             .map { ResponseEntity.ok(it) }
-            .getOrElse { handleProblem(it) }
+            .getOrElse { throw CategoriesProblemException(it) }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable("id") id: String): ResponseEntity<*> =
+    fun delete(@PathVariable("id") id: String): ResponseEntity<Nothing> =
         categoriesApi
             .delete(EntityId.of(id))
             .map { ResponseEntity.status(HttpStatus.NO_CONTENT).build<Nothing>() }
-            .getOrElse { handleProblem(it) }
+            .getOrElse { throw CategoriesProblemException(it) }
+
+    @ExceptionHandler
+    fun handleCategoriesProblemException(exception: CategoriesProblemException): ResponseEntity<ApiProblemDto> =
+        exception.toResponseEntity()
 }
-
-private fun handleProblem(problem: CategoriesProblem): ResponseEntity<*> =
-    when (problem) {
-        is CategoriesProblem.ValidationErrors -> ResponseEntity
-            .status(HttpStatus.UNPROCESSABLE_ENTITY)
-            .header("Content-Type", MediaType.PROBLEM)
-            .body(ApiProblemDto.ConstraintViolations(problem.violations.map { it.toDto() }))
-
-        is CategoriesProblem.Unknown -> ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .header("Content-Type", MediaType.PROBLEM)
-            .body(ApiProblemDto.UnknownResource())
-
-        is CategoriesProblem.Failure -> ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .header("Content-Type", MediaType.PROBLEM)
-            .body(ApiProblemDto.Undefined())
-    }
