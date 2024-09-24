@@ -1,11 +1,9 @@
 package com.smtm.api
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
-data class HalCollection(
-    @JsonProperty("_links") val links: Map<String, Link>,
-    @JsonProperty("count") val count: Int,
-    @JsonProperty("total") val total: Int,
-    @JsonProperty("_embedded") val embedded: Map<String, Iterable<HalResource<out Any>>>
+abstract class HalCollection(
+    open val links: Map<String, Link>,
+    open val count: Int,
+    open val total: Int,
+    open val embedded: Map<String, Iterable<HalResource<out Any>>>
 )
 

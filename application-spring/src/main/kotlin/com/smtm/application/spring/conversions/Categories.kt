@@ -3,6 +3,7 @@ package com.smtm.application.spring.conversions
 import com.smtm.api.HalCollection
 import com.smtm.api.LinkFactory
 import com.smtm.api.ResourcePaths
+import com.smtm.api.v1.CategoriesCollection
 import com.smtm.api.v1.CategoryDto
 import com.smtm.api.v1.CategoryResource
 import com.smtm.core.domain.EntityId
@@ -12,8 +13,8 @@ import com.smtm.core.domain.categories.Category
 
 internal object Categories {
 
-    fun Categories.toHalCollection(linkFactory: LinkFactory): HalCollection =
-        HalCollection(
+    fun Categories.toHalCollection(linkFactory: LinkFactory): CategoriesCollection =
+        CategoriesCollection(
             links = mapOf(
                 "self" to linkFactory.create(ResourcePaths.CATEGORIES)
             ),

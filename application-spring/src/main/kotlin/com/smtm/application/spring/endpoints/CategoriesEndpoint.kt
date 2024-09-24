@@ -1,11 +1,11 @@
 package com.smtm.application.spring.endpoints
 
 import arrow.core.getOrElse
-import com.smtm.api.HalCollection
 import com.smtm.api.LinkFactory
 import com.smtm.api.MediaType
 import com.smtm.api.ResourcePaths
 import com.smtm.api.v1.ApiProblemDto
+import com.smtm.api.v1.CategoriesCollection
 import com.smtm.api.v1.CategoryDto
 import com.smtm.api.v1.CategoryResource
 import com.smtm.application.spring.conversions.Categories.toDomain
@@ -36,7 +36,7 @@ class CategoriesEndpoint(
     @GetMapping(
         produces = [MediaType.VERSION_1_JSON]
     )
-    fun getAll(): ResponseEntity<HalCollection> =
+    fun getAll(): ResponseEntity<CategoriesCollection> =
         categoriesApi.getAll()
             .map { it.toHalCollection(linkFactory) }
             .map { ResponseEntity.ok(it) }

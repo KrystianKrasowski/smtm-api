@@ -1,10 +1,10 @@
 package com.smtm.application.spring.endpoints
 
 import arrow.core.getOrElse
-import com.smtm.api.HalCollection
 import com.smtm.api.LinkFactory
 import com.smtm.api.MediaType
 import com.smtm.api.ResourcePaths
+import com.smtm.api.v1.PlanHeadersCollection
 import com.smtm.application.spring.conversions.Plans.toHalCollection
 import com.smtm.core.api.PlansQueries
 import org.springframework.format.annotation.DateTimeFormat
@@ -29,7 +29,7 @@ class PlanHeadersEndpoint(
         @RequestParam("matching-date", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         matchingDate: LocalDate? = null
-    ): ResponseEntity<HalCollection> =
+    ): ResponseEntity<PlanHeadersCollection> =
         PlansQueries.Criteria.by(matchingDate)
             .let { plansQueries.getPlanHeadersBy(it) }
             .map { it.toHalCollection(linksFactory) }

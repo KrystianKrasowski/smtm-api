@@ -1,6 +1,5 @@
 package com.smtm.application.spring.conversions
 
-import com.smtm.api.HalCollection
 import com.smtm.api.LinkFactory
 import com.smtm.api.ResourcePaths
 import com.smtm.api.v1.CategoryDto
@@ -10,6 +9,7 @@ import com.smtm.api.v1.MoneyDto
 import com.smtm.api.v1.PlanDto
 import com.smtm.api.v1.PlanHeaderDto
 import com.smtm.api.v1.PlanHeaderResource
+import com.smtm.api.v1.PlanHeadersCollection
 import com.smtm.api.v1.PlanResource
 import com.smtm.core.api.PlanHeaders
 import com.smtm.core.domain.plans.Plan
@@ -17,8 +17,8 @@ import com.smtm.core.domain.plans.PlanHeader
 
 object Plans {
 
-    fun PlanHeaders.toHalCollection(linkFactory: LinkFactory): HalCollection =
-        HalCollection(
+    fun PlanHeaders.toHalCollection(linkFactory: LinkFactory): PlanHeadersCollection =
+        PlanHeadersCollection(
             links = mapOf(
                 "self" to linkFactory.create(ResourcePaths.PLAN_HEADERS)
             ),
