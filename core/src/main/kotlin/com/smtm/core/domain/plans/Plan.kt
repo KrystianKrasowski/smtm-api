@@ -19,4 +19,13 @@ data class Plan(
         val category: Category,
         val value: MonetaryAmount
     )
+
+    companion object {
+
+        fun of(header: PlanHeader, entries: List<Entry>): Plan =
+            Plan(entries, header)
+
+        fun entry(category: Category, value: MonetaryAmount): Entry =
+            Entry(category, value)
+    }
 }
