@@ -6,14 +6,13 @@ import com.smtm.api.MediaType
 import com.smtm.api.ResourcePaths
 import com.smtm.api.v1.ApiProblemDto
 import com.smtm.api.v1.CategoryDto
-import com.smtm.application.spring.conversions.CategoriesConversions.toHalCollection
-import com.smtm.application.spring.conversions.CategoriesConversions.toResource
+import com.smtm.application.spring.conversions.Categories.toDomain
+import com.smtm.application.spring.conversions.Categories.toHalCollection
+import com.smtm.application.spring.conversions.Categories.toResource
 import com.smtm.application.spring.conversions.Violations.toDto
 import com.smtm.core.api.CategoriesApi
 import com.smtm.core.domain.EntityId
-import com.smtm.core.domain.Icon
 import com.smtm.core.domain.categories.CategoriesProblem
-import com.smtm.core.domain.categories.Category
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -69,11 +68,6 @@ class CategoriesEndpoint(
             .map { ResponseEntity.status(HttpStatus.NO_CONTENT).build<Nothing>() }
             .getOrElse { handleProblem(it) }
 }
-
-private fun CategoryDto.toDomain(id: String? = null): Category =
-    id?.let { EntityId.of(it) }
-        ?.let { Category.of(it, name, Icon.valueOfOrDefault(icon)) }
-        ?: Category.newOf(name, Icon.valueOfOrDefault(icon))
 
 private fun handleProblem(problem: CategoriesProblem): ResponseEntity<*> =
     when (problem) {

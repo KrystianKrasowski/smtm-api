@@ -5,10 +5,12 @@ import com.smtm.api.LinkFactory
 import com.smtm.api.ResourcePaths
 import com.smtm.api.v1.CategoryDto
 import com.smtm.api.v1.CategoryResource
+import com.smtm.core.domain.EntityId
+import com.smtm.core.domain.Icon
 import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.categories.Category
 
-object CategoriesConversions {
+internal object Categories {
 
     fun Categories.toHalCollection(linkFactory: LinkFactory): HalCollection =
         HalCollection(
@@ -33,4 +35,9 @@ object CategoriesConversions {
                 icon = icon.name
             )
         )
+
+    fun CategoryDto.toDomain(id: String? = null): Category =
+        id?.let { EntityId.of(it) }
+            ?.let { Category.of(it, name, Icon.valueOfOrDefault(icon)) }
+            ?: Category.newOf(name, Icon.valueOfOrDefault(icon))
 }
