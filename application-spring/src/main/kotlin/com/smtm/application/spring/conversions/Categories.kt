@@ -1,6 +1,5 @@
 package com.smtm.application.spring.conversions
 
-import com.smtm.api.HalCollection
 import com.smtm.api.LinkFactory
 import com.smtm.api.ResourcePaths
 import com.smtm.api.v1.CategoriesCollection
