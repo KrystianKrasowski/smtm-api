@@ -7,7 +7,6 @@ import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.Version
 import com.smtm.core.domain.Violation
-import com.smtm.core.domain.categories.CategoriesProblem
 
 data class Categories(
     val id: OwnerId,

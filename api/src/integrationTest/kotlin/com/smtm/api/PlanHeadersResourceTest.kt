@@ -48,7 +48,6 @@ class PlanHeadersResourceTest {
     fun `should return all plan headers`() {
         Given {
             port(8080)
-            header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
             header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
         } When {

@@ -37,6 +37,7 @@ object Environment {
             .withExposedService("application_1", 8080, Wait.forListeningPort())
             .withExposedService("db_1", 5432, Wait.forListeningPort())
             .withEnv(ENVIRONMENT)
+            .withLogConsumer("application_1") { println(it.utf8String) }
             .apply { start() }
 
     private fun setUpDatabase(): Database =

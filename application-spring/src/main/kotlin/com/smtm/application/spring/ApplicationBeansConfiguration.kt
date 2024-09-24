@@ -5,9 +5,8 @@ import com.smtm.core.api.CategoriesApi
 import com.smtm.core.api.PlansQueries
 import com.smtm.core.domain.OwnerId
 import com.smtm.infrastructure.adapters.CategoriesRepositoryJpaAdapter
-import com.smtm.infrastructure.adapters.PlansAdapter
+import com.smtm.infrastructure.adapters.PlansRepositoryJpaAdapter
 import jakarta.persistence.EntityManager
-import javax.sql.DataSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -37,7 +36,7 @@ class ApplicationBeansConfiguration {
         CategoriesApi.of(repository)
 
     @Bean
-    fun plansQueries(plansAdapter: PlansAdapter): PlansQueries =
+    fun plansQueries(plansAdapter: PlansRepositoryJpaAdapter): PlansQueries =
         plansAdapter
 
     // Adapters
@@ -48,6 +47,6 @@ class ApplicationBeansConfiguration {
         CategoriesRepositoryJpaAdapter(entityManager, ownerIdProvider)
 
     @Bean
-    fun plansAdapter(dataSource: DataSource): PlansAdapter =
-        PlansAdapter(dataSource)
+    fun plansRepositoryJpaAdapter(ownerIdProvider: () -> OwnerId): PlansRepositoryJpaAdapter =
+        PlansRepositoryJpaAdapter(entityManager, ownerIdProvider)
 }

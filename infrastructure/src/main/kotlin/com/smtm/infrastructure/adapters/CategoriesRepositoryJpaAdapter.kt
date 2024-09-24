@@ -8,7 +8,7 @@ import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.categories.CategoriesProblem
 import com.smtm.core.spi.CategoriesRepository
 import com.smtm.infrastructure.persistence.categories.CategorySetEntity
-import com.smtm.infrastructure.persistence.categories.CategorySetsRepository
+import com.smtm.infrastructure.persistence.categories.CategorySetsJpaRepository
 import jakarta.persistence.EntityManager
 import org.slf4j.LoggerFactory
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
@@ -19,8 +19,7 @@ open class CategoriesRepositoryJpaAdapter(
     private val ownerIdProvider: () -> OwnerId,
 ) : CategoriesRepository {
 
-    private val repository = JpaRepositoryFactory(entityManager).getRepository(CategorySetsRepository::class.java)
-
+    private val repository = JpaRepositoryFactory(entityManager).getRepository(CategorySetsJpaRepository::class.java)
     private val logger = LoggerFactory.getLogger(CategoriesRepositoryJpaAdapter::class.java)
 
     override fun getCategories(): Either<CategoriesProblem, Categories> =

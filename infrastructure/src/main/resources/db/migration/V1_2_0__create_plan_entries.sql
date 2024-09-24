@@ -1,10 +1,11 @@
 create table plan_entries
 (
-    id          bigint generated always as identity primary key,
     plan_id     varchar    not null,
     category_id varchar    not null,
     amount      integer    not null,
-    currency    varchar(3) not null
+    currency    varchar(3) not null,
+    constraint plan_entries_pk
+        primary key (plan_id, category_id)
 );
 
 alter table plan_entries
