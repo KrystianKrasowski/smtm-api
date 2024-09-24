@@ -54,7 +54,11 @@ class CategoriesEndpoint(
             .map { ResponseEntity.created(it.getSelfURI()).body(it) }
             .getOrElse { throw CategoriesProblemException(it) }
 
-    @PutMapping("/{id}")
+    @PutMapping(
+        path = ["/{id}"],
+        consumes = [MediaType.VERSION_1_JSON],
+        produces = [MediaType.VERSION_1_JSON]
+    )
     fun update(
         @PathVariable("id") id: String,
         @RequestBody categoryDto: CategoryDto
