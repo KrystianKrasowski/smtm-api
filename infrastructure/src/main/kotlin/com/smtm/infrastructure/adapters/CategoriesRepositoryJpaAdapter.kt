@@ -24,7 +24,7 @@ open class CategoriesRepositoryJpaAdapter(
 
     override fun getCategories(): Either<CategoriesProblem, Categories> =
         repository
-            .runCatching { findByOwnerId(ownerIdProvider().value) }
+            .runCatching { findByOwnerId(ownerIdProvider().asString()) }
             .map { it?.toDomain() ?: Categories.empty(ownerIdProvider()) }
             .map { it.right() }
             .onFailure { logger.error("Failed to fetch all categories", it) }

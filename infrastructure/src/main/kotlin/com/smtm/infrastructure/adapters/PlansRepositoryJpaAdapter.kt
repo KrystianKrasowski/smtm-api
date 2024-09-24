@@ -32,7 +32,7 @@ class PlansRepositoryJpaAdapter(
 
     override fun getPlan(id: EntityId): Either<PlansProblem, Plan> =
         repository
-            .runCatching { getReferenceById(id.toString()) }
+            .runCatching { getReferenceById(id.asString()) }
             .mapCatching { it.toPlan() }
             .map { it.right() }
             .onFailure { logger.error("Error while fetching the plan of ID: $id", it) }
@@ -40,7 +40,7 @@ class PlansRepositoryJpaAdapter(
 
     private fun getByOwnerAndMatchingDate(owner: OwnerId, date: LocalDate): Either<Throwable, PlanHeaders> =
         repository
-            .runCatching { findByOwnerIdAndMatchingDate(date, owner.value) }
+            .runCatching { findByOwnerIdAndMatchingDate(date, owner.asString()) }
             .map { it.toPlanHeaders() }
             .map { it.right() }
             .onFailure { logger.error("Error while fetching plan headers.", it) }
@@ -48,7 +48,7 @@ class PlansRepositoryJpaAdapter(
 
     private fun getByOwner(owner: OwnerId): Either<Throwable, PlanHeaders> =
         repository
-            .runCatching { findAllByOwnerIdOrderByEndDesc(owner.value) }
+            .runCatching { findAllByOwnerIdOrderByEndDesc(owner.asString()) }
             .map { it.toPlanHeaders() }
             .map { it.right() }
             .onFailure { logger.error("Error while fetching plan headers.", it) }

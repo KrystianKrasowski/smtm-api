@@ -40,7 +40,7 @@ internal open class CategoryEntity(
 
         fun from(category: Category, set: CategorySetEntity): CategoryEntity =
             CategoryEntity(
-                id = category.id.toString(),
+                id = category.id.asString(),
                 name = category.name,
                 icon = category.icon.name,
                 categorySet = set

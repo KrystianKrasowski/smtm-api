@@ -1,10 +1,10 @@
 package com.smtm.core.domain
 
 @JvmInline
-value class Version(val value: Int) {
+value class Version(private val value: Int) {
 
-    fun increment(): Version =
-        Version(value = value + 1)
+    fun asInt(): Int =
+        value
 
     companion object {
 

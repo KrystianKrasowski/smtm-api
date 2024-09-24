@@ -34,7 +34,7 @@ object Plans {
             links = mapOf(
                 "self" to linkFactory.create("${ResourcePaths.PLANS}/$id")
             ),
-            id = id.toString(),
+            id = id.asString(),
             plan = PlanDto(
                 name = name,
                 period = DatePeriodDto(
@@ -53,7 +53,7 @@ object Plans {
             links = mapOf(
                 "self" to linkFactory.create("${ResourcePaths.PLANS}/$id")
             ),
-            id = id.toString(),
+            id = id.asString(),
             header = PlanHeaderDto(
                 name = name,
                 period = DatePeriodDto(
@@ -65,7 +65,7 @@ object Plans {
 
     private fun Plan.Entry.toEntryDto(): PlanDto.Entry =
         PlanDto.Entry(
-            categoryId = category.id.toString(),
+            categoryId = category.id.asString(),
             value = MoneyDto.of(value)
         )
 
@@ -74,7 +74,7 @@ object Plans {
             links = mapOf(
                 "self" to linkFactory.create("/categories/${category.id}")
             ),
-            id = category.id.toString(),
+            id = category.id.asString(),
             category = CategoryDto(
                 name = category.name,
                 icon = category.icon.name

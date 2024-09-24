@@ -38,8 +38,8 @@ internal open class CategorySetEntity(
 
         fun from(categories: Categories): CategorySetEntity {
             val categorySetEntity = CategorySetEntity(
-                ownerId = categories.id.value,
-                version = categories.version.value,
+                ownerId = categories.id.asString(),
+                version = categories.version.asInt(),
                 categories = mutableListOf()
             )
             val categoryEntities = categories.map { CategoryEntity.from(it, categorySetEntity) }

@@ -27,7 +27,7 @@ object CategoriesConversions {
             links = mapOf(
                 "self" to linkFactory.create("${ResourcePaths.CATEGORIES}/$id")
             ),
-            id = id.toString(),
+            id = id.asString(),
             category = CategoryDto(
                 name = name,
                 icon = icon.name

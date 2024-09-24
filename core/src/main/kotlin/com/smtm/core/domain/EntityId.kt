@@ -5,9 +5,11 @@ import java.util.UUID
 @JvmInline
 value class EntityId(private val value: String) {
 
-    override fun toString(): String {
-        return value
-    }
+    override fun toString(): String =
+        asString()
+
+    fun asString(): String =
+        value
 
     companion object {
 
