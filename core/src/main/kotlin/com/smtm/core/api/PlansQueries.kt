@@ -2,7 +2,6 @@ package com.smtm.core.api
 
 import arrow.core.Either
 import com.smtm.core.domain.EntityId
-import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
 import com.smtm.core.domain.plans.PlansProblem
@@ -15,19 +14,17 @@ interface PlansQueries {
 
     fun getPlanHeadersBy(criteria: Criteria): Either<Throwable, PlanHeaders>
 
-    fun getPlan(id: EntityId, owner: OwnerId): Either<PlansProblem, Plan>
+    fun getPlan(id: EntityId): Either<PlansProblem, Plan>
 
     interface Criteria {
-        val byOwner: OwnerId
         val byDateWithinPeriod: LocalDate?
 
         companion object {
 
             fun by(
-                owner: OwnerId,
                 dateWithinPeriod: LocalDate? = null
             ): Criteria {
-                return PlansQueriesCriteria(owner, dateWithinPeriod)
+                return PlansQueriesCriteria(dateWithinPeriod)
             }
         }
     }

@@ -9,7 +9,6 @@ import com.smtm.api.v1.PlanDto
 import com.smtm.application.spring.conversions.Plans.toHalResource
 import com.smtm.core.api.PlansQueries
 import com.smtm.core.domain.EntityId
-import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.plans.PlansProblem
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(ResourcePaths.PLANS)
 class PlansEndpoint(
     private val plansQueries: PlansQueries,
-    private val ownerIdProvider: () -> OwnerId,
     private val linksFactory: LinkFactory
 ) {
 
@@ -33,7 +31,7 @@ class PlansEndpoint(
         produces = [MediaType.VERSION_1_JSON]
     )
     fun getPlan(@PathVariable("id") id: String): ResponseEntity<*> =
-        plansQueries.getPlan(EntityId.of(id), ownerIdProvider())
+        plansQueries.getPlan(EntityId.of(id))
             .map { it.toHalResource(linksFactory) }
             .map { ResponseEntity.ok(it) }
             .getOrElse { it.toResponseEntity() }
