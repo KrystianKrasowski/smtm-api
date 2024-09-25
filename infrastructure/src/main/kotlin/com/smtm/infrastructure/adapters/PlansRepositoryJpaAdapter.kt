@@ -10,6 +10,7 @@ import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlansProblem
 import com.smtm.core.spi.PlansRepository
+import com.smtm.infrastructure.persistence.categories.CategorySetsJpaRepository
 import com.smtm.infrastructure.persistence.plans.PlanEntity
 import com.smtm.infrastructure.persistence.plans.PlansJpaRepository
 import jakarta.persistence.EntityManager
@@ -23,7 +24,9 @@ class PlansRepositoryJpaAdapter(
     private val ownerIdProvider: () -> OwnerId,
 ) : PlansQueries, PlansRepository {
 
-    private val repository = JpaRepositoryFactory(entityManager).getRepository(PlansJpaRepository::class.java)
+    private val plansJpaRepository = JpaRepositoryFactory(entityManager).getRepository(PlansJpaRepository::class.java)
+    private val categorySetsJpaRepository =
+        JpaRepositoryFactory(entityManager).getRepository(CategorySetsJpaRepository::class.java)
     private val logger = LoggerFactory.getLogger(PlansRepositoryJpaAdapter::class.java)
 
     override fun getPlanHeadersBy(criteria: PlansQueries.Criteria): Either<Throwable, PlanHeaders> =
@@ -32,9 +35,9 @@ class PlansRepositoryJpaAdapter(
             ?: getByOwner(ownerIdProvider())
 
     override fun getPlan(id: EntityId): Either<PlansProblem, Plan> =
-        repository
+        plansJpaRepository
             .runCatching { getReferenceById(id.asString()) }
-            .mapCatching { it.toPlan() }
+            .mapCatching { createPlan(it) }
             .map { it.right() }
             .onFailure { logger.error("Error while fetching the plan of ID: $id", it) }
             .getOrElse { it.toPlansProblem(id).left() }
@@ -44,7 +47,7 @@ class PlansRepositoryJpaAdapter(
     }
 
     private fun getByOwnerAndMatchingDate(owner: OwnerId, date: LocalDate): Either<Throwable, PlanHeaders> =
-        repository
+        plansJpaRepository
             .runCatching { findByOwnerIdAndMatchingDate(date, owner.asString()) }
             .map { it.toPlanHeaders() }
             .map { it.right() }
@@ -52,12 +55,19 @@ class PlansRepositoryJpaAdapter(
             .getOrElse { it.left() }
 
     private fun getByOwner(owner: OwnerId): Either<Throwable, PlanHeaders> =
-        repository
+        plansJpaRepository
             .runCatching { findAllByOwnerIdOrderByEndDesc(owner.asString()) }
             .map { it.toPlanHeaders() }
             .map { it.right() }
             .onFailure { logger.error("Error while fetching plan headers.", it) }
             .getOrElse { it.left() }
+
+    private fun createPlan(entity: PlanEntity): Plan =
+        categorySetsJpaRepository
+            .runCatching { findByOwnerId(ownerIdProvider().asString()) }
+            .map { it?.categories ?: emptyList() }
+            .map { entity.toPlan(it) }
+            .getOrThrow()
 }
 
 private fun List<PlanEntity>.toPlanHeaders(): PlanHeaders =
@@ -65,6 +75,6 @@ private fun List<PlanEntity>.toPlanHeaders(): PlanHeaders =
 
 private fun Throwable.toPlansProblem(id: EntityId): PlansProblem =
     when (this) {
-        is EntityNotFoundException -> PlansProblem.NotFound(id)
-        else -> PlansProblem.Failure(this)
+        is EntityNotFoundException -> PlansProblem.notFound(id)
+        else -> PlansProblem.failure(this)
     }

@@ -3,6 +3,7 @@ package com.smtm.infrastructure.persistence.plans
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
+import com.smtm.infrastructure.persistence.categories.CategoryEntity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -47,9 +48,10 @@ internal open class PlanEntity(
             period = start..end
         )
 
-    fun toPlan(): Plan =
+    fun toPlan(categories: List<CategoryEntity>): Plan =
         Plan(
             entries = entries.map { it.toPlanEntry() },
-            header = toPlanHeader()
+            header = toPlanHeader(),
+            categories = categories.map { it.toDomain() }
         )
 }

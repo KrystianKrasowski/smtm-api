@@ -9,7 +9,8 @@ import java.time.LocalDate
 
 data class Plan(
     val entries: List<Entry>,
-    private val header: PlanHeader
+    val categories: List<Category>,
+    private val header: PlanHeader,
 ) {
 
     val id: EntityId = header.id
@@ -18,19 +19,20 @@ data class Plan(
     val end: LocalDate = header.period.endInclusive
 
     data class Entry(
-        val category: Category,
+        val categoryId: EntityId,
         val value: MonetaryAmount
     )
 
     companion object {
 
-        fun of(header: PlanHeader, entries: List<Entry>): Plan =
-            Plan(entries, header)
+        fun validated(
+            header: PlanHeader,
+            entries: List<Entry>,
+            categories: List<Category>
+        ): Either<PlansProblem, Plan> =
+            Plan(entries, categories, header).right()
 
-        fun validated(header: PlanHeader, entries: List<Entry>): Either<PlansProblem, Plan> =
-            Plan(entries, header).right()
-
-        fun entry(category: Category, value: MonetaryAmount): Entry =
-            Entry(category, value)
+        fun entry(categoryId: EntityId, value: MonetaryAmount): Entry =
+            Entry(categoryId, value)
     }
 }

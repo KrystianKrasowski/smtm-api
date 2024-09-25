@@ -1,7 +1,7 @@
 package com.smtm.infrastructure.persistence.plans
 
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.plans.Plan
-import com.smtm.infrastructure.persistence.categories.CategoryEntity
 import com.smtm.infrastructure.persistence.toMonetaryAmount
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -22,9 +22,8 @@ internal open class PlanEntryEntity(
     open val plan: PlanEntity,
 
     @Id
-    @ManyToOne
     @JoinColumn(name = "category_id")
-    open val category: CategoryEntity,
+    open val categoryId: String,
 
     @Column(name = "amount")
     open val amount: Int,
@@ -35,7 +34,7 @@ internal open class PlanEntryEntity(
 
     fun toPlanEntry(): Plan.Entry =
         Plan.Entry(
-            category = category.toDomain(),
+            categoryId = EntityId.of(categoryId),
             value = amount.toMonetaryAmount(currency)
         )
 }

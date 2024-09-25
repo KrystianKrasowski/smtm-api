@@ -6,12 +6,16 @@ import com.tngtech.keycloakmock.api.TokenConfig.aTokenConfig
 import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import java.io.File
+import java.io.FileOutputStream
+import java.io.PrintStream
 
 object Environment {
 
     private lateinit var compose: DockerComposeContainer<*>
     private lateinit var database: Database
     private lateinit var authServer: KeycloakMock
+
+    private val applicationLogStream = PrintStream(FileOutputStream(File("logs/it/application_1.log")))
 
     fun setUp() {
         compose = setUpCompose()
@@ -37,6 +41,7 @@ object Environment {
             .withExposedService("application_1", 8080, Wait.forListeningPort())
             .withExposedService("db_1", 5432, Wait.forListeningPort())
             .withEnv(ENVIRONMENT)
+            .withLogConsumer("application_1") { applicationLogStream.print(it.utf8String) }
             .apply { start() }
 
     private fun setUpDatabase(): Database =

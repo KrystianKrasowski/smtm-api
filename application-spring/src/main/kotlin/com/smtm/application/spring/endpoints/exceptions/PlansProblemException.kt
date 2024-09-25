@@ -9,7 +9,8 @@ class PlansProblemException(private val plansProblem: PlansProblem) : Throwable(
 
     fun toResponseEntity(): ResponseEntity<ApiProblemDto> =
         when (plansProblem) {
-            is PlansProblem.Failure -> ResponseEntity
+            is PlansProblem.Failure,
+            is PlansProblem.CategoriesFetchingFailure -> ResponseEntity
                 .internalServerError()
                 .body(ApiProblemDto.Undefined())
 
