@@ -1,5 +1,7 @@
 package com.smtm.core.domain.plans
 
+import arrow.core.Either
+import arrow.core.right
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.categories.Category
 import javax.money.MonetaryAmount
@@ -24,6 +26,9 @@ data class Plan(
 
         fun of(header: PlanHeader, entries: List<Entry>): Plan =
             Plan(entries, header)
+
+        fun validated(header: PlanHeader, entries: List<Entry>): Either<PlansProblem, Plan> =
+            Plan(entries, header).right()
 
         fun entry(category: Category, value: MonetaryAmount): Entry =
             Entry(category, value)

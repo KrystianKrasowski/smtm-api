@@ -1,11 +1,13 @@
 package com.smtm.core.service
 
 import com.smtm.core.World
+import com.smtm.core.domain.Violation
 import com.smtm.core.domain.categories.Category
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
 import com.smtm.core.domain.plans.PlansProblem
 import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import javax.money.MonetaryAmount
 
@@ -30,8 +32,13 @@ class PlansServiceStepdefs(private val world: World) {
 
     @When("user creates a plan")
     fun `user creates s plan`() {
-        plansService.create(planHeader, entries)
+        plansService.store(planHeader, entries)
             .onRight { plan = it }
             .onLeft { problem = it }
+    }
+
+    @Then("plan is not saved due to constraint violation")
+    fun `plan is not saved due to constraint violation`(violation: Violation) {
+
     }
 }

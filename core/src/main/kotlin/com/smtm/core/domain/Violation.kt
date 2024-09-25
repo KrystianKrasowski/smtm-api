@@ -12,7 +12,8 @@ data class Violation(val path: Path, val code: Code, val parameters: Map<String,
         EMPTY,
         ILLEGAL_CHARACTERS,
         NON_UNIQUE,
-        UNKNOWN
+        UNKNOWN,
+        INVALID
     }
 
     companion object {

@@ -9,6 +9,7 @@ import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlansProblem
+import com.smtm.core.spi.PlansRepository
 import com.smtm.infrastructure.persistence.plans.PlanEntity
 import com.smtm.infrastructure.persistence.plans.PlansJpaRepository
 import jakarta.persistence.EntityManager
@@ -20,7 +21,7 @@ import java.time.LocalDate
 class PlansRepositoryJpaAdapter(
     entityManager: EntityManager,
     private val ownerIdProvider: () -> OwnerId,
-) : PlansQueries {
+) : PlansQueries, PlansRepository {
 
     private val repository = JpaRepositoryFactory(entityManager).getRepository(PlansJpaRepository::class.java)
     private val logger = LoggerFactory.getLogger(PlansRepositoryJpaAdapter::class.java)
@@ -37,6 +38,10 @@ class PlansRepositoryJpaAdapter(
             .map { it.right() }
             .onFailure { logger.error("Error while fetching the plan of ID: $id", it) }
             .getOrElse { it.toPlansProblem(id).left() }
+
+    override fun save(plan: Plan): Either<PlansProblem, Plan> {
+        TODO("Not yet implemented")
+    }
 
     private fun getByOwnerAndMatchingDate(owner: OwnerId, date: LocalDate): Either<Throwable, PlanHeaders> =
         repository

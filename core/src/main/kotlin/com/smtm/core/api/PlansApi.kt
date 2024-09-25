@@ -7,5 +7,5 @@ import com.smtm.core.domain.plans.PlansProblem
 
 interface PlansApi {
 
-    fun create(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan>
+    fun store(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan>
 }

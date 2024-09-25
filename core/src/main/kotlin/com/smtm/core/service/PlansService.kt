@@ -2,7 +2,6 @@ package com.smtm.core.service
 
 import arrow.core.Either
 import arrow.core.flatMap
-import arrow.core.right
 import com.smtm.core.api.PlansApi
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
@@ -13,9 +12,7 @@ internal class PlansService(
     private val plansRepository: PlansRepository
 ) : PlansApi {
 
-    override fun create(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan> {
-        return Plan.of(header, entries)
-            .right()
+    override fun store(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan> =
+        Plan.validated(header, entries)
             .flatMap { plansRepository.save(it) }
-    }
 }
