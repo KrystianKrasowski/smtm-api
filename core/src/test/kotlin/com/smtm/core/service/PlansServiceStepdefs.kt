@@ -1,5 +1,9 @@
 package com.smtm.core.service
 
+import assertk.assertThat
+import assertk.assertions.containsAtLeast
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
 import com.smtm.core.World
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Violation
@@ -37,8 +41,11 @@ class PlansServiceStepdefs(private val world: World) {
             .onLeft { problem = it }
     }
 
-    @Then("plan is not saved due to constraint violation")
-    fun `plan is not saved due to constraint violation`(violation: Violation) {
-
+    @Then("plan is not saved due to constraint violations")
+    fun `plan is not saved due to constraint violations`(violation: List<Violation>) {
+        assertThat(problem)
+            .isNotNull()
+            .isInstanceOf(PlansProblem.ValidationErrors::class)
+            .containsAtLeast(*violation.toTypedArray())
     }
 }

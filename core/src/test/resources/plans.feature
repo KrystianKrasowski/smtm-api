@@ -25,7 +25,7 @@ Feature: Plans
       | id      | name          | start      | end        |
       | plan-30 | November 2024 | 2024-12-01 | 2024-11-30 |
     When user creates a plan
-    Then plan is not saved due to constraint violation
+    Then plan is not saved due to constraint violations
       | path   | code    |
       | period | INVALID |
 
@@ -35,7 +35,7 @@ Feature: Plans
       | id      | name   | start      | end        |
       | plan-30 | <name> | 2024-11-01 | 2024-11-30 |
     When user creates a plan
-    Then plan is not saved due to constraint violation
+    Then plan is not saved due to constraint violations
       | path | code               | illegal characters   |
       | name | ILLEGAL_CHARACTERS | <illegal characters> |
 
@@ -53,7 +53,25 @@ Feature: Plans
     And plan has category "ID-rent" with value PLN 385.79
     And plan has category "ID-savings" with value PLN 5500.00
     And plan has category "ID-groceries" with value PLN 1200.00
+    And plan has category "ID-rent" with value PLN 385.79
     When user creates a plan
-    Then plan is not saved due to constraint violation
+    Then plan is not saved due to constraint violations
       | path               | code       |
       | entries/4/category | NON_UNIQUE |
+      | entries/5/category | NON_UNIQUE |
+
+
+  Scenario: The one where plan has an entry for unknown category
+    Given plan is defined
+      | id      | name          | start      | end        |
+      | plan-30 | November 2024 | 2024-11-01 | 2024-11-30 |
+    And plan has category "ID-unknown-category-1" with value PLN 1299.00
+    And plan has category "ID-rent" with value PLN 385.79
+    And plan has category "ID-unknown-category-1" with value PLN 1299.00
+    And plan has category "ID-unknown-category-2" with value PLN 1299.00
+    When user creates a plan
+    Then plan is not saved due to constraint violations
+      | path               | code    |
+      | entries/1/category | UNKNOWN |
+      | entries/3/category | UNKNOWN |
+      | entries/4/category | UNKNOWN |
