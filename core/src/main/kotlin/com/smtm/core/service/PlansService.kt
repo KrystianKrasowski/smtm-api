@@ -17,7 +17,7 @@ internal class PlansService(
 
     override fun store(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan> =
         getCategories()
-            .flatMap { Plan.validated(header, entries, it.toList()) }
+            .flatMap { Plan.newValidated(header, entries, it.toList()) }
             .flatMap { plansRepository.save(it) }
 
     private fun getCategories(): Either<PlansProblem, Categories> =

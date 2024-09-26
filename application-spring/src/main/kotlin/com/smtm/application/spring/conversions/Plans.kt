@@ -11,9 +11,11 @@ import com.smtm.api.v1.PlanHeadersCollection
 import com.smtm.api.v1.PlanResource
 import com.smtm.application.spring.conversions.Categories.toResource
 import com.smtm.core.api.PlanHeaders
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.categories.Category
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
+import javax.swing.text.html.parser.Entity
 
 object Plans {
 
@@ -47,6 +49,19 @@ object Plans {
                 "categories" to categories.map { it.toResource(linkFactory) }
             )
         )
+
+    fun PlanDto.toHeader(id: String? = null): PlanHeader =
+        id?.let { EntityId.of(it) }
+            ?.let { PlanHeader.of(it, name, period.start, period.end) }
+            ?: PlanHeader.newOf(name, period.start, period.end)
+
+    fun PlanDto.toEntries(): List<Plan.Entry> =
+        entries.map {
+            Plan.Entry(
+                categoryId = EntityId.of(it.categoryId),
+                value = it.value.monetaryAmount
+            )
+        }
 
     private fun PlanHeader.toResource(linkFactory: LinkFactory): PlanHeaderResource =
         PlanHeaderResource(

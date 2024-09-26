@@ -2,6 +2,7 @@ package com.smtm.infrastructure.persistence.plans
 
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.plans.Plan
+import com.smtm.infrastructure.persistence.toCents
 import com.smtm.infrastructure.persistence.toMonetaryAmount
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -37,4 +38,15 @@ internal open class PlanEntryEntity(
             categoryId = EntityId.of(categoryId),
             value = amount.toMonetaryAmount(currency)
         )
+
+    companion object {
+
+        fun from(entry: Plan.Entry, planEntity: PlanEntity): PlanEntryEntity =
+            PlanEntryEntity(
+                plan = planEntity,
+                categoryId = entry.categoryId.asString(),
+                amount = entry.value.toCents(),
+                currency = entry.value.currency.currencyCode
+            )
+    }
 }

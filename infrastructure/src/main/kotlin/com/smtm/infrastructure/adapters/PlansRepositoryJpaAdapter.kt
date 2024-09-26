@@ -7,6 +7,7 @@ import com.smtm.core.api.PlanHeaders
 import com.smtm.core.api.PlansQueries
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.OwnerId
+import com.smtm.core.domain.categories.Category
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlansProblem
 import com.smtm.core.spi.PlansRepository
@@ -17,16 +18,17 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
-class PlansRepositoryJpaAdapter(
+open class PlansRepositoryJpaAdapter(
     entityManager: EntityManager,
     private val ownerIdProvider: () -> OwnerId,
 ) : PlansQueries, PlansRepository {
 
-    private val plansJpaRepository = JpaRepositoryFactory(entityManager).getRepository(PlansJpaRepository::class.java)
-    private val categorySetsJpaRepository =
-        JpaRepositoryFactory(entityManager).getRepository(CategorySetsJpaRepository::class.java)
+    private val jpaRepositoryFactory = JpaRepositoryFactory(entityManager)
+    private val plansJpaRepository = jpaRepositoryFactory.getRepository(PlansJpaRepository::class.java)
+    private val categorySetsJpaRepository = jpaRepositoryFactory.getRepository(CategorySetsJpaRepository::class.java)
     private val logger = LoggerFactory.getLogger(PlansRepositoryJpaAdapter::class.java)
 
     override fun getPlanHeadersBy(criteria: PlansQueries.Criteria): Either<Throwable, PlanHeaders> =
@@ -42,9 +44,14 @@ class PlansRepositoryJpaAdapter(
             .onFailure { logger.error("Error while fetching the plan of ID: $id", it) }
             .getOrElse { it.toPlansProblem(id).left() }
 
-    override fun save(plan: Plan): Either<PlansProblem, Plan> {
-        TODO("Not yet implemented")
-    }
+    @Transactional
+    override fun save(plan: Plan): Either<PlansProblem, Plan> =
+        plansJpaRepository
+            .runCatching { save(PlanEntity.from(plan, ownerIdProvider())) }
+            .map { it.toPlan(plan.categories) }
+            .map { it.right() }
+            .onFailure { logger.error("Error while saving the plan of ID: $it", it) }
+            .getOrElse { it.toPlansProblem().left() }
 
     private fun getByOwnerAndMatchingDate(owner: OwnerId, date: LocalDate): Either<Throwable, PlanHeaders> =
         plansJpaRepository
@@ -63,11 +70,16 @@ class PlansRepositoryJpaAdapter(
             .getOrElse { it.left() }
 
     private fun createPlan(entity: PlanEntity): Plan =
-        categorySetsJpaRepository
-            .runCatching { findByOwnerId(ownerIdProvider().asString()) }
-            .map { it?.categories ?: emptyList() }
+        runCatching { findCategoriesByOwnerId(ownerIdProvider()) }
             .map { entity.toPlan(it) }
             .getOrThrow()
+
+    private fun findCategoriesByOwnerId(owner: OwnerId): List<Category> =
+        categorySetsJpaRepository
+            .findByOwnerId(owner.asString())
+            ?.categories
+            ?.map { it.toDomain() }
+            ?: emptyList()
 }
 
 private fun List<PlanEntity>.toPlanHeaders(): PlanHeaders =
@@ -76,5 +88,8 @@ private fun List<PlanEntity>.toPlanHeaders(): PlanHeaders =
 private fun Throwable.toPlansProblem(id: EntityId): PlansProblem =
     when (this) {
         is EntityNotFoundException -> PlansProblem.notFound(id)
-        else -> PlansProblem.failure(this)
+        else -> toPlansProblem()
     }
+
+private fun Throwable.toPlansProblem(): PlansProblem =
+    PlansProblem.failure(this)
