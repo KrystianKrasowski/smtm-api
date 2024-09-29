@@ -7,34 +7,40 @@ Feature: Plans
       | ID-rent      | Rent      | HOUSE         |
       | ID-savings   | Savings   | PIGGY_BANK    |
       | ID-groceries | Groceries | SHOPPING_CART |
+    * user plans are
+      | id      | name           | start      | end        |
+      | plan-10 | September 2024 | 2024-09-01 | 2024-09-30 |
+      | plan-20 | September 2024 | 2024-10-01 | 2024-10-31 |
 
 
   Scenario: The one where plan is created successfully
-    Given plan is defined
+    When plan is defined
       | id      | name          | start      | end        |
       | plan-30 | November 2024 | 2024-11-01 | 2024-11-30 |
-    And plan has category "ID-rent" with value PLN 385.79
-    And plan has category "ID-savings" with value PLN 5500.00
-    And plan has category "ID-groceries" with value PLN 1200.00
-    When user creates a plan
+    And plan entries are defined
+      | category  | value       |
+      | Groceries | PLN 1200.00 |
+      | Rent      | PLN 385.79  |
+      | Savings   | PLN 5500.00 |
+    And user creates a plan
     Then plan "plan-30" is saved successfully
 
 
   Scenario: The one where plan has start after end
-    Given plan is defined
+    When plan is defined
       | id      | name          | start      | end        |
       | plan-30 | November 2024 | 2024-12-01 | 2024-11-30 |
-    When user creates a plan
+    And user creates a plan
     Then plan is not saved due to constraint violations
       | path   | code    |
       | period | INVALID |
 
 
   Scenario Outline: The one where plan has invalid name
-    Given plan is defined
+    When plan is defined
       | id      | name   | start      | end        |
       | plan-30 | <name> | 2024-11-01 | 2024-11-30 |
-    When user creates a plan
+    And user creates a plan
     Then plan is not saved due to constraint violations
       | path | code               | illegal characters   |
       | name | ILLEGAL_CHARACTERS | <illegal characters> |
@@ -46,15 +52,17 @@ Feature: Plans
 
 
   Scenario: The one where plan has duplicated entries
-    Given plan is defined
+    When plan is defined
       | id      | name          | start      | end        |
       | plan-30 | November 2024 | 2024-11-01 | 2024-11-30 |
-    And plan has category "ID-groceries" with value PLN 1200.00
-    And plan has category "ID-rent" with value PLN 385.79
-    And plan has category "ID-savings" with value PLN 5500.00
-    And plan has category "ID-groceries" with value PLN 1200.00
-    And plan has category "ID-rent" with value PLN 385.79
-    When user creates a plan
+    And plan entries are defined
+      | category  | value       |
+      | Groceries | PLN 1200.00 |
+      | Rent      | PLN 385.79  |
+      | Savings   | PLN 5500.00 |
+      | Groceries | PLN 1200.00 |
+      | Rent      | PLN 385.79  |
+    And user creates a plan
     Then plan is not saved due to constraint violations
       | path               | code       |
       | entries/4/category | NON_UNIQUE |
@@ -62,16 +70,31 @@ Feature: Plans
 
 
   Scenario: The one where plan has an entry for unknown category
-    Given plan is defined
+    When plan is defined
       | id      | name          | start      | end        |
       | plan-30 | November 2024 | 2024-11-01 | 2024-11-30 |
-    And plan has category "ID-unknown-category-1" with value PLN 1299.00
-    And plan has category "ID-rent" with value PLN 385.79
-    And plan has category "ID-unknown-category-1" with value PLN 1299.00
-    And plan has category "ID-unknown-category-2" with value PLN 1299.00
-    When user creates a plan
+    And plan entries are defined
+      | category  | value       |
+      | Unknown 1 | PLN 1299.00 |
+      | Rent      | PLN 385.79  |
+      | Unknown 1 | PLN 1299.00 |
+      | Unknown 2 | PLN 1299.00 |
+    And user creates a plan
     Then plan is not saved due to constraint violations
       | path               | code    |
       | entries/1/category | UNKNOWN |
       | entries/3/category | UNKNOWN |
       | entries/4/category | UNKNOWN |
+
+
+  Scenario: The one where plan is updated successfully
+    When plan is defined
+      | id      | name               | start      | end        |
+      | plan-20 | Awesome OCTOBER!!! | 2024-10-01 | 2024-10-31 |
+    And plan entries are defined
+      | category  | value          |
+      | Rent      | PLN 279.79     |
+      | Savings   | PLN 1000000.00 |
+      | Groceries | PLN 700.00     |
+    When user updates a plan
+    Then plan "plan-20" is saved successfully

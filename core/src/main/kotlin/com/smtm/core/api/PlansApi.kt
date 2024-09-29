@@ -10,7 +10,9 @@ import com.smtm.core.spi.PlansRepository
 
 interface PlansApi {
 
-    fun store(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan>
+    fun create(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan>
+
+    fun update(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan>
 
     companion object {
 

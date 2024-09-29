@@ -35,6 +35,12 @@ data class Plan(
             }
             .mapLeft { PlansProblem.validationErrors(it) }
 
+    fun redefine(header: PlanHeader): Plan =
+        copy(header = header)
+
+    fun redefine(entries: List<Entry>): Plan =
+        copy(entries = entries)
+
     data class Entry(
         val categoryId: EntityId,
         val value: MonetaryAmount
@@ -42,7 +48,7 @@ data class Plan(
 
     companion object {
 
-        fun newValidated(
+        fun validated(
             header: PlanHeader,
             entries: List<Entry>,
             categories: List<Category>

@@ -14,12 +14,12 @@ import com.smtm.application.spring.endpoints.exceptions.PlansProblemException
 import com.smtm.core.api.PlansApi
 import com.smtm.core.api.PlansQueries
 import com.smtm.core.domain.EntityId
-import com.smtm.core.domain.plans.Plan
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -48,9 +48,22 @@ class PlansEndpoint(
         produces = [MediaType.VERSION_1_JSON]
     )
     fun createPlan(@RequestBody planDto: PlanDto): ResponseEntity<PlanResource> =
-        plansApi.store(planDto.toHeader(), planDto.toEntries())
+        plansApi.create(planDto.toHeader(), planDto.toEntries())
             .map { it.toHalResource(linksFactory) }
             .map { ResponseEntity.created(it.getSelfURI()).body(it) }
+            .getOrElse { throw PlansProblemException(it) }
+
+    @PutMapping(
+        path = ["/{id}"],
+        consumes = [MediaType.VERSION_1_JSON],
+        produces = [MediaType.VERSION_1_JSON]
+    )
+    fun updatePlan(
+        @PathVariable("id") id: String,
+        @RequestBody planDto: PlanDto
+    ): ResponseEntity<Nothing> =
+        plansApi.update(planDto.toHeader(id), planDto.toEntries())
+            .map { ResponseEntity.noContent().build<Nothing>() }
             .getOrElse { throw PlansProblemException(it) }
 
     @ExceptionHandler

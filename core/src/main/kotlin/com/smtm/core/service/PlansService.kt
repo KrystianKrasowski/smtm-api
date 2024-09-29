@@ -15,9 +15,17 @@ internal class PlansService(
     private val plansRepository: PlansRepository
 ) : PlansApi {
 
-    override fun store(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan> =
+    override fun create(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan> =
         getCategories()
-            .flatMap { Plan.newValidated(header, entries, it.toList()) }
+            .flatMap { Plan.validated(header, entries, it.toList()) }
+            .flatMap { plansRepository.save(it) }
+
+    override fun update(header: PlanHeader, entries: List<Plan.Entry>): Either<PlansProblem, Plan> =
+        plansRepository
+            .getPlan(header.id)
+            .map { it.redefine(header) }
+            .map { it.redefine(entries) }
+            .flatMap { it.validate() }
             .flatMap { plansRepository.save(it) }
 
     private fun getCategories(): Either<PlansProblem, Categories> =

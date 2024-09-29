@@ -5,38 +5,42 @@ import assertk.assertions.containsAtLeast
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import com.smtm.core.World
-import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Violation
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
 import com.smtm.core.domain.plans.PlansProblem
-import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
-import javax.money.MonetaryAmount
 
 class PlansServiceStepdefs(private val world: World) {
 
     private val plansService get() = PlansService(world.categoriesRepository, world.plansRepository)
 
-    private var entries: MutableList<Plan.Entry> = mutableListOf()
+    private var entries: List<Plan.Entry> = mutableListOf()
     private lateinit var planHeader: PlanHeader
     private lateinit var plan: Plan
     private lateinit var problem: PlansProblem
 
-    @Given("plan is defined")
+    @When("plan is defined")
     fun `plan is defined`(planHeader: PlanHeader) {
         this.planHeader = planHeader
     }
 
-    @Given("plan has category {string} with value {money}")
-    fun `plan has category with value`(categoryId: String, value: MonetaryAmount) {
-        entries.add(Plan.entry(EntityId.of(categoryId), value))
+    @When("plan entries are defined")
+    fun `plan entries are defined`(entries: List<Plan.Entry>) {
+        this.entries = entries
     }
 
     @When("user creates a plan")
     fun `user creates s plan`() {
-        plansService.store(planHeader, entries)
+        plansService.create(planHeader, entries)
+            .onRight { plan = it }
+            .onLeft { problem = it }
+    }
+
+    @When("user updates a plan")
+    fun `user updates a plan`() {
+        plansService.update(planHeader, entries)
             .onRight { plan = it }
             .onLeft { problem = it }
     }

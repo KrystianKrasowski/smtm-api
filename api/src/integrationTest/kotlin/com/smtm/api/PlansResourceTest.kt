@@ -9,7 +9,6 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class PlansResourceTest {
@@ -254,13 +253,12 @@ class PlansResourceTest {
     }
 
     @Test
-    @Disabled("Not implemented yet with this approach")
     fun `should update plan by id`() {
         Given {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
-        } When {
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
             body(
                 """
                 {
@@ -268,25 +266,25 @@ class PlansResourceTest {
                     "name": "Super September 2024",
                     "period": {
                         "start": "2024-09-01",
-                        "end": "2024-09-30",
+                        "end": "2024-09-30"
                     },
                     "entries": [
                         {
-                            "category-id": 1,
+                            "category-id": "smtm-cat-1",
                             "value": {
                                 "amount": 41099,
                                 "currency": "PLN"
                             }
                         },
                         {
-                            "category-id": 2,
+                            "category-id": "smtm-cat-2",
                             "value": {
                                 "amount": 500000,
                                 "currency": "PLN"
                             }
                         },
                         {
-                            "category-id": 3,
+                            "category-id": "smtm-cat-3",
                             "value": {
                                 "amount": 100000,
                                 "currency": "PLN"
@@ -296,21 +294,20 @@ class PlansResourceTest {
                 }
             """.trimIndent()
             )
-            put("/plans/1")
+        } When {
+            put("/plans/plan-1")
         } Then {
             statusCode(204)
-            header("Location", "http://localhost:8080/plans/1")
         }
     }
 
     @Test
-    @Disabled("Not implemented yet with this approach")
     fun `should return 404 while updating unknown plan`() {
         Given {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
-        } When {
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
             body(
                 """
                 {
@@ -318,25 +315,25 @@ class PlansResourceTest {
                     "name": "Super September 2024",
                     "period": {
                         "start": "2024-09-01",
-                        "end": "2024-09-30",
+                        "end": "2024-09-30"
                     },
                     "entries": [
                         {
-                            "category-id": 1,
+                            "category-id": "smtm-cat-1",
                             "value": {
                                 "amount": 41099,
                                 "currency": "PLN"
                             }
                         },
                         {
-                            "category-id": 2,
+                            "category-id": "smtm-cat-2",
                             "value": {
                                 "amount": 500000,
                                 "currency": "PLN"
                             }
                         },
                         {
-                            "category-id": 3,
+                            "category-id": "smtm-cat-3",
                             "value": {
                                 "amount": 100000,
                                 "currency": "PLN"
@@ -346,6 +343,7 @@ class PlansResourceTest {
                 }
             """.trimIndent()
             )
+        } When {
             put("/plans/99")
         } Then {
             statusCode(404)
@@ -356,38 +354,37 @@ class PlansResourceTest {
     }
 
     @Test
-    @Disabled("Not implemented yet with this approach")
     fun `should return 422 while updating invalid plan`() {
         Given {
             port(8080)
             header("Content-Type", "application/vnd.smtm.v1+json")
             header("Accept", "application/vnd.smtm.v1+json")
-        } When {
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
             body(
                 """
                 {
                     "name": "September <2024>",
                     "period": {
                         "start": "2024-10-01",
-                        "end": "2024-09-30",
+                        "end": "2024-09-30"
                     },
                     "entries": [
                         {
-                            "category-id": 1,
+                            "category-id": "smtm-cat-1",
                             "value": {
                                 "amount": 37959,
                                 "currency": "PLN"
                             }
                         },
                         {
-                            "category-id": 2,
+                            "category-id": "smtm-cat-2",
                             "value": {
                                 "amount": 600000,
                                 "currency": "PLN"
                             }
                         },
                         {
-                            "category-id": 99,
+                            "category-id": "smtm-cat-99",
                             "value": {
                                 "amount": 100000,
                                 "currency": "PLN"
@@ -397,22 +394,20 @@ class PlansResourceTest {
                 }
             """.trimIndent()
             )
-            put("/plans/1")
+        } When {
+            put("/plans/plan-1")
         } Then {
             statusCode(422)
             header("Content-Type", "application/problem+json")
             body("type", equalTo("https://api.smtm.com/problems/constraint-violations"))
             body("title", equalTo("Provided resource is not valid"))
-            body("violations[0].path", equalTo("/name"))
-            body("violations[0].message", equalTo("contains illegal characters: %chars%"))
+            body("violations[0].path", equalTo("name"))
             body("violations[0].code", equalTo("ILLEGAL_CHARACTERS"))
-            body("violations[0].parameters.chars", equalTo("<, >"))
-            body("violations[1].path", equalTo("/period"))
-            body("violations[1].message", equalTo("invalid date range"))
-            body("violations[1].code", equalTo("INVALID_DATE_RANGE"))
-            body("violations[2].path", equalTo("/entries/2/category-id"))
-            body("violations[2].message", equalTo("unknown category"))
-            body("violations[2].code", equalTo("UNKNOWN_CATEGORY"))
+            body("violations[0].parameters.illegal-characters", equalTo("<, >"))
+            body("violations[1].path", equalTo("period"))
+            body("violations[1].code", equalTo("INVALID"))
+            body("violations[2].path", equalTo("entries/3/category"))
+            body("violations[2].code", equalTo("UNKNOWN"))
         }
     }
 }
