@@ -1,11 +1,9 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.8.21' apply false
-    id 'org.jetbrains.kotlin.plugin.jpa' version '1.8.21' apply false
-    id 'org.springframework.boot' version '3.1.0' apply false
-    id 'io.spring.dependency-management' version '1.1.0' apply false
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.8.21' apply false
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25' apply false
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.25' apply false
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25' apply false
+    id 'org.springframework.boot' version '3.3.3' apply false
+    id 'io.spring.dependency-management' version '1.1.6' apply false
     id 'org.flywaydb.flyway' version '9.19.3' apply false
 }
 
@@ -17,25 +15,24 @@ ext {
     ASSERTK_VERSION = '0.28.1'
     CUCUMBER_VERSION = '7.14.0'
     MONETA_VERSION = '1.1'
-    SPRING_VERSION = '6.0.9'
-    SPRING_BOOT_VERSION = '3.1.0'
-    SPRING_DATA_VERSION = '3.1.0'
+    SPRING_VERSION = '6.1.13'
+    SPRING_BOOT_VERSION = '3.3.3'
+    SPRING_DATA_VERSION = '3.3.3'
     JPA_VERSION = '3.1.0'
     TEST_CONTAINERS_VERSION = '1.20.0'
     POSTGRES_VERSION = '42.6.0'
+    FLYWAY_VERSION = '10.18.2'
 }
 
 subprojects {
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+
     repositories {
         mavenCentral()
     }
-}
 
-allprojects {
-    tasks.withType(KotlinCompile).configureEach {
-        kotlinOptions {
-            freeCompilerArgs = ['-Xjsr305=strict']
-            jvmTarget = '17'
-        }
+    compileKotlin {
+        kotlinOptions.jvmTarget = '21'
+        kotlinOptions.freeCompilerArgs = ['-Xjsr305=strict']
     }
 }
