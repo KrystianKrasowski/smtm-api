@@ -10,4 +10,6 @@ interface PlansRepository {
     fun save(plan: Plan): Either<PlansProblem, Plan>
 
     fun getPlan(id: EntityId): Either<PlansProblem, Plan>
+
+    fun deleteById(id: EntityId): Either<PlansProblem, EntityId>
 }

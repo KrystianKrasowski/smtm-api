@@ -53,6 +53,18 @@ open class PlansRepositoryJpaAdapter(
             .onFailure { logger.error("Error while saving the plan of ID: $it", it) }
             .getOrElse { it.toPlansProblem().left() }
 
+    @Transactional
+    override fun deleteById(id: EntityId): Either<PlansProblem, EntityId> =
+        plansJpaRepository
+            .runCatching { deleteByEntityId(id.asString()) }
+            .map { affectedRows ->
+                id.takeUnless { affectedRows == 0 }
+                    ?.right()
+                    ?: PlansProblem.notFound(id).left()
+            }
+            .onFailure { logger.error("Error while deleting the plan of ID: $id", it) }
+            .getOrElse { it.toPlansProblem().left() }
+
     private fun getByOwnerAndMatchingDate(owner: OwnerId, date: LocalDate): Either<Throwable, PlanHeaders> =
         plansJpaRepository
             .runCatching { findByOwnerIdAndMatchingDate(date, owner.asString()) }

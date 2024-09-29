@@ -12,19 +12,20 @@ class PlansTestRepository : PlansRepository {
     var plans: MutableList<Plan> = mutableListOf()
 
     override fun save(plan: Plan): Either<PlansProblem, Plan> =
-        plan
-            .also { plans.add(it) }
+        plan.also { plans.add(it) }
             .right()
 
     override fun getPlan(id: EntityId): Either<PlansProblem, Plan> =
-        plans
-            .firstOrNull { it.id == id }
+        plans.firstOrNull { it.id == id }
+            ?.right()
+            ?: PlansProblem.notFound(id).left()
+
+    override fun deleteById(id: EntityId): Either<PlansProblem, EntityId> =
+        id.takeIf { entityId -> plans.removeIf { it.id == entityId } }
             ?.right()
             ?: PlansProblem.notFound(id).left()
 
     fun hasPlan(id: String): Boolean =
-        plans
-            .map { it.id.asString() }
+        plans.map { it.id.asString() }
             .contains(id)
-
 }

@@ -5,6 +5,7 @@ import assertk.assertions.containsAtLeast
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import com.smtm.core.World
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Violation
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
@@ -45,11 +46,24 @@ class PlansServiceStepdefs(private val world: World) {
             .onLeft { problem = it }
     }
 
+    @When("user deletes the plan of id {string}")
+    fun `user deletes plan of id`(id: String) {
+        plansService.delete(EntityId.of(id))
+            .onLeft { problem = it }
+    }
+
     @Then("plan is not saved due to constraint violations")
     fun `plan is not saved due to constraint violations`(violation: List<Violation>) {
         assertThat(problem)
             .isNotNull()
             .isInstanceOf(PlansProblem.ValidationErrors::class)
             .containsAtLeast(*violation.toTypedArray())
+    }
+
+    @Then("unknown plan problem occurs")
+    fun `unknown plan problem occurs`() {
+        assertThat(problem)
+            .isNotNull()
+            .isInstanceOf(PlansProblem.NotFound::class)
     }
 }
