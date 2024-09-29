@@ -53,6 +53,9 @@ open class PlansRepositoryJpaAdapter(
             .onFailure { logger.error("Error while saving the plan of ID: $it", it) }
             .getOrElse { it.toPlansProblem().left() }
 
+    override fun deleteById(id: EntityId): Either<PlansProblem, EntityId> =
+        TODO("Not yet implemented")
+
     private fun getByOwnerAndMatchingDate(owner: OwnerId, date: LocalDate): Either<Throwable, PlanHeaders> =
         plansJpaRepository
             .runCatching { findByOwnerIdAndMatchingDate(date, owner.asString()) }

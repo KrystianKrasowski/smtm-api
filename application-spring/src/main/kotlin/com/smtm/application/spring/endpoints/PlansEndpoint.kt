@@ -14,7 +14,9 @@ import com.smtm.application.spring.endpoints.exceptions.PlansProblemException
 import com.smtm.core.api.PlansApi
 import com.smtm.core.api.PlansQueries
 import com.smtm.core.domain.EntityId
+import com.smtm.core.domain.plans.PlansProblem
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -65,6 +67,12 @@ class PlansEndpoint(
         plansApi.update(planDto.toHeader(id), planDto.toEntries())
             .map { ResponseEntity.noContent().build<Nothing>() }
             .getOrElse { throw PlansProblemException(it) }
+
+    @DeleteMapping("/{id}")
+    fun deletePlan(@PathVariable("id") id: String): ResponseEntity<Nothing> =
+        EntityId.of(id)
+            .let { PlansProblem.notFound(it) }
+            .let { throw PlansProblemException(it) }
 
     @ExceptionHandler
     fun handleCategoriesProblemException(exception: PlansProblemException): ResponseEntity<ApiProblemDto> =

@@ -410,4 +410,31 @@ class PlansResourceTest {
             body("violations[2].code", equalTo("UNKNOWN"))
         }
     }
+
+    @Test
+    fun `should delete existing plan`() {
+        Given {
+            port(8080)
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
+        } When {
+            delete("/plans/plan-1")
+        } Then {
+            statusCode(204)
+        }
+    }
+
+    @Test
+    fun `should return 404 while deleting non existing category`() {
+        Given {
+            port(8080)
+            header("Authorization", "Bearer ${Environment.getAccessToken("owner-1")}")
+        } When {
+            delete("/plans/plan-999")
+        } Then {
+            statusCode(404)
+            header("Content-Type", "application/problem+json")
+            body("type", equalTo("https://api.smtm.com/problems/unknown-resource"))
+            body("title", equalTo("Requested resource is unknown"))
+        }
+    }
 }

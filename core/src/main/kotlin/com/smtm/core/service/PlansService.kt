@@ -2,7 +2,9 @@ package com.smtm.core.service
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.left
 import com.smtm.core.api.PlansApi
+import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
@@ -27,6 +29,9 @@ internal class PlansService(
             .map { it.redefine(entries) }
             .flatMap { it.validate() }
             .flatMap { plansRepository.save(it) }
+
+    override fun delete(id: EntityId): Either<PlansProblem, EntityId> =
+        plansRepository.deleteById(id)
 
     private fun getCategories(): Either<PlansProblem, Categories> =
         categoriesRepository

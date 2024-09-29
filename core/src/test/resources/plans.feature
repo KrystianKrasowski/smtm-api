@@ -98,3 +98,8 @@ Feature: Plans
       | Groceries | PLN 700.00     |
     When user updates a plan
     Then plan "plan-20" is saved successfully
+
+
+  Scenario: The one where deleting plan does not exist
+    When user deletes the plan of id "plan-950"
+    Then unknown plan problem occurs
