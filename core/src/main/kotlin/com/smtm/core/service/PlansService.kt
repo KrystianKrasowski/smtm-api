@@ -2,7 +2,6 @@ package com.smtm.core.service
 
 import arrow.core.Either
 import arrow.core.flatMap
-import arrow.core.left
 import com.smtm.core.api.PlansApi
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.categories.Categories
