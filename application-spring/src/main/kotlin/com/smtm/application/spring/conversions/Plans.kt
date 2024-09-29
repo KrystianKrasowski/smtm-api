@@ -2,8 +2,6 @@ package com.smtm.application.spring.conversions
 
 import com.smtm.api.LinkFactory
 import com.smtm.api.ResourcePaths
-import com.smtm.api.v1.CategoryDto
-import com.smtm.api.v1.CategoryResource
 import com.smtm.api.v1.DatePeriodDto
 import com.smtm.api.v1.MoneyDto
 import com.smtm.api.v1.PlanDto
@@ -11,9 +9,13 @@ import com.smtm.api.v1.PlanHeaderDto
 import com.smtm.api.v1.PlanHeaderResource
 import com.smtm.api.v1.PlanHeadersCollection
 import com.smtm.api.v1.PlanResource
+import com.smtm.application.spring.conversions.Categories.toResource
 import com.smtm.core.api.PlanHeaders
+import com.smtm.core.domain.EntityId
+import com.smtm.core.domain.categories.Category
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
+import javax.swing.text.html.parser.Entity
 
 object Plans {
 
@@ -41,12 +43,25 @@ object Plans {
                     start = start,
                     end = end
                 ),
-                entries = entries.map { it.toEntryDto() },
+                entries = entries.map { it.toEntryDto(categories) },
             ),
             embedded = mapOf(
-                "categories" to entries.map { it.toCategoryResource(linkFactory) }
+                "categories" to categories.map { it.toResource(linkFactory) }
             )
         )
+
+    fun PlanDto.toHeader(id: String? = null): PlanHeader =
+        id?.let { EntityId.of(it) }
+            ?.let { PlanHeader.of(it, name, period.start, period.end) }
+            ?: PlanHeader.newOf(name, period.start, period.end)
+
+    fun PlanDto.toEntries(): List<Plan.Entry> =
+        entries.map {
+            Plan.Entry(
+                categoryId = EntityId.of(it.categoryId),
+                value = it.value.monetaryAmount
+            )
+        }
 
     private fun PlanHeader.toResource(linkFactory: LinkFactory): PlanHeaderResource =
         PlanHeaderResource(
@@ -63,21 +78,9 @@ object Plans {
             ),
         )
 
-    private fun Plan.Entry.toEntryDto(): PlanDto.Entry =
+    private fun Plan.Entry.toEntryDto(categories: List<Category>): PlanDto.Entry =
         PlanDto.Entry(
-            categoryId = category.id.asString(),
+            categoryId = categories.first { it.id == categoryId }.id.asString(),
             value = MoneyDto.of(value)
-        )
-
-    private fun Plan.Entry.toCategoryResource(linkFactory: LinkFactory): CategoryResource =
-        CategoryResource(
-            links = mapOf(
-                "self" to linkFactory.create("/categories/${category.id}")
-            ),
-            id = category.id.asString(),
-            category = CategoryDto(
-                name = category.name,
-                icon = category.icon.name
-            )
         )
 }

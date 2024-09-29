@@ -7,6 +7,7 @@ import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.Version
 import com.smtm.core.domain.Violation
+import com.smtm.core.domain.shared.extractIllegalCharactersFrom
 
 data class Categories(
     val id: OwnerId,
@@ -86,9 +87,7 @@ private class CategoryValidator(private val categories: Categories, private val 
 
     fun hasUniqueName(): Violation? =
         Violation.nonUnique("name")
-            .takeIf {
-                categories.any { it.name == category.name }
-            }
+            .takeIf { categories.any { it.name == category.name } }
             ?.also { violations.add(it) }
 
     fun hasNotEmptyName(): Violation? =
@@ -108,8 +107,3 @@ private class CategoryValidator(private val categories: Categories, private val 
     fun getViolations(): Collection<Violation> =
         violations.toSet()
 }
-
-private fun Regex.extractIllegalCharactersFrom(text: String) = replace(text, "")
-    .toCharArray()
-    .distinct()
-    .toCharArray()

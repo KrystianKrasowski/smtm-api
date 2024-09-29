@@ -2,7 +2,6 @@ Feature: Categories
 
 
   Background:
-    * user categories version is 1
     * user categories are
       | id         | name    | icon       |
       | category-1 | Rent    | HOUSE      |

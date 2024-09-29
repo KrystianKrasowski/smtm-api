@@ -10,11 +10,14 @@ import com.smtm.core.domain.categories.Category
 
 class CategoriesTestRepository : CategoriesRepository {
 
-    private var categories = Categories(
-        id = OwnerId.of("owner-john-doe"),
-        version = Version.of(0),
-        actual = emptyList()
-    )
+    var categoryList: List<Category> = listOf()
+
+    private val categories: Categories
+        get() = Categories(
+            id = OwnerId.of("owner-john-doe"),
+            version = Version.of(0),
+            actual = categoryList
+        )
 
     override fun getCategories(): Either<CategoriesProblem, Categories> {
         return categories.right()
@@ -22,13 +25,5 @@ class CategoriesTestRepository : CategoriesRepository {
 
     override fun save(categories: Categories): Either<CategoriesProblem, Categories> {
         return categories.right()
-    }
-
-    fun setVersion(version: Int) {
-        categories = categories.copy(version = Version.of(version))
-    }
-
-    fun setCategories(categoryList: List<Category>) {
-        categories = categories.copy(actual = categoryList)
     }
 }

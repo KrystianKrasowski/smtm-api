@@ -12,7 +12,8 @@ data class Violation(val path: Path, val code: Code, val parameters: Map<String,
         EMPTY,
         ILLEGAL_CHARACTERS,
         NON_UNIQUE,
-        UNKNOWN
+        UNKNOWN,
+        INVALID
     }
 
     companion object {
@@ -40,5 +41,11 @@ data class Violation(val path: Path, val code: Code, val parameters: Map<String,
 
         fun unknown(path: Path): Violation =
             Violation(path, Code.UNKNOWN)
+
+        fun unknown(path: String): Violation =
+            Violation(path(path), Code.UNKNOWN)
+
+        fun invalid(path: String): Violation =
+            Violation(path(path), Code.INVALID)
     }
 }

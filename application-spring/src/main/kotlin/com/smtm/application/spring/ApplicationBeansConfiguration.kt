@@ -2,6 +2,7 @@ package com.smtm.application.spring
 
 import com.smtm.api.LinkFactory
 import com.smtm.core.api.CategoriesApi
+import com.smtm.core.api.PlansApi
 import com.smtm.core.api.PlansQueries
 import com.smtm.core.domain.OwnerId
 import com.smtm.infrastructure.adapters.CategoriesRepositoryJpaAdapter
@@ -34,6 +35,13 @@ class ApplicationBeansConfiguration {
     @Bean
     fun categoriesApi(repository: CategoriesRepositoryJpaAdapter): CategoriesApi =
         CategoriesApi.of(repository)
+
+    @Bean
+    fun plansApi(
+        categoriesRepository: CategoriesRepositoryJpaAdapter,
+        plansRepository: PlansRepositoryJpaAdapter
+        ): PlansApi =
+        PlansApi.of(categoriesRepository, plansRepository)
 
     @Bean
     fun plansQueries(plansAdapter: PlansRepositoryJpaAdapter): PlansQueries =
