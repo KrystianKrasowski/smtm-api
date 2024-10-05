@@ -15,26 +15,20 @@ data class Tags<T : Tag>(
     override fun iterator(): Iterator<T> =
         tagsCollection.iterator()
 
-    fun getById(id: EntityId): Either<TagsProblem, T> =
-        tagsCollection
-            .runCatching { first { it.id == id } }
-            .map { it.right() }
-            .getOrElse { TagsProblem.from(it).left() }
+    fun getBy(id: EntityId): Either<TagsProblem, T> =
+        getBy { it.id == id }
 
-    fun getByName(name: String): Either<TagsProblem, T> =
-        tagsCollection
-            .runCatching { first { it.name == name } }
-            .map { it.right() }
-            .getOrElse { TagsProblem.from(it).left() }
+    fun getBy(name: String): Either<TagsProblem, T> =
+        getBy { it.name == name }
 
     fun add(tag: T): Either<TagsProblem, Tags<T>> =
-        validate(tag)
-            .map { upsertTag(it) }
+        tag.validate()
+            .map { it.upsert() }
 
     fun replace(tag: T): Either<TagsProblem, Tags<T>> =
         tag.takeIf { hasTagWith(tag.id) }
-            ?.let { validate(it) }
-            ?.map { upsertTag(it) }
+            ?.validate()
+            ?.map { it.upsert() }
             ?: TagsProblem.unknown(tag.id).left()
 
     fun delete(id: EntityId): Either<TagsProblem, Tags<T>> =
@@ -43,8 +37,14 @@ data class Tags<T : Tag>(
             ?.right()
             ?: TagsProblem.unknown(id).left()
 
-    private fun validate(tag: T): Either<TagsProblem, T> =
-        TagValidator(tag, tagsCollection)
+    private fun getBy(predicate: (T) -> Boolean): Either<TagsProblem, T> =
+        tagsCollection
+            .runCatching { first(predicate) }
+            .map { it.right() }
+            .getOrElse { TagsProblem.from(it).left() }
+
+    private fun T.validate(): Either<TagsProblem, T> =
+        TagValidator(this, tagsCollection)
             .validate {
                 hasUniqueName()
                 hasNotEmptyName()
@@ -52,10 +52,10 @@ data class Tags<T : Tag>(
             }
             .mapLeft { TagsProblem.from(it) }
 
-    private fun upsertTag(tag: T): Tags<T> =
+    private  fun T.upsert(): Tags<T> =
         tagsCollection.toMutableList()
-            .apply { removeIf { it.id == tag.id } }
-            .apply { add(tag) }
+            .apply { removeIf { it.id == id } }
+            .also { it.add(this) }
             .let { copy(tagsCollection = it.toList()) }
 
     private fun hasTagWith(id: EntityId): Boolean =

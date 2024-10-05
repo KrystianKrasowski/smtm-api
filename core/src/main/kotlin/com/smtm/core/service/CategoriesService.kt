@@ -23,7 +23,7 @@ internal class CategoriesService(
             .getCategories()
             .flatMap { it.add(category) }
             .flatMap { categoriesRepository.save(it) }
-            .flatMap { it.getById(category.id) }
+            .flatMap { it.getBy(category.id) }
             .mapLeft { CategoriesProblem.from(it) }
 
     override fun update(category: Category): Either<CategoriesProblem, Category> =
@@ -31,7 +31,7 @@ internal class CategoriesService(
             .getCategories()
             .flatMap { it.replace(category) }
             .flatMap { categoriesRepository.save(it) }
-            .flatMap { it.getById(category.id) }
+            .flatMap { it.getBy(category.id) }
             .mapLeft { CategoriesProblem.from(it) }
 
     override fun delete(id: EntityId): Either<CategoriesProblem, EntityId> =

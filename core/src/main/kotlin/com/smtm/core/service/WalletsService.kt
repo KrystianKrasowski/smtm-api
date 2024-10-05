@@ -23,7 +23,7 @@ internal class WalletsService(
             .getWallets()
             .flatMap { it.add(wallet) }
             .flatMap { walletsRepository.save(it) }
-            .flatMap { it.getById(wallet.id) }
+            .flatMap { it.getBy(wallet.id) }
             .mapLeft { WalletsProblem.from(it) }
 
     override fun update(wallet: Wallet): Either<WalletsProblem, Wallet> =
@@ -31,7 +31,7 @@ internal class WalletsService(
             .getWallets()
             .flatMap { it.replace(wallet) }
             .flatMap { walletsRepository.save(it) }
-            .flatMap { it.getById(wallet.id) }
+            .flatMap { it.getBy(wallet.id) }
             .mapLeft { WalletsProblem.from(it) }
 
     override fun delete(id: EntityId): Either<WalletsProblem, EntityId> =
