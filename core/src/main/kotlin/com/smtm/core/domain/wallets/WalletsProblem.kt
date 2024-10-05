@@ -2,6 +2,7 @@ package com.smtm.core.domain.wallets
 
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Violation
+import com.smtm.core.domain.tags.TagsProblem
 
 sealed interface WalletsProblem {
 
@@ -18,13 +19,11 @@ sealed interface WalletsProblem {
 
     companion object {
 
-        fun failure(throwable: Throwable): WalletsProblem =
-            Failure(throwable)
-
-        fun validationError(violations: Collection<Violation>): WalletsProblem =
-            ValidationErrors(violations)
-
-        fun unknown(id: EntityId): WalletsProblem =
-            Unknown(id)
+        internal fun from(tagsProblem: TagsProblem): WalletsProblem =
+            when (tagsProblem) {
+                is TagsProblem.Failure -> Failure(tagsProblem.throwable)
+                is TagsProblem.ValidationErrors -> ValidationErrors(tagsProblem.violations)
+                is TagsProblem.Unknown -> Unknown(tagsProblem.id)
+            }
     }
 }

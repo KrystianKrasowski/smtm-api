@@ -2,21 +2,20 @@ package com.smtm.core.api
 
 import arrow.core.Either
 import com.smtm.core.domain.EntityId
-import com.smtm.core.domain.categories.Category
-import com.smtm.core.domain.wallets.Wallets
+import com.smtm.core.domain.wallets.Wallet
 import com.smtm.core.domain.wallets.WalletsProblem
 import com.smtm.core.service.WalletsService
 import com.smtm.core.spi.WalletsRepository
 
 interface WalletsApi {
 
-    fun getAll(): Either<WalletsProblem, Wallets>
+    fun getAll(): Either<WalletsProblem, Collection<Wallet>>
 
-    fun create(category: Category): Either<WalletsProblem, Wallets>
+    fun create(category: Wallet): Either<WalletsProblem, Wallet>
 
-    fun update(category: Category): Either<WalletsProblem, Wallets>
+    fun update(category: Wallet): Either<WalletsProblem, Wallet>
 
-    fun delete(id: EntityId): Either<WalletsProblem, Wallets>
+    fun delete(id: EntityId): Either<WalletsProblem, EntityId>
 
     companion object {
 

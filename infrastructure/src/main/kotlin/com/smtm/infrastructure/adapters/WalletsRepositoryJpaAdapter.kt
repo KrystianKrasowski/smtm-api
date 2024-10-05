@@ -4,8 +4,9 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.smtm.core.domain.OwnerId
-import com.smtm.core.domain.wallets.Wallets
-import com.smtm.core.domain.wallets.WalletsProblem
+import com.smtm.core.domain.tags.Tags
+import com.smtm.core.domain.tags.TagsProblem
+import com.smtm.core.domain.wallets.Wallet
 import com.smtm.core.spi.WalletsRepository
 import com.smtm.infrastructure.persistence.wallets.WalletSetEntity
 import com.smtm.infrastructure.persistence.wallets.WalletSetsJpaRepository
@@ -22,20 +23,20 @@ open class WalletsRepositoryJpaAdapter(
     private val repository = JpaRepositoryFactory(entityManager).getRepository(WalletSetsJpaRepository::class.java)
     private val logger = LoggerFactory.getLogger(WalletsRepositoryJpaAdapter::class.java)
 
-    override fun getWallets(): Either<WalletsProblem, Wallets> =
+    override fun getWallets(): Either<TagsProblem, Tags<Wallet>> =
         repository
             .runCatching { findByOwnerId(ownerIdProvider().asString()) }
-            .map { it?.toDomain() ?: Wallets.empty(ownerIdProvider()) }
+            .map { it?.toDomain() ?: Tags.empty(ownerIdProvider().asEntityId()) }
             .map { it.right() }
             .onFailure { logger.error("Failed to fetch all categories", it) }
-            .getOrElse { WalletsProblem.failure(it).left() }
+            .getOrElse { TagsProblem.from(it).left() }
 
     @Transactional
-    override fun save(wallets: Wallets): Either<WalletsProblem, Wallets> =
+    override fun save(wallets: Tags<Wallet>): Either<TagsProblem, Tags<Wallet>> =
         repository
             .runCatching { save(WalletSetEntity.from(wallets)) }
             .map { it.toDomain() }
             .map { it.right() }
             .onFailure { logger.error("Failed to save categories", it) }
-            .getOrElse { WalletsProblem.failure(it).left() }
+            .getOrElse { TagsProblem.from(it).left() }
 }

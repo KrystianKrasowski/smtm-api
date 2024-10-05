@@ -1,7 +1,8 @@
 package com.smtm.infrastructure.persistence.wallets
 
-import com.smtm.core.domain.OwnerId
-import com.smtm.core.domain.wallets.Wallets
+import com.smtm.core.domain.EntityId
+import com.smtm.core.domain.tags.Tags
+import com.smtm.core.domain.wallets.Wallet
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -27,16 +28,16 @@ internal open class WalletSetEntity(
     open val wallets: MutableList<WalletEntity>
 ) {
 
-    fun toDomain(): Wallets =
-        Wallets(
-            id = OwnerId.of(ownerId),
+    fun toDomain(): Tags<Wallet> =
+        Tags(
+            id = EntityId.of(ownerId),
             version = DomainEntityVersion.of(version),
-            actual = wallets.map { it.toDomain() }
+            tagsCollection = wallets.map { it.toDomain() }
         )
 
     companion object {
 
-        fun from(categories: Wallets): WalletSetEntity {
+        fun from(categories: Tags<Wallet>): WalletSetEntity {
             val categorySetEntity = WalletSetEntity(
                 ownerId = categories.id.asString(),
                 version = categories.version.asInt(),

@@ -8,11 +8,10 @@ import com.smtm.api.v1.WalletsCollection
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Icon
 import com.smtm.core.domain.wallets.Wallet
-import com.smtm.core.domain.wallets.Wallets
 
 internal object Wallets {
 
-    fun Wallets.toHalCollection(linkFactory: LinkFactory): WalletsCollection =
+    fun Collection<Wallet>.toHalCollection(linkFactory: LinkFactory): WalletsCollection =
         WalletsCollection(
             links = mapOf(
                 "self" to linkFactory.create(ResourcePaths.WALLETS)

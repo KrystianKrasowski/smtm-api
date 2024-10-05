@@ -1,12 +1,13 @@
 package com.smtm.core.spi
 
 import arrow.core.Either
-import com.smtm.core.domain.wallets.Wallets
-import com.smtm.core.domain.wallets.WalletsProblem
+import com.smtm.core.domain.tags.Tags
+import com.smtm.core.domain.tags.TagsProblem
+import com.smtm.core.domain.wallets.Wallet
 
 interface WalletsRepository {
 
-    fun getWallets(): Either<WalletsProblem, Wallets>
+    fun getWallets(): Either<TagsProblem, Tags<Wallet>>
 
-    fun save(wallets: Wallets): Either<WalletsProblem, Wallets>
+    fun save(wallets: Tags<Wallet>): Either<TagsProblem, Tags<Wallet>>
 }
