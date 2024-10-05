@@ -11,9 +11,9 @@ interface WalletsApi {
 
     fun getAll(): Either<WalletsProblem, Collection<Wallet>>
 
-    fun create(category: Wallet): Either<WalletsProblem, Wallet>
+    fun create(wallet: Wallet): Either<WalletsProblem, Wallet>
 
-    fun update(category: Wallet): Either<WalletsProblem, Wallet>
+    fun update(wallet: Wallet): Either<WalletsProblem, Wallet>
 
     fun delete(id: EntityId): Either<WalletsProblem, EntityId>
 

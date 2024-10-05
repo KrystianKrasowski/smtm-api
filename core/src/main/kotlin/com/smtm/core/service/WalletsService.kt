@@ -1,6 +1,7 @@
 package com.smtm.core.service
 
 import arrow.core.Either
+import arrow.core.flatMap
 import com.smtm.core.api.WalletsApi
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.wallets.Wallet
@@ -17,15 +18,27 @@ internal class WalletsService(
             .map { it.toList() }
             .mapLeft { WalletsProblem.from(it) }
 
-    override fun create(category: Wallet): Either<WalletsProblem, Wallet> {
-        TODO("Not yet implemented")
-    }
+    override fun create(wallet: Wallet): Either<WalletsProblem, Wallet> =
+        walletsRepository
+            .getWallets()
+            .flatMap { it.add(wallet) }
+            .flatMap { walletsRepository.save(it) }
+            .flatMap { it.getById(wallet.id) }
+            .mapLeft { WalletsProblem.from(it) }
 
-    override fun update(category: Wallet): Either<WalletsProblem, Wallet> {
-        TODO("Not yet implemented")
-    }
+    override fun update(wallet: Wallet): Either<WalletsProblem, Wallet> =
+        walletsRepository
+            .getWallets()
+            .flatMap { it.replace(wallet) }
+            .flatMap { walletsRepository.save(it) }
+            .flatMap { it.getById(wallet.id) }
+            .mapLeft { WalletsProblem.from(it) }
 
-    override fun delete(id: EntityId): Either<WalletsProblem, EntityId> {
-        TODO("Not yet implemented")
-    }
+    override fun delete(id: EntityId): Either<WalletsProblem, EntityId> =
+        walletsRepository
+            .getWallets()
+            .flatMap { it.delete(id) }
+            .flatMap { walletsRepository.save(it) }
+            .map { id }
+            .mapLeft { WalletsProblem.from(it) }
 }
