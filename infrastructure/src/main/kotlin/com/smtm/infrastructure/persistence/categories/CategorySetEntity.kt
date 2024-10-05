@@ -31,7 +31,7 @@ internal open class CategorySetEntity(
         Categories(
             id = OwnerId.of(ownerId),
             version = DomainEntityVersion.of(version),
-            actual = categories.map { it.toDomain() }
+            categoryList = categories.map { it.toDomain() }
         )
 
     companion object {

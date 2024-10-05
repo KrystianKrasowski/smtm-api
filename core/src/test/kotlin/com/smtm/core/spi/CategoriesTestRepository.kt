@@ -16,7 +16,7 @@ class CategoriesTestRepository : CategoriesRepository {
         get() = Categories(
             id = OwnerId.of("owner-john-doe"),
             version = Version.of(0),
-            actual = categoryList
+            categoryList = categoryList
         )
 
     override fun getCategories(): Either<CategoriesProblem, Categories> {

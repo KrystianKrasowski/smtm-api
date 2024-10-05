@@ -6,21 +6,16 @@ import arrow.core.right
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.OwnerId
 import com.smtm.core.domain.Version
-import com.smtm.core.domain.Violation
-import com.smtm.core.domain.shared.extractIllegalCharactersFrom
+import com.smtm.core.domain.tags.TagValidator
 
 data class Categories(
     val id: OwnerId,
     val version: Version,
-    private val actual: List<Category>
+    private val categoryList: List<Category>
 ) : Iterable<Category> {
 
-    val size: Int =
-        actual.size
-
-    override fun iterator(): Iterator<Category> {
-        return actual.iterator()
-    }
+    override fun iterator(): Iterator<Category> =
+        categoryList.iterator()
 
     fun getById(id: EntityId): Either<CategoriesProblem, Category> =
         firstOrNull { it.id == id }
@@ -31,21 +26,13 @@ data class Categories(
         first { it.name == name }
 
     fun add(category: Category): Either<CategoriesProblem, Categories> =
-        category
-            .validate {
-                hasUniqueName()
-                hasNotEmptyName()
-                hasLegalCharacters()
-            }
+        validate(category)
             .map { upsertCategory(it) }
 
     fun replace(category: Category): Either<CategoriesProblem, Categories> =
         category
             .takeIf { hasCategoryWithId(it.id) }
-            ?.validate {
-                hasNotEmptyName()
-                hasLegalCharacters()
-            }
+            ?.let { validate(it) }
             ?.map { upsertCategory(it) }
             ?: CategoriesProblem.unknown(category.id).left()
 
@@ -56,59 +43,32 @@ data class Categories(
             ?.right()
             ?: CategoriesProblem.unknown(categoryId).left()
 
-    private fun Category.validate(block: CategoryValidator.() -> Unit): Either<CategoriesProblem, Category> =
-        CategoryValidator(this@Categories, this)
-            .apply(block)
-            .getViolations()
-            .takeIf { it.isNotEmpty() }
-            ?.let { CategoriesProblem.validationError(it) }
-            ?.left()
-            ?: this.right()
+    private fun validate(category: Category): Either<CategoriesProblem, Category> =
+        TagValidator(category, categoryList)
+            .validate {
+                hasUniqueName()
+                hasNotEmptyName()
+                hasLegalCharacters()
+            }
+            .mapLeft { CategoriesProblem.validationError(it) }
 
     private fun hasCategoryWithId(id: EntityId): Boolean =
         any { it.id == id }
 
     private fun upsertCategory(category: Category): Categories =
-        actual.toMutableList()
+        categoryList.toMutableList()
             .apply { removeIf { it.id == category.id } }
             .apply { add(category) }
-            .let { copy(actual = it.toList()) }
+            .let { copy(categoryList = it.toList()) }
 
     private fun deleteCategoryById(categoryId: EntityId): Categories =
-        actual.toMutableList()
+        categoryList.toMutableList()
             .apply { removeIf { it.id == categoryId } }
-            .let { copy(actual = it.toList()) }
+            .let { copy(categoryList = it.toList()) }
 
     companion object {
 
         fun empty(ownerId: OwnerId): Categories =
             Categories(ownerId, Version.of(0), emptyList())
     }
-}
-
-private class CategoryValidator(private val categories: Categories, private val category: Category) {
-
-    private val violations = mutableListOf<Violation>()
-
-    fun hasUniqueName(): Violation? =
-        Violation.nonUnique("name")
-            .takeIf { categories.any { it.name == category.name } }
-            ?.also { violations.add(it) }
-
-    fun hasNotEmptyName(): Violation? =
-        Violation.empty("name")
-            .takeIf { category.name.isBlank() }
-            ?.also { violations.add(it) }
-
-    fun hasLegalCharacters(): Violation? =
-        "[\\p{IsLatin}0-9 ]+"
-            .toRegex()
-            .extractIllegalCharactersFrom(category.name)
-            .takeIf { it.isNotEmpty() }
-            ?.let { Violation.illegalCharacters("name", it) }
-            ?.also { violations.add(it) }
-
-
-    fun getViolations(): Collection<Violation> =
-        violations.toSet()
 }
