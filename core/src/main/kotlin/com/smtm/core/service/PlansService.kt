@@ -4,10 +4,11 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.smtm.core.api.PlansApi
 import com.smtm.core.domain.EntityId
-import com.smtm.core.domain.categories.Categories
+import com.smtm.core.domain.categories.Category
 import com.smtm.core.domain.plans.Plan
 import com.smtm.core.domain.plans.PlanHeader
 import com.smtm.core.domain.plans.PlansProblem
+import com.smtm.core.domain.tags.Tags
 import com.smtm.core.spi.CategoriesRepository
 import com.smtm.core.spi.PlansRepository
 
@@ -32,7 +33,7 @@ internal class PlansService(
     override fun delete(id: EntityId): Either<PlansProblem, EntityId> =
         plansRepository.deleteById(id)
 
-    private fun getCategories(): Either<PlansProblem, Categories> =
+    private fun getCategories(): Either<PlansProblem, Tags<Category>> =
         categoriesRepository
             .getCategories()
             .mapLeft { PlansProblem.categoriesFetchingFailure() }

@@ -4,8 +4,9 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.smtm.core.domain.OwnerId
-import com.smtm.core.domain.categories.Categories
-import com.smtm.core.domain.categories.CategoriesProblem
+import com.smtm.core.domain.categories.Category
+import com.smtm.core.domain.tags.Tags
+import com.smtm.core.domain.tags.TagsProblem
 import com.smtm.core.spi.CategoriesRepository
 import com.smtm.infrastructure.persistence.categories.CategorySetEntity
 import com.smtm.infrastructure.persistence.categories.CategorySetsJpaRepository
@@ -22,20 +23,20 @@ open class CategoriesRepositoryJpaAdapter(
     private val repository = JpaRepositoryFactory(entityManager).getRepository(CategorySetsJpaRepository::class.java)
     private val logger = LoggerFactory.getLogger(CategoriesRepositoryJpaAdapter::class.java)
 
-    override fun getCategories(): Either<CategoriesProblem, Categories> =
+    override fun getCategories(): Either<TagsProblem, Tags<Category>> =
         repository
             .runCatching { findByOwnerId(ownerIdProvider().asString()) }
-            .map { it?.toDomain() ?: Categories.empty(ownerIdProvider()) }
+            .map { it?.toDomain() ?: Tags.empty(ownerIdProvider().asEntityId()) }
             .map { it.right() }
             .onFailure { logger.error("Failed to fetch all categories", it) }
-            .getOrElse { CategoriesProblem.failure(it).left() }
+            .getOrElse { TagsProblem.from(it).left() }
 
     @Transactional
-    override fun save(categories: Categories): Either<CategoriesProblem, Categories> =
+    override fun save(categories: Tags<Category>): Either<TagsProblem, Tags<Category>> =
         repository
             .runCatching { save(CategorySetEntity.from(categories)) }
             .map { it.toDomain() }
             .map { it.right() }
             .onFailure { logger.error("Failed to save categories", it) }
-            .getOrElse { CategoriesProblem.failure(it).left() }
+            .getOrElse { TagsProblem.from(it).left() }
 }

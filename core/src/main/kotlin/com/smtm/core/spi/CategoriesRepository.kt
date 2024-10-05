@@ -1,12 +1,13 @@
 package com.smtm.core.spi
 
 import arrow.core.Either
-import com.smtm.core.domain.categories.Categories
-import com.smtm.core.domain.categories.CategoriesProblem
+import com.smtm.core.domain.categories.Category
+import com.smtm.core.domain.tags.Tags
+import com.smtm.core.domain.tags.TagsProblem
 
 interface CategoriesRepository {
 
-    fun getCategories(): Either<CategoriesProblem, Categories>
+    fun getCategories(): Either<TagsProblem, Tags<Category>>
 
-    fun save(categories: Categories): Either<CategoriesProblem, Categories>
+    fun save(categories: Tags<Category>): Either<TagsProblem, Tags<Category>>
 }

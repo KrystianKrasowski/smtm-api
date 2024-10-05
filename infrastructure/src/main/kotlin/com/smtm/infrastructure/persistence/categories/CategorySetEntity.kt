@@ -1,7 +1,8 @@
 package com.smtm.infrastructure.persistence.categories
 
-import com.smtm.core.domain.OwnerId
-import com.smtm.core.domain.categories.Categories
+import com.smtm.core.domain.EntityId
+import com.smtm.core.domain.categories.Category
+import com.smtm.core.domain.tags.Tags
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -27,16 +28,16 @@ internal open class CategorySetEntity(
     open val categories: MutableList<CategoryEntity>
 ) {
 
-    fun toDomain(): Categories =
-        Categories(
-            id = OwnerId.of(ownerId),
+    fun toDomain(): Tags<Category> =
+        Tags(
+            id = EntityId.of(ownerId),
             version = DomainEntityVersion.of(version),
-            categoryList = categories.map { it.toDomain() }
+            tagsCollection = categories.map { it.toDomain() }
         )
 
     companion object {
 
-        fun from(categories: Categories): CategorySetEntity {
+        fun from(categories: Tags<Category>): CategorySetEntity {
             val categorySetEntity = CategorySetEntity(
                 ownerId = categories.id.asString(),
                 version = categories.version.asInt(),

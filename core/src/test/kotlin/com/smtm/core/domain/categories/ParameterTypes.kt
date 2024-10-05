@@ -1,5 +1,6 @@
 package com.smtm.core.domain.categories
 
+import arrow.core.flatMap
 import arrow.core.getOrElse
 import com.smtm.core.World
 import com.smtm.core.domain.EntityId
@@ -21,7 +22,7 @@ class ParameterTypes(private val world: World) {
     fun categoryByName(input: String): Category =
         world.categoriesRepository
             .getCategories()
-            .map { it.getByName(input) }
+            .flatMap { it.getByName(input) }
             .getOrElse { error("Cannot get category by name") }
 
     private fun Map<String, String>.extractIcon() = getValue("icon")
