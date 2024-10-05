@@ -7,7 +7,8 @@ enum class Icon {
     LIGHTENING,
     SHOPPING_CART,
     SUNGLASSES,
-    WALLET
+    WALLET,
+    BANK
     ;
 
     companion object {
