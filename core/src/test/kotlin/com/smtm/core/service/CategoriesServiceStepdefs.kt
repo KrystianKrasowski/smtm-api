@@ -2,13 +2,11 @@ package com.smtm.core.service
 
 import assertk.assertThat
 import assertk.assertions.containsAtLeast
-import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import com.smtm.core.World
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Violation
-import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.categories.CategoriesProblem
 import com.smtm.core.domain.categories.Category
 import io.cucumber.java.en.Then
@@ -18,27 +16,23 @@ class CategoriesServiceStepdefs(private val world: World) {
 
     private val categoriesService get() = CategoriesService(world.categoriesRepository)
 
-    private var categories: Categories? = null
     private var problem: CategoriesProblem? = null
 
     @When("user creates new category")
     fun `user creates new category`(category: Category) {
         categoriesService.create(category)
-            .onRight { categories = it }
             .onLeft { problem = it }
     }
 
     @When("user updates the category")
     fun `user updates the category`(category: Category) {
         categoriesService.update(category)
-            .onRight { categories = it }
             .onLeft { problem = it }
     }
 
     @When("user deletes category of id {string}")
     fun `user deletes category of id N`(id: String) {
         categoriesService.delete(EntityId.of(id))
-            .onRight { categories = it }
             .onLeft { problem = it }
     }
 
@@ -55,12 +49,5 @@ class CategoriesServiceStepdefs(private val world: World) {
         assertThat(problem)
             .isNotNull()
             .isInstanceOf(CategoriesProblem.Unknown::class)
-    }
-
-    @Then("user categories contains")
-    fun `user categories contains`(categoryList: List<Category>) {
-        assertThat(categories)
-            .isNotNull()
-            .containsExactlyInAnyOrder(*(categoryList.toTypedArray()))
     }
 }

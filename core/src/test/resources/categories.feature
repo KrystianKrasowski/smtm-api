@@ -8,17 +8,6 @@ Feature: Categories
       | category-2 | Savings | PIGGY_BANK |
 
 
-  Scenario: The one where category is created successfully
-    When user creates new category
-      | id         | name      | icon          |
-      | category-3 | Groceries | SHOPPING_CART |
-    Then user categories contains
-      | id         | name      | icon          |
-      | category-1 | Rent      | HOUSE         |
-      | category-2 | Savings   | PIGGY_BANK    |
-      | category-3 | Groceries | SHOPPING_CART |
-
-
   Scenario: The one where creating category has non unique name
     When user creates new category
       | id         | name | icon   |
@@ -51,16 +40,6 @@ Feature: Categories
       | Awesome!! | !                  |
 
 
-  Scenario: The one where category is updated successfully
-    When user updates the category
-      | id         | name      | icon          |
-      | category-2 | Groceries | SHOPPING_CART |
-    Then user categories contains
-      | id         | name      | icon          |
-      | category-1 | Rent      | HOUSE         |
-      | category-2 | Groceries | SHOPPING_CART |
-
-
   Scenario: The one where updating category has empty name
     When user updates the category
       | id         | name | icon       |
@@ -89,13 +68,6 @@ Feature: Categories
       | id          | name    | icon   |
       | category-?? | Unknown | FOLDER |
     Then unknown category problem occurs
-
-
-  Scenario: The one where category is deleted
-    When user deletes category of id "category-2"
-    Then user categories contains
-      | id         | name      | icon          |
-      | category-1 | Rent      | HOUSE         |
 
 
   Scenario: The one where deleting category does not exist

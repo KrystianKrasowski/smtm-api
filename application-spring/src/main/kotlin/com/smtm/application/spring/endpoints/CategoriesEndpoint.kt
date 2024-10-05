@@ -49,7 +49,6 @@ class CategoriesEndpoint(
     fun create(@RequestBody categoryDto: CategoryDto): ResponseEntity<CategoryResource> =
         categoriesApi
             .create(categoryDto.toDomain())
-            .map { it.getByName(categoryDto.name) }
             .map { it.toResource(linkFactory) }
             .map { ResponseEntity.created(it.getSelfURI()).body(it) }
             .getOrElse { throw CategoriesProblemException(it) }
@@ -65,7 +64,6 @@ class CategoriesEndpoint(
     ): ResponseEntity<CategoryResource> =
         categoriesApi
             .update(categoryDto.toDomain(id))
-            .map { it.getByName(categoryDto.name) }
             .map { it.toResource(linkFactory) }
             .map { ResponseEntity.ok(it) }
             .getOrElse { throw CategoriesProblemException(it) }

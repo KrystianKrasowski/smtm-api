@@ -18,6 +18,9 @@ sealed interface CategoriesProblem {
 
     companion object {
 
+        fun illegalState(message: String): CategoriesProblem =
+            failure(IllegalStateException(message))
+
         fun failure(throwable: Throwable): CategoriesProblem =
             Failure(throwable)
 

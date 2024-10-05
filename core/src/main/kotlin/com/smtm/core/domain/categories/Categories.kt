@@ -22,6 +22,11 @@ data class Categories(
         return actual.iterator()
     }
 
+    fun getById(id: EntityId): Either<CategoriesProblem, Category> =
+        firstOrNull { it.id == id }
+            ?.right()
+            ?: CategoriesProblem.illegalState("Category of id: $id does not exist").left()
+
     fun getByName(name: String): Category =
         first { it.name == name }
 
