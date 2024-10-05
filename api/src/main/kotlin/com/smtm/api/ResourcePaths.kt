@@ -6,4 +6,5 @@ object ResourcePaths {
     const val CATEGORIES = "/categories"
     const val PLAN_HEADERS = "/plan-headers"
     const val PLANS = "/plans"
+    const val WALLETS = "/wallets"
 }

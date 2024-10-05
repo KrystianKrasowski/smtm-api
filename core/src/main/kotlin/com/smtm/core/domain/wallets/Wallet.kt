@@ -1,10 +1,10 @@
-package com.smtm.core.domain.categories
+package com.smtm.core.domain.wallets
 
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Icon
 import com.smtm.core.domain.tags.Tag
 
-data class Category(
+data class Wallet(
     override val id: EntityId,
     override val name: String,
     override val icon: Icon
@@ -12,10 +12,10 @@ data class Category(
 
     companion object {
 
-        fun of(id: EntityId, name: String, icon: Icon): Category =
-            Category(id, name, icon)
+        fun of(id: EntityId, name: String, icon: Icon): Wallet =
+            Wallet(id, name, icon)
 
         fun newOf(name: String, icon: Icon) =
-            of(EntityId.generate("category"), name, icon)
+            of(EntityId.generate("wallet"), name, icon)
     }
 }

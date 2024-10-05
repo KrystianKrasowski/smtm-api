@@ -9,6 +9,9 @@ value class OwnerId(private val value: String) {
     fun asString(): String =
         value
 
+    fun asEntityId(): EntityId =
+        EntityId.of(value)
+
     companion object {
 
         fun of(id: String): OwnerId =

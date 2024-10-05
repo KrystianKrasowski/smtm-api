@@ -6,15 +6,16 @@ enum class Icon {
     PIGGY_BANK,
     LIGHTENING,
     SHOPPING_CART,
-    SUNGLASSES
+    SUNGLASSES,
+    WALLET,
+    BANK
     ;
 
     companion object {
 
-        fun valueOfOrNull(value: String) = runCatching { Icon.valueOf(value) }
-            .getOrNull()
-
         fun valueOfOrDefault(value: String, default: Icon = FOLDER): Icon =
-            valueOfOrNull(value) ?: default
+            runCatching { valueOf(value) }
+                .getOrNull()
+                ?: default
     }
 }

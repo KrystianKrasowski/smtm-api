@@ -4,26 +4,26 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.smtm.core.domain.OwnerId
-import com.smtm.core.domain.categories.Category
 import com.smtm.core.domain.tags.Tags
 import com.smtm.core.domain.tags.TagsProblem
-import com.smtm.core.spi.CategoriesRepository
-import com.smtm.infrastructure.persistence.categories.CategorySetEntity
-import com.smtm.infrastructure.persistence.categories.CategorySetsJpaRepository
+import com.smtm.core.domain.wallets.Wallet
+import com.smtm.core.spi.WalletsRepository
+import com.smtm.infrastructure.persistence.wallets.WalletSetEntity
+import com.smtm.infrastructure.persistence.wallets.WalletSetsJpaRepository
 import jakarta.persistence.EntityManager
 import org.slf4j.LoggerFactory
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.transaction.annotation.Transactional
 
-open class CategoriesRepositoryJpaAdapter(
+open class WalletsRepositoryJpaAdapter(
     entityManager: EntityManager,
     private val ownerIdProvider: () -> OwnerId,
-) : CategoriesRepository {
+) : WalletsRepository {
 
-    private val repository = JpaRepositoryFactory(entityManager).getRepository(CategorySetsJpaRepository::class.java)
-    private val logger = LoggerFactory.getLogger(CategoriesRepositoryJpaAdapter::class.java)
+    private val repository = JpaRepositoryFactory(entityManager).getRepository(WalletSetsJpaRepository::class.java)
+    private val logger = LoggerFactory.getLogger(WalletsRepositoryJpaAdapter::class.java)
 
-    override fun getCategories(): Either<TagsProblem, Tags<Category>> =
+    override fun getWallets(): Either<TagsProblem, Tags<Wallet>> =
         repository
             .runCatching { findByOwnerId(ownerIdProvider().asString()) }
             .map { it?.toDomain() ?: Tags.empty(ownerIdProvider().asEntityId()) }
@@ -32,9 +32,9 @@ open class CategoriesRepositoryJpaAdapter(
             .getOrElse { TagsProblem.from(it).left() }
 
     @Transactional
-    override fun save(categories: Tags<Category>): Either<TagsProblem, Tags<Category>> =
+    override fun save(wallets: Tags<Wallet>): Either<TagsProblem, Tags<Wallet>> =
         repository
-            .runCatching { save(CategorySetEntity.from(categories)) }
+            .runCatching { save(WalletSetEntity.from(wallets)) }
             .map { it.toDomain() }
             .map { it.right() }
             .onFailure { logger.error("Failed to save categories", it) }

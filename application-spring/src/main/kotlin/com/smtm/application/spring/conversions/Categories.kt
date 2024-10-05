@@ -7,12 +7,11 @@ import com.smtm.api.v1.CategoryDto
 import com.smtm.api.v1.CategoryResource
 import com.smtm.core.domain.EntityId
 import com.smtm.core.domain.Icon
-import com.smtm.core.domain.categories.Categories
 import com.smtm.core.domain.categories.Category
 
 internal object Categories {
 
-    fun Categories.toHalCollection(linkFactory: LinkFactory): CategoriesCollection =
+    fun Collection<Category>.toHalCollection(linkFactory: LinkFactory): CategoriesCollection =
         CategoriesCollection(
             links = mapOf(
                 "self" to linkFactory.create(ResourcePaths.CATEGORIES)

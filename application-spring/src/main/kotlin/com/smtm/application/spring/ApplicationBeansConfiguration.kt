@@ -4,9 +4,11 @@ import com.smtm.api.LinkFactory
 import com.smtm.core.api.CategoriesApi
 import com.smtm.core.api.PlansApi
 import com.smtm.core.api.PlansQueries
+import com.smtm.core.api.WalletsApi
 import com.smtm.core.domain.OwnerId
 import com.smtm.infrastructure.adapters.CategoriesRepositoryJpaAdapter
 import com.smtm.infrastructure.adapters.PlansRepositoryJpaAdapter
+import com.smtm.infrastructure.adapters.WalletsRepositoryJpaAdapter
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -47,6 +49,12 @@ class ApplicationBeansConfiguration {
     fun plansQueries(plansAdapter: PlansRepositoryJpaAdapter): PlansQueries =
         plansAdapter
 
+    @Bean
+    fun walletsApi(
+        walletsRepositoryJpaAdapter: WalletsRepositoryJpaAdapter
+    ): WalletsApi =
+        WalletsApi.create(walletsRepositoryJpaAdapter)
+
     // Adapters
     @Bean
     fun categoriesRepositoryAdapter(
@@ -57,4 +65,8 @@ class ApplicationBeansConfiguration {
     @Bean
     fun plansRepositoryJpaAdapter(ownerIdProvider: () -> OwnerId): PlansRepositoryJpaAdapter =
         PlansRepositoryJpaAdapter(entityManager, ownerIdProvider)
+
+    @Bean
+    fun walletsRepositoryJpaAdapter(ownerIdProvider: () -> OwnerId): WalletsRepositoryJpaAdapter =
+        WalletsRepositoryJpaAdapter(entityManager, ownerIdProvider)
 }

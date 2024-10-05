@@ -20,7 +20,9 @@ class RootEndpoint(private val linkFactory: LinkFactory) {
             links = mapOf(
                 "self" to linkFactory.create(ResourcePaths.ROOT),
                 "categories" to linkFactory.create(ResourcePaths.CATEGORIES),
-                "plans" to linkFactory.create(ResourcePaths.PLANS)
+                "plan-headers" to linkFactory.create(ResourcePaths.PLAN_HEADERS),
+                "plans" to linkFactory.create(ResourcePaths.PLANS),
+                "wallets" to linkFactory.create(ResourcePaths.WALLETS),
             )
         )
     }

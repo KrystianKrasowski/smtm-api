@@ -1,8 +1,8 @@
-package com.smtm.infrastructure.persistence.categories
+package com.smtm.infrastructure.persistence.wallets
 
 import com.smtm.core.domain.EntityId
-import com.smtm.core.domain.categories.Category
 import com.smtm.core.domain.tags.Tags
+import com.smtm.core.domain.wallets.Wallet
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -13,8 +13,8 @@ import jakarta.persistence.Version
 import com.smtm.core.domain.Version.Companion as DomainEntityVersion
 
 @Entity
-@Table(name = "category_sets")
-internal open class CategorySetEntity(
+@Table(name = "wallet_sets")
+internal open class WalletSetEntity(
 
     @Id
     @Column(name = "owner_id")
@@ -24,27 +24,27 @@ internal open class CategorySetEntity(
     @Column(name = "version")
     open val version: Int,
 
-    @OneToMany(mappedBy = "categorySet", cascade = [CascadeType.ALL], orphanRemoval = true)
-    open val categories: MutableList<CategoryEntity>
+    @OneToMany(mappedBy = "walletSet", cascade = [CascadeType.ALL], orphanRemoval = true)
+    open val wallets: MutableList<WalletEntity>
 ) {
 
-    fun toDomain(): Tags<Category> =
+    fun toDomain(): Tags<Wallet> =
         Tags(
             id = EntityId.of(ownerId),
             version = DomainEntityVersion.of(version),
-            tagsCollection = categories.map { it.toDomain() }
+            tagsCollection = wallets.map { it.toDomain() }
         )
 
     companion object {
 
-        fun from(categories: Tags<Category>): CategorySetEntity {
-            val categorySetEntity = CategorySetEntity(
+        fun from(categories: Tags<Wallet>): WalletSetEntity {
+            val categorySetEntity = WalletSetEntity(
                 ownerId = categories.id.asString(),
                 version = categories.version.asInt(),
-                categories = mutableListOf()
+                wallets = mutableListOf()
             )
-            val categoryEntities = categories.map { CategoryEntity.from(it, categorySetEntity) }
-            categorySetEntity.categories.addAll(categoryEntities)
+            val categoryEntities = categories.map { WalletEntity.from(it, categorySetEntity) }
+            categorySetEntity.wallets.addAll(categoryEntities)
             return categorySetEntity
         }
     }
